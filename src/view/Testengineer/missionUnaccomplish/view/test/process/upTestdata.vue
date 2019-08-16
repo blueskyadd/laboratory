@@ -107,7 +107,7 @@ export default {
             .uploadFile{
                 margin-bottom: 4.3rem;
                 display: flex;
-                align-items: baseline;
+                align-items:  flex-start;
                 .accessory{
                     margin-left: .27rem;
                     display: flex;

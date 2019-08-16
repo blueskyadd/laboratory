@@ -1,20 +1,19 @@
 <template>
-    <div class="addEquipment">
-        <header class="addEquipment_header">
-            <h3>设备负责数</h3>
+    <div class="ReWire">
+        <header class="ReWire_header">
+            <h3>设备操作指导书</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.back(-1)">申请设备</span>
+            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9rem;" @click="$router.push({name:'updataReWire'})">上传设备操作指导书</span>
             <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="设备名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="数量" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="状态"  fixed='right'   header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">正常</span></template>
-                </el-table-column>
+                <el-table-column prop="date"  label="设备操作指导书编号" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="date"  label="设备操作指导书名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="date"  label="所属设备" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="date"  label="上传时间" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
+                    <template slot-scope="scoped"><span class="underline span_upload"  @click="allocation(scoped)">编辑</span><span class="underline span_upload"  @click="allocation(scoped)">查看</span><span class="underline"  @click="allocation(scoped)">下载</span></template>
                 </el-table-column>
             </el-table>
         </div>
@@ -35,7 +34,7 @@
 <script>
 import Search from "../../../components/common/search";
 export default {
-    name: 'addEquipment',
+    name: 'ReWire',
     components:{Search},
     data(){
         return{
@@ -90,10 +89,10 @@ export default {
 }
 </script>
 <style lang="scss">
-.addEquipment{
+.ReWire{
     @import '../../../style/LabManager/management/index.scss';
     height: 100%;
-    .addEquipment_header{
+    .ReWire_header{
         padding-top: .42rem;
         padding-left: .41rem;
         height: .38rem;
@@ -148,6 +147,9 @@ export default {
                 }
             }
         }
+        .span_upload{
+            margin-right: .26rem;
+        }
     }
     footer{
         font-size: .32rem;
@@ -174,7 +176,7 @@ export default {
         li>span{
             font-size: .28rem;
             color: #333333;
-        }
+        }   
         .taskDetail{
             padding-top: .39rem;
             li{

@@ -1,26 +1,18 @@
 <template>
-    <div class="equipmentFlow body_main">
-        <header class="equipmentFlow_index_header">
+    <div class="frockFlow body_main">
+        <header class="frockFlow_index_header">
             <h3>设备流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <span class="goBack underline" @click="goHome">首页</span>
         </header>
         <div class="main">
-            <div class="titleEquipment"><span>设备名称：</span><p>老化试验箱</p></div>
             <div class="main_list">
                 <ul class="flow">
-                    <li @click="gopurchaseEquipment()"><img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt=""><span>申请设备</span></li>
+                    <li @click="goProposeFeock()"><img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt=""><span>申请工装</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @click="godocumentEquipment()"><img src="../../../assets/img/Equipmentengineer/malfunction/contract.png" alt=""><span>合同</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="gomaintenanceRecord()"><img src="../../../assets/img/Equipmentengineer/malfunction/debugging.png" alt=""><span>上传调试报告</span></li>
-                    
-                </ul>
-                <ul class="arrows">
-                    <li><img src="../../../assets/img/Equipmentengineer/malfunction/arrowsTop.png" alt=""></li>
-                    <li @click="goRecord()"><img src="../../../assets/img/Equipmentengineer/malfunction/maintain.png" alt=""><span>保养记录</span></li>
-                    <li><img src="../../../assets/img/Equipmentengineer/malfunction/arrowsBottom.png" alt=""></li>
-                    <li @click="goMaintain()"><img src="../../../assets/img/Equipmentengineer/malfunction/service.png" alt=""><span>维修记录</span></li>
+                    <li @click="goUpdatafrockReport()"><img src="../../../assets/img/Equipmentengineer/malfunction/debugging.png" alt=""><span>上传调试报告</span></li>
                 </ul>
             </div>
         </div>
@@ -28,7 +20,7 @@
 </template>
 <script>
 export default {
-    name:'equipmentFlow',
+    name:'frockFlow',
     data(){
         return{
             cause: '',
@@ -38,29 +30,23 @@ export default {
         goHome(){
             this.$router.push({name:'EquipmentengineerIndex'})
         },
-        gopurchaseEquipment(){
-            this.$router.push({name:'purchaseEquipment'})
+        goProposeFeock(){
+            this.$router.push({name:'proposeFeock'})
         },
         godocumentEquipment(){
             this.$router.push({name:'documentEquipment'})
         },
-        gomaintenanceRecord(){
-            this.$router.push({name:'maintenanceRecord'})
+        goUpdatafrockReport(){
+            this.$router.push({name:'updatafrockReport'})
         },
-        goRecord(){
-            this.$router.push({name:'record'})
-        },
-        goMaintain(){
-            this.$router.push({name:'maintain'})
-        }
     }
 }
 </script>
 <style lang="scss" scoped>
-.equipmentFlow{
+.frockFlow{
      padding-top: .42rem;
      overflow-y: scroll;
-    .equipmentFlow_index_header{
+    .frockFlow_index_header{
         padding-left: .41rem;
         height: .38rem;
         display: flex;
@@ -86,22 +72,14 @@ export default {
     }
     .main{
         padding: 0 .58rem;
-        .titleEquipment{
-            display: flex;
-            // margin-bottom: 2.58rem;
-            span{
-                font-size: .24rem;
-                color: #333333;
-            }
-            p{
-                font-size: .24rem;
-                color: #07A695
-            }
-        }
         .main_list{
+             margin-top: 2.82rem;
             display: flex;
+            // align-items: center;
+            // padding-left: 2.26rem;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding-left: 2.26rem;
             ul{
                 display: flex;
                 // width: 100%;
@@ -129,7 +107,6 @@ export default {
                         color: #07A695;
                     }
                 }
-                
                 li:hover{
                     background:#fff;
                    span{
@@ -138,7 +115,7 @@ export default {
 
                 }
             }
-            .flow li:nth-child(2),.flow li:nth-child(4),.arrows li:nth-child(1),.arrows li:nth-child(3){
+            .flow li:nth-child(2n){
                 position: inherit;
                 width: 1.18rem;
                 display: flex;
@@ -155,43 +132,52 @@ export default {
                     margin-right: -.02rem;
                 }
             }
-            .flow li:nth-child(2):hover,.flow li:nth-child(4):hover,.arrows li:nth-child(1):hover,.arrows li:nth-child(3):hover{
+            .flow li:nth-child(2n):hover{
                 background:#fff;
                 span{
                     color: #07A695;
                 }
             }
-            .flow{
-                margin-right: -1.76rem;
-                z-index: 2;
+            .flow li:last-child{
+                img{
+                    width: .93rem;
+                    height: .82rem;
+                }
+                span{
+                    font-size: .22rem;
+                    margin-bottom: .21rem;
+                }
+                div{
+                    font-size: .22rem;
+                    font-family:MicrosoftYaHei;
+                    font-weight:400;
+                    color:rgba(7,166,149,1);
+                    width: 1.38rem;
+                    height: .4rem;
+                    border: 1px solid #07A695;
+                    text-align: center;
+                    line-height: .4rem;
+                }
             }
-            .arrows{
-                // margin-left: -1.73rem;
-                width: 4.9rem;
-                flex-wrap: wrap;
-                li:nth-child(1),li:nth-child(3){
-                    width: 2.44rem;
-                    height: .94rem;
-                    img{
-                        width: 100%;
-                    }
-                    padding: 0;
-                    // margin-bottom: 2.4rem;
-                }
-                li:nth-child(1){
-                    margin-top: .95rem;
-                }
-                li:nth-child(2){
-                    margin-bottom: 1.29rem;
-                }
-                li:nth-child(3){
-                    margin-top: .65rem;
-                }
+             .flow li:nth-child(5){
+                 img{
+                     width: 1.32rem;
+                     height: .98rem;
+                     margin-top: .4rem;
+                 }
+             }
+            p{
+                font-family:MicrosoftYaHei;
+                font-weight:400;
+                color:rgba(7,166,149,1);
+                font-size: .24rem;
+                margin-left: 10.78rem;
+                padding-top: .52rem;
             }
         }
     }
 }
-.equipmentFlow::-webkit-scrollbar{
+.frockFlow::-webkit-scrollbar{
     display: none;
 }
 </style>

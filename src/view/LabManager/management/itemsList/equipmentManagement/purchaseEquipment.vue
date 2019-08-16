@@ -29,7 +29,7 @@ export default {
     },
     methods:{
         goHome(){
-            this.$router.push({name:'index'})
+            this.$router.push({name:'LabManagerIndex'})
         },
         gopurchaseEquipment(){
             this.$router.push({name:'purchaseEquipment'})

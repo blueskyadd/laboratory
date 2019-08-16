@@ -1,18 +1,15 @@
 <template>
-    <div class="addEquipment">
-        <header class="addEquipment_header">
-            <h3>设备负责数</h3>
+    <div class="frock">
+        <header class="frock_header">
+            <h3>试验工装数</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.back(-1)">申请设备</span>
+            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.push({name:'addFrock'})">新增工装</span>
             <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="设备名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="数量" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="状态"  fixed='right'   header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">正常</span></template>
-                </el-table-column>
+                <el-table-column prop="date"  label="工装编号" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="date"  label="工装名称" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
                 </el-table-column>
@@ -35,7 +32,7 @@
 <script>
 import Search from "../../../components/common/search";
 export default {
-    name: 'addEquipment',
+    name: 'frock',
     components:{Search},
     data(){
         return{
@@ -90,10 +87,10 @@ export default {
 }
 </script>
 <style lang="scss">
-.addEquipment{
+.frock{
     @import '../../../style/LabManager/management/index.scss';
     height: 100%;
-    .addEquipment_header{
+    .frock_header{
         padding-top: .42rem;
         padding-left: .41rem;
         height: .38rem;
@@ -174,7 +171,7 @@ export default {
         li>span{
             font-size: .28rem;
             color: #333333;
-        }
+        }   
         .taskDetail{
             padding-top: .39rem;
             li{

@@ -20,11 +20,7 @@
                         placeholder="选择日期">
                     </el-date-picker>
                     <span>保养截止时间：</span>
-                    <el-date-picker
-                        v-model="statusTime"
-                        type="date"
-                        placeholder="选择日期">
-                    </el-date-picker>
+                    
                 </div>
             </div>
             <footer>

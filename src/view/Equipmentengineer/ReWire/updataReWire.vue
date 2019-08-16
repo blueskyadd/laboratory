@@ -1,62 +1,90 @@
 <template>
-    <div class="applicationEquipment body_main">
-        <header class="applicationEquipment_index_header">
+    <div class="updataReWire body_main">
+        <header class="updataReWire_index_header">
             <h3>申请设备</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text first_child">
-                    <span>设备名称：</span>
-                    <p>烟雾试验箱</p>
+                    <span>选择设备编号：</span>
+                    <el-select v-model="principal"  popper-class='principal_element' placeholder="选择负责人">
+                        <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <span style="margin-left:.98rem;">选择设备编号：</span>
+                    <p>为覅ii 而无法看</p>
                 </div>
-                <div class="mian_text two_child ">
-                    <span>申请时间：</span>
-                    <p>2012.02.12</p>
+                <div class="mian_text first_child">
+                    <span>设备操作指导书名称：</span>
+                    <input type="text" placeholder="填写设备操作指导书名称">
                 </div>
-                <div class="mian_text textarea">
-                    <span>申请原因</span>
-                    <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="需求设备量大" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
-                    </div>
+                <div class="mian_text first_child">
+                    <span>设备操作指导书编码：</span>
+                    <input type="text" placeholder="填写设备操作指导书编码">
                 </div>
                 <div class="main_list updata">
-                    <span class="file_title">采购技术指导书:</span>
+                    <span class="file_title">采购技术指导书：</span>
                     <div class="file_box">
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
-                            <!-- <div><span @click="updataFileChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span></div> -->
-                            <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span>
+                            <div><span @click="updataFileChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
+                            <span class="accessory" @click="updataFileChange"><img src="../../../assets/img/commont/file/accessory.png" alt=""></span>
                             <p>{{fileName}}</p>
                         </div>
-                        <!-- <span class="underline deleteFile" @click="deleteFile()">删除</span> -->
+                        <span class="underline deleteFile" @click="deleteFile()">删除</span>
                     </div>
                 </div>
+                 
             </div>
             <footer>
-                <el-button type="primary">不同意</el-button>
-                <el-button type="primary">审批</el-button>
+                <el-button type="primary">提交</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
 export default {
-    name:'applicationEquipment',
+    name:'updataReWire',
     data(){
         return{
             cause: '',//申请原因
-            fileName: '指导书',
+            fileName: '设备操作指导书',
+            options: [{
+                value: '选项1',
+                label: '黄金糕'
+                }, {
+                value: '选项2',
+                label: '双皮奶'
+                }, {
+                value: '选项3',
+                label: '蚵仔煎'
+                }, {
+                value: '选项4',
+                label: '龙须面'
+                }, {
+                value: '选项5',
+                label: '北京烤鸭'
+                }],
+            value: ''
+        }
+    },
+    methods:{
+        updataFileChange(){
+
         }
     }
 }
 </script>
 <style lang="scss" scoped>
-.applicationEquipment{
+.updataReWire{
      padding-top: .42rem;
      overflow-y: scroll;
-    .applicationEquipment_index_header{
+    .updataReWire_index_header{
         padding-left: .41rem;
         height: .38rem;
         display: flex;
@@ -96,7 +124,18 @@ export default {
                 display: flex;
                 justify-content: flex-start;
                 align-items: flex-start;
-                height: .85rem;
+                height: .9rem;
+                input{
+                    width: 3rem;
+                    height: .48rem;
+                    font-size: .22rem;
+                    border:1px solid #cccccc;
+                    padding: 0 .15rem;
+                    font-weight: 200;
+                }
+                input::placeholder{
+                    color: #989898;
+                } 
                 span{
                     font-size: .24rem;
                     color: #333333;
@@ -137,7 +176,7 @@ export default {
             }
             .updata{
                 display: flex;
-                margin-top: .64rem;
+                margin-top: .2rem;
                 .file_title{
                     width: auto!important;
                     margin-bottom: .4rem;
@@ -194,13 +233,17 @@ export default {
                         font-size: .23rem;
                         display: block;
                     }
-                    
                 }
-                
             }
             .first_child{
                 p{
                     color:#333;
+                }
+                .updataReWireName{
+                    width: 2.6rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
             }
             .two_child{
@@ -209,7 +252,6 @@ export default {
                 }
             }
             .textarea{
-                margin-top: .05rem;
                 height: auto;
                 div{
                     margin-left: .19rem;
@@ -242,7 +284,7 @@ export default {
         }
     }
 }
-.applicationEquipment::-webkit-scrollbar{
+.updataReWire::-webkit-scrollbar{
     display: none;
 }
 </style>

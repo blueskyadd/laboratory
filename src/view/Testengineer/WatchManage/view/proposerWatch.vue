@@ -219,6 +219,7 @@ export default {
                     p{
                         font-size: .22rem;
                         color: #666666;
+                        margin-top: .6rem;
                     }
                     .deleteFile{
                         color: #f20000;

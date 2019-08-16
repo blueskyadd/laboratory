@@ -9,3 +9,21 @@
 .el-input__icon{
     display: none!important;
 }
+//下拉菜单
+.el-input__inner{
+    height: .52rem!important; 
+    width: 4rem!important;
+    font-size: .2rem!important;
+    font-weight: 200!important;
+}
+//下拉框
+.principal_element{
+    // width: 9.28rem;
+    margin-top: -.1rem;
+    .el-select-dropdown__item{
+        height: .44rem;
+        font-size: .2rem;
+        font-weight: 300;
+        line-height: .44rem;
+    }
+}

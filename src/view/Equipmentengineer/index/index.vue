@@ -1,39 +1,45 @@
 <template>
     <index-home>
         <div class="index_topHeader main_body_html EquipmentengineerIndex_index">
-            <!-- <swiper :options="swiperOption" v-if="swiperOption">
-                 <swiper-slide> -->
+            <swiper :options="swiperOption" v-if="swiperOption">
+                 <swiper-slide>
                     <div class="show_background divNumber toplist" @click="goMalfunction()">
                         <div><img src="../../../assets/img/Testengineer/index/yesOrder.png" alt=""><span>故障</span></div>
                         <div class="number"><span>09</span><span>个</span></div>
                     </div>
+                </swiper-slide>
+                <swiper-slide>
                     <div class="show_background toplist divNumber bottom_text" @click="goupkeepEqupment()">
                         <div><img src="../../../assets/img/Testengineer/index/unOrder.png" alt=""><span>保养</span></div>
                         <div class="number"><span>09</span><span>个</span></div>
                         <div><p>今日任务<i>5个</i></p></div>
                     </div>
+                </swiper-slide>
+                <swiper-slide>
                     <div class="show_background toplist divNumber" @click="goResponsible()">
                         <div><img src="../../../assets/img/Testengineer/index/talentCultivation.png" alt=""><span>设备负责数</span></div>
                         <div class="number"><span>09</span><span>个</span></div>
                     </div>
-                    <div class="show_background toplist divNumber" @click="gowatchManage()">
+                </swiper-slide>
+                <swiper-slide>
+                    <div class="show_background toplist divNumber" @click="goFrock()">
                         <div><img src="../../../assets/img/Testengineer/index/watchDay.png" alt=""><span>工装治具</span></div>
                         <div class="number"><span>09</span><span>个</span></div>
                     </div>
-                    <!-- <div class="show_background toplist divNumber" @click="goTeststandard()">
-                        <div><img src="../../../assets/img/Testengineer/index/watchDay.png" alt=""><span>实验方法</span></div>
+                </swiper-slide>
+                <swiper-slide>
+                    <div class="show_background toplist divNumber" @click="goReWire()">
+                        <div><img src="../../../assets/img/Testengineer/index/watchDay.png" alt=""><span>设备操作指导书</span></div>
                         <div class="number"><span>09</span><span>个</span></div>
                     </div>
-                    <div class="show_background toplist divNumber" @click="goTestStandard()">
-                        <div><img src="../../../assets/img/Testengineer/index/watchDay.png" alt=""><span>实验标准</span></div>
+                </swiper-slide>
+                <swiper-slide>
+                    <div class="show_background toplist divNumber" @click="goInfrastructure()">
+                        <div><img src="../../../assets/img/Testengineer/index/watchDay.png" alt=""><span>基础设施管理</span></div>
                         <div class="number"><span>09</span><span>个</span></div>
                     </div>
-                    <div class="show_background toplist divNumber" @click="goTestWarning()">
-                        <div><img src="../../../assets/img/Testengineer/index/watchDay.png" alt=""><span>报警日志</span></div>
-                        <div class="number"><span>09</span><span>个</span></div>
-                    </div> -->
-                <!-- </swiper-slide>
-            </swiper> -->
+                </swiper-slide>
+            </swiper>
         </div>  
             
     </index-home>
@@ -47,7 +53,9 @@ export default {
     data() {
       return {
           swiperOption: {
-            slidesPerView: 'auto',
+            slidesPerView: '4',
+            // spaceBetween: 22,
+            freeMode: true,
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
@@ -73,22 +81,17 @@ export default {
         goResponsible(){
             this.$router.push({name:'responsible'})            
         },
-        //信息发布
-        gowatchManage(){
-            this.$router.push({name:'watchManage'})
+        //工装治具
+        goFrock(){
+            this.$router.push({name:'frock'})
         },
-        //试验方法
-        goTeststandard(){
-            this.$router.push({name:'testMethods'})
+        //设备操作指导书
+        goReWire(){
+            this.$router.push({name:'ReWire'})
         },
-        //实验标准
-        goTestStandard(){
-            this.$router.push({name:'testStandard'})
-        },
-        //报警日志
-        goTestWarning(){
-            this.$router.push({name:'testWarning'})
-        },
+        goInfrastructure(){
+            this.$router.push({name:'Infrastructure'})
+        }
     }
 }
 </script>
@@ -100,7 +103,7 @@ export default {
         width: 100%;
     }
     .swiper-slide{
-        display: flex;
+        // display: flex;
     }
     .divNumber{
         div{justify-content: center;}
@@ -109,11 +112,11 @@ export default {
         }
     }
     .toplist{
-        width: 21.5%!important;
+        width: 3.35rem!important;
+        margin-right: .22rem;
     }
     .bottom_text{
             justify-content: center;
-            padding-right: .27rem;
             p{
                 letter-spacing: .05rem;
                 font-size:.22rem;color:#333;

@@ -31,7 +31,7 @@ export default {
     },
     methods:{
         goHome(){
-            this.$router.push({name:'index'})
+            this.$router.push({name:'TestengineerIndex'})
         },
         environmentActive(){
             this.$router.push({'name':'environmentActive'})

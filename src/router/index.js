@@ -519,5 +519,89 @@ export default new Router({
       name: 'equipmentFlow',
       component:() => import('@/view/Equipmentengineer/equipment/equipmentFlow'),
     },
+    //保养记录
+    {
+      path: '/Equipmentengineer/record',
+      name: 'record',
+      component:() => import('@/view/Equipmentengineer/equipment/record'),
+    },
+    //保养记录
+    {
+      path: '/Equipmentengineer/maintain',
+      name: 'maintain',
+      component:() => import('@/view/Equipmentengineer/equipment/maintain'),
+    },
+    //新增设备流程
+    {
+      path: '/Equipmentengineer/NewEquipmentFlow',
+      name: 'NewEquipmentFlow',
+      component:() => import('@/view/Equipmentengineer/equipment/NewEquipmentFlow'),
+    },
+    //申请设备
+    {
+      path: '/Equipmentengineer/proposerEquipment',
+      name: 'proposerEquipment',
+      component:() => import('@/view/Equipmentengineer/equipment/proposerEquipment'),
+    },
+    //上传调试报告
+    {
+      path: '/Equipmentengineer/updataReport',
+      name: 'updataReport',
+      component:() => import('@/view/Equipmentengineer/equipment/updataReport'),
+    },
+    /**@name 工装治具 */
+    {
+      path: '/Equipmentengineer/frock',
+      name: 'frock',
+      component:() => import('@/view/Equipmentengineer/frock/frock'),
+    },
+    //新增工装数
+    {
+      path: '/Equipmentengineer/addFrock',
+      name: 'addFrock',
+      component:() => import('@/view/Equipmentengineer/frock/addFrock'),
+    },
+    //工装流程
+    {
+      path: '/Equipmentengineer/frockFlow',
+      name: 'frockFlow',
+      component:() => import('@/view/Equipmentengineer/frock/frockFlow'),
+    },
+    //申请工装
+    {
+      path: '/Equipmentengineer/proposeFeock',
+      name: 'proposeFeock',
+      component:() => import('@/view/Equipmentengineer/frock/proposeFeock'),
+    },
+    //上传调试报告
+    {
+      path: '/Equipmentengineer/updatafrockReport',
+      name: 'updatafrockReport',
+      component:() => import('@/view/Equipmentengineer/frock/updatafrockReport'),
+    },
+    /**@name 设备操作指导书 */
+    {
+      path: '/Equipmentengineer/ReWire',
+      name: 'ReWire',
+      component:() => import('@/view/Equipmentengineer/ReWire/ReWire'),
+    },
+    //上传设备操作指导书
+    {
+      path: '/Equipmentengineer/updataReWire',
+      name: 'updataReWire',
+      component:() => import('@/view/Equipmentengineer/ReWire/updataReWire'),
+    },
+    /**@name基础设施管理 */
+    {
+      path: '/Equipmentengineer/Infrastructure',
+      name: 'Infrastructure',
+      component:() => import('@/view/Equipmentengineer/Infrastructure/Infrastructure'),
+    },
+    //申请保修
+    {
+      path: '/Equipmentengineer/InfrastructurePropose',
+      name: 'InfrastructurePropose',
+      component:() => import('@/view/Equipmentengineer/Infrastructure/InfrastructurePropose'),
+    },
   ]
 })

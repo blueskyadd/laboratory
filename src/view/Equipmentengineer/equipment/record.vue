@@ -1,42 +1,22 @@
 <template>
-    <div class="addEquipment">
-        <header class="addEquipment_header">
-            <h3>设备负责数</h3>
+    <div class="record_index">
+        <header class="record_index_header">
+            <h3>盐雾试验箱</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.back(-1)">申请设备</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="设备名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="数量" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="状态"  fixed='right'   header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">正常</span></template>
-                </el-table-column>
+                <el-table-column prop="date"  label="保养时间"  header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
                 </el-table-column>
             </el-table>
         </div>
-        <div class="pagination">
-            <span class="pagesize">共10页</span>
-            <el-pagination
-            @size-change="handleSizeChange" 
-            @current-change="handleCurrentChange"
-            :current-page.sync="CurrentChange"
-            :page-size="10"
-            layout="prev, pager, next"
-            :total="1000">
-            </el-pagination>
-            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
-        </div>
     </div>
 </template>
 <script>
-import Search from "../../../components/common/search";
 export default {
-    name: 'addEquipment',
-    components:{Search},
+    name: 'record',
     data(){
         return{
             tableData: [{
@@ -51,7 +31,7 @@ export default {
                 date: '2016-05-01',
                 name: '王小虎',
                 address: '上1519 弄'
-                },{
+                }, {
                 date: '2016-05-03',
                 name: '王小虎',
                 address: '上海 1516 弄'
@@ -61,7 +41,7 @@ export default {
             isUpslot:1,
             placeholderTexe:'搜索试验编号、名称',
         }
-    },
+    },              
     methods:{
          /**@name 修改表格字体颜色 */
         changecolor(data){
@@ -77,24 +57,16 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
-        },
         allocation(){
-            this.$router.push({name:'NewEquipmentFlow'})
+            this.$router.push({name:'upkeepFlow'})
         },
-        goUpdataFile(){
-            this.$router.push({name: 'updataFile'})
-        }
     }
 }
 </script>
 <style lang="scss">
-.addEquipment{
-    @import '../../../style/LabManager/management/index.scss';
-    height: 100%;
-    .addEquipment_header{
-        padding-top: .42rem;
+.record_index{
+    padding-top: .42rem;
+    .record_index_header{
         padding-left: .41rem;
         height: .38rem;
         display: flex;
@@ -112,6 +84,7 @@ export default {
         .goBack{
             margin-left: .28rem;
             font-size: .23rem;
+            margin-right: 9.88rem;
         }
     }
     .taskName{
@@ -127,7 +100,6 @@ export default {
         background:#f6f6f6;
     }
     .taskAllocation_distributed{
-        height: calc(100% - 4.5rem);
         th{
             font-size: .2rem;
             line-height: .48rem;
@@ -148,11 +120,6 @@ export default {
                 }
             }
         }
-    }
-    footer{
-        font-size: .32rem;
-        float: right;
-        margin-right: 1.66rem;
     }
     .popUp{
         .el-dialog{

@@ -1,21 +1,16 @@
 <template>
-    <div class="addEquipment">
-        <header class="addEquipment_header">
-            <h3>设备负责数</h3>
+    <div class="Infrastructure">
+        <header class="ReWire_header">
+            <h3>基础设施管理</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.back(-1)">申请设备</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.push({name:'InfrastructurePropose'})">申请报修</span>
         </header>
          <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="设备名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="数量" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="状态"  fixed='right'   header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">正常</span></template>
-                </el-table-column>
-                <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
-                </el-table-column>
+                <el-table-column  min-width="20%" prop="date"  label="设施名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  min-width="20%" prop="date"  label="实验室" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  min-width="30%" prop="date"  label="保修时间" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  prop="date"  label="故障描述" header-align='left'  align='left'> </el-table-column>
             </el-table>
         </div>
         <div class="pagination">
@@ -33,10 +28,9 @@
     </div>
 </template>
 <script>
-import Search from "../../../components/common/search";
 export default {
-    name: 'addEquipment',
-    components:{Search},
+    name: 'Infrastructure',
+    
     data(){
         return{
             tableData: [{
@@ -90,10 +84,10 @@ export default {
 }
 </script>
 <style lang="scss">
-.addEquipment{
+.Infrastructure{
     @import '../../../style/LabManager/management/index.scss';
     height: 100%;
-    .addEquipment_header{
+    .ReWire_header{
         padding-top: .42rem;
         padding-left: .41rem;
         height: .38rem;
@@ -148,6 +142,9 @@ export default {
                 }
             }
         }
+        .span_upload{
+            margin-right: .26rem;
+        }
     }
     footer{
         font-size: .32rem;
@@ -174,7 +171,7 @@ export default {
         li>span{
             font-size: .28rem;
             color: #333333;
-        }
+        }   
         .taskDetail{
             padding-top: .39rem;
             li{

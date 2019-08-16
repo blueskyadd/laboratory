@@ -30,7 +30,7 @@ export default {
     },
     methods:{
         goHome(){
-            this.$router.push({name:'index'})
+            this.$router.push({name:'EquipmentengineerIndex'})
         },
         goMalfunctionDetail(){
             this.$router.push({name:'malfunctionDetail'})

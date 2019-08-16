@@ -1,16 +1,16 @@
 <template>
-    <div class="malfunctionReport_detail body_main">
-        <header class="malfunctionReport_index_header">
-            <h3>上传维修报告</h3>
+    <div class="updatafrockReport_detail body_main">
+        <header class="updatafrockReport_index_header">
+            <h3>上传调试报告</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
         <div class="main">
             <div class="updata main_text">
-                <span class="projectupdataName">维修报告上传</span>
+                <span class="projectupdataName">调试报告上传</span>
                 <div class="file_box">
-                    <input type="file" ref="file"  @change='malfunctionReport' style="display:none" >
+                    <input type="file" ref="file"  @change='updatafrockReport' style="display:none" >
                     <div class="uploadFile">
-                        <div ><span @click="malfunctionReportChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
+                        <div ><span @click="updatafrockReportChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
                         <span class="accessory"><img src="../../../assets/img/commont/file/accessory.png" alt=""><span class="underline deleteFile" @click="deleteFile()">删除</span></span>
                         <p>{{fileName}}</p>
                     </div>
@@ -25,20 +25,19 @@
 </template>
 <script>
 export default {
-    name:'malfunctionReport',
+    name:'updatafrockReport',
     data(){
         return{
-            fileName: '维修报告',
+            fileName: '调试报告',
             file:{},
             isupload: false,
         }
     },
     methods:{
-        malfunctionReportChange(){
+        updatafrockReportChange(){
             this.$refs.file.click()
-
         },
-        malfunctionReport(e){
+        updatafrockReport(e){
             this.file =  e.target.files[0];
             this.fileName =  e.target.files[0].name;
         },
@@ -50,11 +49,11 @@ export default {
 }
 </script>
 <style lang="scss">
-.malfunctionReport_detail{
+.updatafrockReport_detail{
      padding-top: .42rem;
 @import '../../../style/Testengineer/teskName.scss';
 @import '../../../style/LabManager/updata.scss';
-    .malfunctionReport_index_header{
+    .updatafrockReport_index_header{
         padding-left: .41rem;
         height: .38rem;
         display: flex;
