@@ -1,0 +1,128 @@
+    .Search{
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        
+        ul{
+            margin-left: .55rem;
+            display: flex;
+            margin-top: .26rem;
+            margin-bottom: .33rem;
+            flex-wrap: wrap;
+            li{
+                margin-right: .94rem;
+                display: flex;
+                align-items: center;
+                .equipmentName{
+                    font-size: .24rem;
+                    margin-right: .27rem;
+                }
+                input{
+                    width: 3.60rem;
+                    font-size: .23rem;
+                    font-weight: 200;
+                    height: .48rem;
+                    border: 1px solid #999999;
+                }
+                .el-select__caret{
+                    font-size: .23rem;
+                    color:#999999;
+                }
+                .el-input__icon{
+                    line-height: .46rem;
+                    width: .46rem;
+                }
+            }
+        }
+         button{
+            font-size: .25rem;
+            padding: .1rem .32rem;
+            background: #08a795;
+            color: #fff;
+            border: 0;
+            span{
+                text-decoration: underline;
+            }
+        }
+        .editTableButton{
+            margin-top: .43rem;
+            padding-bottom: .26rem;
+            padding-right: 1.8rem;
+            height: .48rem;
+            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+            margin-left: .18rem;
+            border-bottom: 1px solid #cccccc;
+            button:first-child{
+                margin-right: .28rem;
+            }
+            button:last-child{
+                background: #fff;
+                color: #08a795;
+                margin-right: 1.79rem;
+            }
+        }
+        .addequipment{
+            margin: .22rem 1.79rem .15rem 0;
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            button{
+                margin-right: 1.79rem;
+            }
+        }
+        
+    }
+//分页
+.pagination{
+    position: absolute;
+    bottom: .88rem;
+    width: 100%;
+    display: flex;
+    right: .83rem;
+    justify-content: flex-end;
+    /* padding-right: .83rem; */
+    align-items: center;
+    .pagesize{
+        font-size: .24rem;
+        color: #666;
+    }
+    .changePage{
+        display: flex;
+        align-items: center;
+        span{
+            font-size: .25rem;
+            color: #666666;
+            font-weight: 200;
+        }
+        input{
+            width: .46rem;
+            height: 0.46rem;
+            font-size: .2rem;
+            border-radius: .05rem;
+            margin: 0 .15rem;
+            border:1px solid rgba(204,204,204,1);
+            padding: .05rem;
+        }
+    }
+}
+.el-pagination{
+    white-space: nowrap;
+    padding: 2px 5px;
+    color: #303133;
+    font-weight: 700;
+    height: .88rem;
+    align-items: center;
+    display: flex;
+} 
+.el-pager li{
+    padding: 0 .24rem;
+    color: #666666;
+    font-weight: 400;
+    font-size: .2rem;
+}
+.el-pager li:hover,.el-pager li:hover.active, .el-pager li.active{
+    color: #07A695;
+}

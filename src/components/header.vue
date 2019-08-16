@@ -6,13 +6,18 @@
             <div class="right_trake">
                 <div><img src="../assets/img/commont/header/inform.png" alt=""><span>通知</span></div>
                 <div><img src="../assets/img/commont/header/user.png" alt=""><span>张三</span></div>
-                <div><img src="../assets/img/commont/header/userOut.png" alt=""><span>退出</span></div>
+                <div @click="goOutSystem()"><img src="../assets/img/commont/header/userOut.png" alt=""><span>退出</span></div>
             </div>
         </header>
 </template>
 <script>
 export default {
-    name:'header'
+    name:'header',
+    methods:{
+        goOutSystem(){
+            this.$router.push({name:'loging'})
+        }
+    }
 }
 </script>
 <style lang="scss" scoped>

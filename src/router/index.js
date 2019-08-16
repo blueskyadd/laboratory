@@ -9,9 +9,9 @@ export default new Router({
     {
       path: '/',
       name: 'loging',
-      component:() => import('@/view/LabManager/loging/index'),
+      component:() => import('@/view/loging/index'),
     },
-    /**@name 管理员-首页 */
+    /**@name 管理员-首页-------------------------------(1)--------*/
     {
       path: '/LabManager/index',
       name: 'LabManagerIndex',
@@ -271,14 +271,14 @@ export default new Router({
       component:() => import('@/view/LabManager/informationPublish/index'),
     },
 
-    /**@name 试验工程师 */
+    /**@name 试验工程师-------------------------------------(2)-------------------------*/
     /**@name 首页 */
     {
       path: '/Testengineer/index',
       name: 'TestengineerIndex',
       component:() => import('@/view/Testengineer/index/index'),
     },
-    //任务mission
+    //完成任务mission
     {
       path: '/Testengineer/missionUnaccomplish',
       name: 'missionUnaccomplish',
@@ -302,12 +302,14 @@ export default new Router({
       path: '/Testengineer/missionDetail',
       name: 'missionDetail',
       component:() => import('@/view/Testengineer/missionUnaccomplish/view/project/missionDetail'),
-    },//
+    },
+    //实验流程
     {
       path: '/Testengineer/testProcess',
       name: 'testProcess',
       component:() => import('@/view/Testengineer/missionUnaccomplish/view/test/testProcess'),
     },
+    //试验环境搭建
     {
       path: '/Testengineer/environmentActive',
       name: 'environmentActive',
@@ -330,6 +332,192 @@ export default new Router({
           component:() => import('@/view/Testengineer/missionUnaccomplish/view/test/process/methodsManage'),
         },
       ]
+    },
+    //试验员安排
+    {
+      path: '/Testengineer/tester',
+      name: 'tester',
+      component:() => import('@/view/Testengineer/missionUnaccomplish/view/test/process/tester'),
+    },
+    //上传项目文件
+    {
+      path: '/Testengineer/upTestdata',
+      name: 'upTestdata',
+      component:() => import('@/view/Testengineer/missionUnaccomplish/view/test/process/upTestdata'),
+    },
+    /**@name 未完成任务 */
+    {
+      path: '/Testengineer/unMissionUnaccomplish',
+      name: 'unMissionUnaccomplish',
+      component:() => import('@/view/Testengineer/unMissionUnaccomplish/index'),
+      redirect: '/Testengineer/unMissionUnaccomplish/unMissionUnaccomplishTest',
+      children:[
+        {
+          path: 'unMissionUnaccomplishTest',
+          name: 'unMissionUnaccomplishTest',
+          component:() => import('@/view/Testengineer/unMissionUnaccomplish/view/test/test'),
+        },
+        {
+          path: 'unMissionUnaccomplishProject',
+          name: 'unMissionUnaccomplishProject',
+          component:() => import('@/view/Testengineer/unMissionUnaccomplish/view/project/project'),
+        },
+      ]
+    },
+    //详情页面
+    //申请保修
+    {
+      path: '/Testengineer/guarantee',
+      name: 'guarantee',
+      component:() => import('@/view/Testengineer/unMissionUnaccomplish/view/test/guarantee'),
+    },
+    //未完成任务查看
+    {
+      path: '/Testengineer/unMissionDetail',
+      name: 'unMissionDetail',
+      component:() => import('@/view/Testengineer/unMissionUnaccomplish/view/project/unMissionDetail'),
+    },
+    //项目文件上传
+    {
+      path: '/Testengineer/updataFile',
+      name: 'updataFile',
+      component:() => import('@/view/Testengineer/unMissionUnaccomplish/view/project/updataFile'),
+    },
+    /**@name 培养人员管理 */
+    {
+      path: '/Testengineer/cultivate',
+      name: 'cultivate',
+      component:() => import('@/view/Testengineer/cultivate/index'),
+    },
+    /**@name 值班管理 */
+    {
+      path: '/Testengineer/watchManage',
+      name: 'watchManage',
+      component:() => import('@/view/Testengineer/WatchManage/index')
+    },
+    {
+      path: '/Testengineer/watchManage/proposerSchedule',
+      name: 'proposerSchedule',
+      component:() => import('@/view/Testengineer/WatchManage/view/proposerSchedule'),
+    },
+    {
+      path: '/Testengineer/watchManage/proposerWatch',
+      name: 'proposerWatch',
+      component:() => import('@/view/Testengineer/WatchManage/view/proposerWatch'),
+    },
+    /**@name 实验方法 */
+    {
+      path: '/Testengineer/testMethods',
+      name: 'testMethods',
+      component:() => import('@/view/Testengineer/testMethods/index'),
+    },
+    //上传实验方法
+    {
+      path: '/Testengineer/updataFileTest',
+      name: 'updataFileTest',
+      component:() => import('@/view/Testengineer/testMethods/updataFileTest'),
+    },
+    /**@name 实验标准 */
+    {
+      path: '/Testengineer/testStandard',
+      name: 'testStandard',
+      component:() => import('@/view/Testengineer/testStandard/index'),
+    },
+    /**@name 报警日志 */
+    {
+      path: '/Testengineer/testWarning',
+      name: 'testWarning',
+      component:() => import('@/view/Testengineer/testWarning/index'),
+    },
+    //新增警报
+    {
+      path: '/Testengineer/addWarning',
+      name: 'addWarning',
+      component:() => import('@/view/Testengineer/testWarning/addWarning'),
+    },
+    /**@name 试验设备工程师------------------------(3)----------------------- */
+    {
+      path: '/Equipmentengineer/index',
+      name: 'EquipmentengineerIndex',
+      component:() => import('@/view/Equipmentengineer/index'),
+    },
+    //故障设备管理
+    {
+      path: '/Equipmentengineer/malfunction',
+      name: 'malfunction',
+      component:() => import('@/view/Equipmentengineer/malfunction/malfunction'),
+    },
+    //故障流程
+    {
+      path: '/Equipmentengineer/malfunctionFlow',
+      name: 'malfunctionFlow',
+      component:() => import('@/view/Equipmentengineer/malfunction/malfunctionFlow'),
+    },
+    //故障详情
+    {
+      path: '/Equipmentengineer/malfunctionDetail',
+      name: 'malfunctionDetail',
+      component:() => import('@/view/Equipmentengineer/malfunction/malfunctionDetail'),
+    },
+    //工具物料申请
+    {
+      path: '/Equipmentengineer/malfunctionChange',
+      name: 'malfunctionChange',
+      component:() => import('@/view/Equipmentengineer/malfunction/malfunctionChange'),
+    },
+    //上传维修报告
+    {
+      path: '/Equipmentengineer/malfunctionReport',
+      name: 'malfunctionReport',
+      component:() => import('@/view/Equipmentengineer/malfunction/malfunctionReport'),
+    },
+    /**@name保养设备数 */
+    {
+      path: '/Equipmentengineer/upkeepEqupment',
+      name: 'upkeepEqupment',
+      component:() => import('@/view/Equipmentengineer/upkeep/upkeepEqupment'),
+    },
+    //保养流程
+    {
+      path: '/Equipmentengineer/upkeepFlow',
+      name: 'upkeepFlow',
+      component:() => import('@/view/Equipmentengineer/upkeep/upkeepFlow'),
+    },
+    //申请保养
+    {
+      path: '/Equipmentengineer/upkeepProposer',
+      name: 'upkeepProposer',
+      component:() => import('@/view/Equipmentengineer/upkeep/upkeepProposer'),
+    },
+    //工具物料申请--保养
+    {
+      path: '/Equipmentengineer/upkeepChange',
+      name: 'upkeepChange',
+      component:() => import('@/view/Equipmentengineer/upkeep/upkeepChange'),
+    },
+    //保养报告
+    {
+      path: '/Equipmentengineer/upkeepUpdataFile',
+      name: 'upkeepUpdataFile',
+      component:() => import('@/view/Equipmentengineer/upkeep/upkeepUpdataFile'),
+    },
+    /**@name 设备负责数 */
+    {
+      path: '/Equipmentengineer/responsible',
+      name: 'responsible',
+      component:() => import('@/view/Equipmentengineer/equipment/responsible'),
+    },
+    //新增设备数
+    {
+      path: '/Equipmentengineer/addEquipment',
+      name: 'addEquipment',
+      component:() => import('@/view/Equipmentengineer/equipment/addEquipment'),
+    },
+    //设备流程
+    {
+      path: '/Equipmentengineer/equipmentFlow',
+      name: 'equipmentFlow',
+      component:() => import('@/view/Equipmentengineer/equipment/equipmentFlow'),
     },
   ]
 })

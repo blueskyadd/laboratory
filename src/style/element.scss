@@ -1,0 +1,11 @@
+.el-table::before{
+    display: none;
+}
+//斑马线
+.warning-row{
+    background:#f6f6f6;
+}
+//时间按钮
+.el-input__icon{
+    display: none!important;
+}
