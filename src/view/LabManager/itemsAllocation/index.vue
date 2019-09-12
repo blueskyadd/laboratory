@@ -26,12 +26,18 @@ export default {
     methods:{
         searchDetail(data){
             console.log(data)
-        }
-    }
+        },
+        
+    },
+    mounted(){
+        
+    },
+    
 }
 </script>
 <style lang="scss" scoped>
 .itemsAllocation_index{
+    
     padding-top: .42rem;
     
     .itemsAllocation_index_header{

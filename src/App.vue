@@ -1,7 +1,7 @@
 <template>
-  <div id="app">
-     <AppHeader v-if="header_show"/>
-    <router-view @headerShow="headerShow" />
+  <div id="app" >
+     <AppHeader v-if="header_show" :setHeaderTitle='setHeaderTitle'/>
+    <router-view v-if="isRouterAlive" @headerShow="headerShow" @headerTitle='headerTitle'   />
   </div>
 </template>
 
@@ -11,14 +11,32 @@ import { all } from 'q';
 export default {
   name: 'App',
   components: { AppHeader},
+  provide () {
+    return {
+      reload: this.reload,
+    }
+  },
   data(){
     return{
       header_show:true,
+      setHeaderTitle:'实验室信息化管理系统',
+      isRouterAlive: true,
+      isLoading: true
     }
   },
   methods:{
     headerShow(bool) {
       this.header_show = bool;
+    },
+    headerTitle(title){
+      this.setHeaderTitle = title
+    },
+    reload() {
+      console.log('触发')
+      this.isRouterAlive = false
+      this.$nextTick(function () {
+        this.isRouterAlive = true
+      })
     },
   }
 }

@@ -264,6 +264,18 @@ export default new Router({
       name: 'frockProcess',
       component:() => import('@/view/LabManager/management/itemsList/frockManagement/frockProcess'),
     },
+    //新增公司
+    {
+      path: '/addCompany',
+      name: 'addCompany',
+      component:() => import('@/view/LabManager/management/itemsList/personnelManagement/addCompany'),
+    },
+    //新增部门
+    {
+      path: '/newDepartment',
+      name: 'newDepartment',
+      component:() => import('@/view/LabManager/management/itemsList/personnelManagement/newDepartment'),
+    },
     /**@name 信息发布 */
     {
       path: '/informationPublish',
@@ -603,5 +615,434 @@ export default new Router({
       name: 'InfrastructurePropose',
       component:() => import('@/view/Equipmentengineer/Infrastructure/InfrastructurePropose'),
     },
+    /**@name 物料工程师-------------------------------(4)-------------------------------- */
+    {
+      path: '/materialIndex/index',
+      name: 'materialIndex',
+      component:() => import('@/view/material/index'),
+    },
+    //物料管理
+    {
+      path: '/materialIndex/materialManagementTable',
+      name: 'materialManagementTable',
+      component:() => import('@/view/material/materialManagement/materialManagement'),
+    },
+    //新增物料
+    {
+      path: '/materialIndex/addMaterial',
+      name: 'addMaterial',
+      component:() => import('@/view/material/materialManagement/addMaterial'),
+    },
+    //申请物料
+    {
+      path: '/materialIndex/ediitMaterial',
+      name: 'ediitMaterial',
+      component:() => import('@/view/material/materialManagement/ediitMaterial'),
+    },
+    //物料分配
+    {
+      path: '/materialIndex/meterialAllocation',
+      name: 'meterialAllocation',
+      component:() => import('@/view/material/meterialAllocation/meterialAllocation'),
+      redirect: '/materialIndex/meterialAllocation/materialTest',
+      children:[
+        {
+          path: 'materialTest',
+          name: 'materialTest',
+          component:() => import('@/view/material/meterialAllocation/materialTest/index'),
+        },
+        {
+          path: 'materialMaintain',
+          name: 'materialMaintain',
+          component:() => import('@/view/material/meterialAllocation/materialMaintain/index'),
+        },
+      ]
+    },
+     //分配试验物料
+    {
+      path: '/materialIndex/meterialAllocation/materialTest/allocationTest',
+      name: 'allocationTest',
+      component:() => import('@/view/material/meterialAllocation/materialTest/allocation'),
+    },
+    //分配维修物料
+    {
+      path: '/materialIndex/meterialAllocation/materialTest/allocationMaintain',
+      name: 'allocationMaintain',
+      component:() => import('@/view/material/meterialAllocation/materialMaintain/allocation'),
+    },
+    //物料归还
+    {
+      path: '/materialIndex/returnMaterial',
+      name: 'returnMaterial',
+      component:() => import('@/view/material/returnMaterial/index'),
+      redirect: '/materialIndex/returnMaterial/returnTest',
+      children:[
+        {
+          path: 'returnTest',
+          name: 'returnTest',
+          component:() => import('@/view/material/returnMaterial/returnTest/index'),
+        },
+        {
+          path: 'returnMaintain',
+          name: 'returnMaintain',
+          component:() => import('@/view/material/returnMaterial/returnMaintain/index'),
+        },
+      ]
+    },
+    //归还试验物料
+    {
+      path: '/materialIndex/returnMaterial/returnTest/allocationReturnTest',
+      name: 'allocationReturnTest',
+      component:() => import('@/view/material/returnMaterial/returnTest/allocation'),
+    },
+    //归还维修物料
+    {
+      path: '/materialIndex/returnMaterial/returnMaterial/allocationReturnMaintain',
+      name: 'allocationReturnMaintain',
+      component:() => import('@/view/material/returnMaterial/returnMaintain/allocation'),
+    },
+    //物料入库
+    {
+      path: '/materialIndex/incoming/index',
+      name: 'incoming',
+      component:() => import('@/view/material/incoming/index'),
+    },
+    //样件确认
+    {
+      path: '/materialIndex/exemplar/index',
+      name: 'exemplar',
+      component:() => import('@/view/material/exemplar/index'),
+    },
+    //样件确认详情
+    { 
+      path: '/materialIndex/exemplar/exmplarDetail',
+      name: 'exmplarDetail',
+      component:() => import('@/view/material/exemplar/exmplarDetail'),
+    },
+    /**@name 物料计量员 */
+    { 
+      path: '/gaugerIndex/index',
+      name: 'gaugerIndex',
+      component:() => import('@/view/gauger/index/index'),
+    },
+    //已过计量期设备数
+    { 
+      path: '/gaugerIndex/overdue',
+      name: 'overdue',
+      component:() => import('@/view/gauger/overdue/index'),
+    },
+    //负责计量设备数
+    { 
+      path: '/gaugerIndex/principal',
+      name: 'principal',
+      component:() => import('@/view/gauger/principal/index'),
+    },
+    //负责计量设备数详情
+    { 
+      path: '/gaugerIndex/principalDetail',
+      name: 'principalDetail',
+      component:() => import('@/view/gauger/principal/principalDetail'),
+    },
+    //计量流程
+    { 
+      path: '/gaugerIndex/measureFlow',
+      name: 'measureFlow',
+      component:() => import('@/view/gauger/principal/measureFlow'),
+    },
+    //申请计量
+    { 
+      path: '/gaugerIndex/proposer',
+      name: 'proposer',
+      component:() => import('@/view/gauger/principal/flow/proposer'),
+    },
+    //计量进度
+    { 
+      path: '/gaugerIndex/schedule',
+      name: 'schedule',
+      component:() => import('@/view/gauger/principal/flow/schedule'),
+    },
+    //计量报告
+    { 
+      path: '/gaugerIndex/measureFlowReport',
+      name: 'measureFlowReport',
+      component:() => import('@/view/gauger/principal/flow/report'),
+    },
+    //30天未计量设备数 
+    { 
+      path: '/gaugerIndex/unMeasure',
+      name: 'unMeasure',
+      component:() => import('@/view/gauger/unMeasure/index'),
+    },
+    //计量中设备进度
+    { 
+      path: '/gaugerIndex/scheduleIndex',
+      name: 'scheduleIndex',
+      component:() => import('@/view/gauger/schedule/index'),
+    },
+    /**@name 产品经理 */
+    { 
+      path: '/ProjectManager/ProjectManagerIndex',
+      name: 'ProjectManagerIndex',
+      component:() => import('@/view/ProjectManager/index/index'),
+    },
+    //实验标准
+    { 
+      path: '/ProjectManager/projectStandard',
+      name: 'projectStandard',
+      component:() => import('@/view/ProjectManager/projectStandard/index'),
+    },
+    //预约项目
+    { 
+      path: '/ProjectManager/projectAppointment',
+      name: 'projectAppointment',
+      component:() => import('@/view/ProjectManager/projectAppointment/index'),
+    },
+    //预约项目流程
+    { 
+      path: '/ProjectManager/projectFlow',
+      name: 'projectFlow',
+      component:() => import('@/view/ProjectManager/projectAppointment/projectFlow'),
+    },
+    //试验管理
+    { 
+      path: '/ProjectManager/projectManageTest',
+      name: 'projectManageTest',
+      component:() => import('@/view/ProjectManager/projectAppointment/flow/projectManage'),
+    },
+    //创建试验
+    { 
+      path: '/ProjectManager/addProjectTest',
+      name: 'addProjectTest',
+      component:() => import('@/view/ProjectManager/projectAppointment/addProjectTest'),
+    },
+    //历史项目
+    { 
+      path: '/ProjectManager/projectHistory',
+      name: 'projectHistory',
+      component:() => import('@/view/ProjectManager/projectHistory/index'),
+    },
+    //历史项目详情
+    { 
+      path: '/ProjectManager/projectHistoryDetail',
+      name: 'projectHistoryDetail',
+      component:() => import('@/view/ProjectManager/projectHistory/projectHistoryDetail'),
+    },
+    //内部预约试验列表
+    { 
+      path: '/ProjectManager/InternalAppointment',
+      name: 'InternalAppointment',
+      component:() => import('@/view/ProjectManager/projectAppointment/flow/InternalAppointment'),
+    },
+    //预约信息
+    { 
+      path: '/ProjectManager/AppointmentDetail',
+      name: 'AppointmentDetail',
+      component:() => import('@/view/ProjectManager/projectAppointment/flow/AppointmentDetail'),
+    },
+    //试验进度
+    { 
+      path: '/ProjectManager/scheduleTest',
+      name: 'scheduleTest',
+      component:() => import('@/view/ProjectManager/projectAppointment/flow/scheduleTest'),
+    },
+    //项目报告
+    { 
+      path: '/ProjectManager/projectPaper',
+      name: 'projectPaper',
+      component:() => import('@/view/ProjectManager/projectAppointment/flow/projectPaper'),
+    },
+    //创建/编辑项目
+    { 
+      path: '/ProjectManager/addProjectAppoinment',
+      name: 'addProjectAppoinment',
+      component:() => import('@/view/ProjectManager/projectAppointment/addProjectAppoinment'),
+    },
+    /**@anem消息通知 */
+    { 
+      path: '/notification',
+      name: 'notification',
+      component:() => import('@/components/notification'),
+    },
+    /**@name 实验室经理 */
+    { 
+      path: '/LaboratoryManager/LaboratoryManagerIndex',
+      name: 'LaboratoryManagerIndex',
+      component:() => import('@/view/LaboratoryManager/index/index'),
+    },
+    //负责项目
+    { 
+      path: '/LaboratoryManager/principalProject',
+      name: 'principalProject',
+      component:() => import('@/view/LaboratoryManager/principalProject/index'),
+    },
+    //我的应用--活跃人数
+    { 
+      path: '/LaboratoryManager/activeNumber',
+      name: 'activeNumber',
+      component:() => import('@/view/LaboratoryManager/myApply/activeNumber'),
+    },
+    //我的应用--设备档案
+    { 
+      path: '/LaboratoryManager/equipmentArchives',
+      name: 'equipmentArchives',
+      component:() => import('@/view/LaboratoryManager/myApply/equipmentArchives'),
+    },
+    //我的应用--设备详情--设备查看流程图
+    { 
+      path: '/LaboratoryManager/equipmentDetail',
+      name: 'equipmentDetail',
+      component:() => import('@/view/LaboratoryManager/myApply/equipmentDetail'),
+    },
+    //我的应用--设备查看流程图--设备文档
+    { 
+      path: '/LaboratoryManager/LaboratoryDocumentEquipment',
+      name: 'LaboratoryDocumentEquipment',
+      component:() => import('@/view/LaboratoryManager/myApply/flow/documentEquipment'),
+    },
+    //我的应用--设备查看流程--设备维修记录列表
+    { 
+      path: '/LaboratoryManager/LaboratoryMaintenanceRecord',
+      name: 'LaboratoryMaintenanceRecord',
+      component:() => import('@/view/LaboratoryManager/myApply/flow/maintenanceRecord'),
+    },
+    //我的应用--设备查看流程--设备维修记录流程
+    { 
+      path: '/LaboratoryManager/LaboratoryMaintenanceProcess',
+      name: 'LaboratoryMaintenanceProcess',
+      component:() => import('@/view/LaboratoryManager/myApply/flow/maintenanceProcess'),
+    },
+    //我的应用--设备查看流程--设备保养记录列表
+    { 
+      path: '/LaboratoryManager/LaboratoryUpkeepRecord',
+      name: 'LaboratoryUpkeepRecord',
+      component:() => import('@/view/LaboratoryManager/myApply/flow/upkeepRecord'),
+    },
+    //我的应用--设备查看流程--设备保养记录流程
+    { 
+      path: '/LaboratoryManager/LaboratoryUpkeepProcess',
+      name: 'LaboratoryUpkeepProcess',
+      component:() => import('@/view/LaboratoryManager/myApply/flow/upkeepProcess'),
+    },
+    //我的应用--设备查看流程--设备计量记录列表
+    { 
+      path: '/LaboratoryManager/LaboratoryMeasureRecord',
+      name: 'LaboratoryMeasureRecord',
+      component:() => import('@/view/LaboratoryManager/myApply/flow/measureRecord'),
+    },
+    //我的应用--设备查看流程--设备计量记录流程
+    { 
+      path: '/LaboratoryManager/LaboratoryMeasureProcess',
+      name: 'LaboratoryMeasureProcess',
+      component:() => import('@/view/LaboratoryManager/myApply/flow/measureProcess'),
+    },
+    //我的应用--项目总数
+    { 
+      path: '/LaboratoryManager/projectSum',
+      name: 'projectSum',
+      component:() => import('@/view/LaboratoryManager/myApply/projectSum'),
+    },
+    //测试报告 
+    { 
+      path: '/LaboratoryManager/labRrport',
+      name: 'labRrport',
+      component:() => import('@/view/LaboratoryManager/myApply/labRrport'),
+    },
+    //我的应用--报警日志
+    { 
+      path: '/LaboratoryManager/AlarmLog',
+      name: 'AlarmLog',
+      component:() => import('@/view/LaboratoryManager/myApply/AlarmLog'),
+    },
+    //我的应用--试验标准
+    { 
+      path: '/LaboratoryManager/LabTestStandard',
+      name: 'LabTestStandard',
+      component:() => import('@/view/LaboratoryManager/myApply/testStandard'),
+    },
+    //设备运行率 
+    { 
+      path: '/LaboratoryManager/operatinRatio',
+      name: 'operatinRatio',
+      component:() => import('@/view/LaboratoryManager/operatinRatio/index'),
+    },
+    //安全库存
+    { 
+      path: '/LaboratoryManager/safeStock',
+      name: 'safeStock',
+      component:() => import('@/view/LaboratoryManager/safeStock/index'),
+    },
+    /**@name产品经理 */
+    { 
+      path: '/LaboratoryManager/PMenegeIndex',
+      name: 'PMenegeIndex',
+      component:() => import('@/view/PMenege/index/index'),
+    },
+    //我的应用--审批
+    { 
+      path: '/LaboratoryManager/examine',
+      name: 'examine',
+      component:() => import('@/view/PMenege/examine/index'),
+    },
+    //我的应用--审批详情
+    { 
+      path: '/LaboratoryManager/examineDeatil',
+      name: 'examineDeatil',
+      component:() => import('@/view/PMenege/examine/examineDeatil'),
+    },
+    //我的应用--试验信息
+    { 
+      path: '/LaboratoryManager/testInfo',
+      name: 'testInfo',
+      component:() => import('@/view/PMenege/testInfo/index'),
+    },
+    //我的应用--试验详情
+    { 
+      path: '/LaboratoryManager/testInfoDetail',
+      name: 'testInfoDetail',
+      component:() => import('@/view/PMenege/testInfo/testInfoDetail'),
+    },
+    //我的应用--支出费用
+    { 
+      path: '/LaboratoryManager/incurExpense',
+      name: 'incurExpense',
+      component:() => import('@/view/PMenege/incurExpense/index'),
+    },
+    //我的应用--项目费用
+    { 
+      path: '/LaboratoryManager/incurExpenseDetail',
+      name: 'incurExpenseDetail',
+      component:() => import('@/view/PMenege/incurExpense/incurExpenseDetail'),
+    },
+    //我的应用--试验费用
+    { 
+      path: '/LaboratoryManager/incurTest',
+      name: 'incurTest',
+      component:() => import('@/view/PMenege/incurExpense/incurTest'),
+    },
+    //我的应用--试验费用
+    { 
+      path: '/LaboratoryManager/projectInccur',
+      name: 'projectInccur',
+      component:() => import('@/view/PMenege/incurExpense/projectInccur'),
+    },
+    //右侧时间图表--详情页
+    { 
+      path: '/LaboratoryManager/listInfoDetail',
+      name: 'listInfoDetail',
+      component:() => import('@/view/PMenege/index/listInfoDetail'),
+    },
+    //产品经理---日历
+    { 
+      path: '/LaboratoryManager/calendar',
+      name: 'calendar',
+      component:() => import('@/view/PMenege/index/calendar'),
+    },
+    //负责项目
+    { 
+      path: '/LaboratoryManager/LaboratoryPrincipalProject',
+      name: 'LaboratoryPrincipalProject',
+      component:() => import('@/view/PMenege/index/principalProject'),
+    },
   ]
 })
+

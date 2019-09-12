@@ -1,19 +1,39 @@
 <template>
-    <div class="lookEquipment body_main">
+    <div class="lookEquipment body_main" v-loading.fullscreen.lock="isLoading">
         <header class="lookEquipment_index_header">
             <h3>设备查看</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <span class="goBack underline" @click="goHome">首页</span>
         </header>
         <div class="main">
-            <div class="titleEquipment"><span>设备名称：</span><p>老化试验箱</p></div>
+            <div class="titleEquipment"><span>设备名称：</span><p>{{equipmentName}}</p></div>
             <div class="main_list">
                 <ul>
-                    <li @click="gopurchaseEquipment()"><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>设备采购</span></li>
-                    <li @click="godocumentEquipment()"><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>设备文档</span></li>
-                    <li @click="gomaintenanceRecord()"><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>维修记录</span></li>
-                    <li @click="goupkeepRecord()"><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>保养记录</span></li>
-                    <li @click="gomeasureRecord()"><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>计量记录</span></li>
+                    <li @click="gopurchaseEquipment()" @mouseover="isImgFlowpurchase = true" @mouseout="isImgFlowpurchase = false" :style="{background:isImgFlowpurchase? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/purchase_tag.png" alt="" v-if="!isImgFlowpurchase">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/purchase_tag_actively.png" alt="" v-else>
+                        <span  :style="{color:isImgFlowpurchase? '#fff':'#07A695'}">设备采购</span>
+                    </li>
+                    <li @click="godocumentEquipment()"  @mouseover="isImgFlowequipmentText = true" @mouseout="isImgFlowequipmentText = false" :style="{background:isImgFlowequipmentText? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/equipmentText.png" alt="" v-if="!isImgFlowequipmentText">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/equipmentText_actively.png" alt="" v-else>
+                        <span :style="{color:isImgFlowequipmentText? '#fff':'#07A695'}">设备文档</span>
+                    </li>
+                    <li @click="gomaintenanceRecord()"  @mouseover="isImgFlowmaintenance = true" @mouseout="isImgFlowmaintenance = false" :style="{background:isImgFlowmaintenance? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/maintenance.png" alt="" v-if="!isImgFlowmaintenance">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/maintenance_actively.png" alt="" v-else>
+                        <span :style="{color:isImgFlowmaintenance? '#fff':'#07A695'}">维修记录</span>
+                    </li>
+                    <li @click="goupkeepRecord()" @mouseover="isImgFlowmaintenanceInfo = true" @mouseout="isImgFlowmaintenanceInfo = false" :style="{background:isImgFlowmaintenanceInfo? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/maintenanceInfo.png" alt="" v-if="!isImgFlowmaintenanceInfo">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/maintenanceInfo_actively.png" alt="" v-else>
+                        <span :style="{color:isImgFlowmaintenanceInfo? '#fff':'#07A695'}">保养记录</span>
+                    </li>
+                    <li @click="gomeasureRecord()" @mouseover="isImgFlowmeasure = true" @mouseout="isImgFlowmeasure = false" :style="{background:isImgFlowmeasure? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/measure.png" alt="" v-if="!isImgFlowmeasure">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/flow/measure_actively.png" alt="" v-else>
+                        <span :style="{color:isImgFlowmeasure? '#fff':'#07A695'}">计量记录</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -25,6 +45,15 @@ export default {
     data(){
         return{
             cause: '',
+            equipmentName:'',
+            isImgFlowpurchase: false,
+            isImgFlowequipmentText: false,
+            isImgFlowmaintenance:false,
+            isImgFlowmaintenanceInfo: false,
+            isImgFlowmeasure: false,
+            isLoading: true,
+            EquipmentpurchaseID:'',
+            equipmentNum:'',
         }
     },
     methods:{
@@ -32,20 +61,33 @@ export default {
             this.$router.push({name:'LabManagerIndex'})
         },
         gopurchaseEquipment(){
-            this.$router.push({name:'purchaseEquipment'})
+            this.$router.push({path:'/purchaseEquipment',query:{EquipmentpurchaseID: this.EquipmentpurchaseID}})
         },
         godocumentEquipment(){
             this.$router.push({name:'documentEquipment'})
         },
         gomaintenanceRecord(){
-            this.$router.push({name:'maintenanceRecord'})
+             this.$router.push({path:'/maintenanceRecord',query:{EquipmentpurchaseID: this.EquipmentpurchaseID,equipmentNum:this.equipmentNum,equipmentName: this.equipmentName}})
         },
         goupkeepRecord(){
-            this.$router.push({name:'upkeepRecord'})
+            this.$router.push({path:'/upkeepRecord',query:{EquipmentpurchaseID: this.EquipmentpurchaseID,equipmentNum:this.equipmentNum,equipmentName: this.equipmentName}})
         },
         gomeasureRecord(){
-            this.$router.push({name:'measureRecord'})
+            this.$router.push({path:'/measureRecord',query:{EquipmentpurchaseID: this.EquipmentpurchaseID,equipmentNum:this.equipmentNum,equipmentName: this.equipmentName}})
+        },
+        getEquipmentFlow(){
+            this.$http.get(this.$conf.env.getEquipmentFlow + this.$route.query.equipmentID + '/').then( res =>{
+                this.equipmentName = res.data.name;
+                this.EquipmentpurchaseID = res.data.apply_for;
+                this.equipmentNum = res.data.num;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+            })
         }
+    },
+    mounted(){
+        this.getEquipmentFlow()
     }
 }
 </script>

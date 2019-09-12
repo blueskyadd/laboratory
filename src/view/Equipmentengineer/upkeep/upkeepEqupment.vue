@@ -6,16 +6,16 @@
             <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
                 <el-table-column prop="date"  label="设备编号"  header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="设备名称" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="实验室" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="保养创建时间" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="预计完成时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="状态"  fixed='right'   header-align='center' align='center'>
+                <el-table-column prop="name" label="状态"      header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">进行</span></template>
                 </el-table-column>
-                <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
+                <el-table-column prop="address"   label="操作" header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
                 </el-table-column>
             </el-table>
@@ -87,6 +87,14 @@ export default {
         },
         goUpdataFile(){
             this.$router.push({name: 'updataFile'})
+        },
+        /**@name 分页 */
+        handleSizeChange(val) {
+            console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            this.CurrentChange =  val;
+            console.log(`当前页: ${val}`);
         }
     }
 }

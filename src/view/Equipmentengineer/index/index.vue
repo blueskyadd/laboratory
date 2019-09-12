@@ -63,7 +63,11 @@ export default {
         },
       }
     },  
-    mounted() {
+    mounted(){
+        this.$emit('headerTitle','实验室信息化管理系统-试验设备工程师')
+    },
+    destroyed(){
+        this.$emit('headerTitle','实验室信息化管理系统')
     },
     computed:{
     },

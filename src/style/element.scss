@@ -27,3 +27,29 @@
         line-height: .44rem;
     }
 }
+.el-button--primary:hover{
+    border-color: none!important;
+
+}
+.el-button--primary{
+    border: 0!important;
+}
+//弹框字体
+.el-message--warning,.el-message--success,.el-message--error{
+    font-size: .3rem;
+}
+//无数据是样式
+.el-table__empty-text{
+    font-size: .25rem;
+}
+.el-button--primary:hover,.el-button--primary:focus{
+    background: #08a795!important;
+}
+//鼠标滑过
+.el-table--enable-row-hover .el-table__body tr:hover>td{
+    background-color: #eee !important;
+}
+//表格高度
+.el-table--scrollable-y .el-table__body-wrapper{
+    // height:auto!important;
+}

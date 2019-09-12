@@ -1,7 +1,7 @@
 <template>
     <div class="itemsAllocation_unallocayion">
-        <el-table :data="tableData"  :cell-style="changecolor" :row-class-name="tabRowClassName" width="100%" style="width: 100%">
-            <el-table-column prop="date"  label="项目编号"  header-align='center' align='center'> </el-table-column>
+        <el-table :data="tableData"  :cell-style="changecolor" height="calc(100%  - 1.5rem)" :row-class-name="tabRowClassName" width="100%" style="width: 100%" v-loading="isLoading">
+            <el-table-column prop="number"  label="项目编号"  header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="项目名称" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="date" label-class-name='principal'  label="负责人" header-align='left' align='left'>
                 <template slot-scope="scoped">
@@ -24,6 +24,18 @@
                 <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">分配</span> </template>
             </el-table-column>
         </el-table>
+        <div class="pagination">
+            <span class="pagesize">共10页</span>
+            <el-pagination
+            @size-change="handleSizeChange" 
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="2"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
     </div>
 </template>
 <script>
@@ -32,63 +44,10 @@ export default {
     data() {
       return {
         principal:'',
-        tableData: [{
-            date: 'MC44F9DE03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄',
-            options:[
-                {
-                    name:'张三',
-                    id:'1'
-                },
-                {
-                    name:'张三',
-                    id:'2'
-                }
-            ]
-            }, {
-            date: 'MC44FJDE03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1517 弄',
-            options:[
-                {
-                    name:'张三',
-                    id:'1'
-                },
-                {
-                    name:'张三',
-                    id:'2'
-                }
-            ]
-            }, {
-            date: 'MC44F9DE03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1519 弄',
-            options:[
-                {
-                    name:'张三',
-                    id:'1'
-                },
-                {
-                    name:'张三',
-                    id:'2'
-                }
-            ]
-            }, {
-            date: 'MC44F9DE03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1516 弄',
-            options:[
-                {
-                    name:'张三',
-                    id:'1'
-                },
-                {
-                    name:'张三',
-                    id:'2'
-                }
-            ]
-            }]
+        tableData: [],
+        totalSum:0,
+        currentPage: 1,
+        isLoading: true,
       }
     },
     methods:{
@@ -117,12 +76,40 @@ export default {
         },
         allocation(data){
 
+        },
+        /**@name 分页 */
+        handleSizeChange(val) {
+            
+            console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getItemsAllocation(pageNumber);
+            console.log(`当前页: ${pageNumber}`);
+        },
+        getItemsAllocation(pageNumber){
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getItemsAllocation + '?status=4' : this.$conf.env.getItemsAllocation + '?status=4&p=' + pageNumber ).then( res =>{
+                this.isLoading = false;
+                this.tableData = res.data.results;
+                this.totalSum = res.data.count
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '500'){
+                    this.$message({message: '服务器错误',type: 'error'});
+                }
+            })
         }
+    },
+    mounted(){
+        this.getItemsAllocation(1);
     }
 }
 </script>
 <style lang="scss">
 .itemsAllocation_unallocayion{
+    @import '../../../../style/LabManager/management/index.scss';
     table{
         th{
             font-size: .2rem;

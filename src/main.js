@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './store/index.js'
 
 Vue.config.productionTip = false
 
@@ -16,7 +17,21 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 
-//字体
+//echarts
+import echarts from 'echarts'
+Vue.prototype.$echarts = echarts
+
+/**@name接口请求 */
+import conf from "./config/index.js";
+import http from "./track/http.js";
+
+Vue.prototype.$http = http
+Vue.prototype.$conf = conf
+Vue.config.productionTip = false
+
+//文件上传
+import updataFile from './components/updataFile';
+Vue.prototype.$updataFile  = updataFile;
 
 
 //swiper
@@ -25,6 +40,7 @@ import 'swiper/dist/css/swiper.css';
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

@@ -36,7 +36,7 @@
             </div>
             <footer>
                 <el-button type="primary">不同意</el-button>
-                <el-button type="primary">审批</el-button>
+                <el-button type="primary">审批</el-button> 
             </footer>
         </div>
     </div>

@@ -1,18 +1,23 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import Index from './modules/index';
+import Vue from 'vue'
+import Vuex from 'vuex'
+import userLogin from './modules/userLogin'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
-export default new Vuex.store({
-    state,
-    modules:{
-        Index,
-    },
-    mutations:{
+export default new Vuex.Store({
+  state:{
 
-    },
-    actions:{
-  
-    }
+  },
+  modules:{
+    userLogin,
+  },
+  mutations:{
+
+  },
+  actions:{
+
+  }
+
+
 })
+

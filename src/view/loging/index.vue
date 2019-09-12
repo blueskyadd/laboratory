@@ -33,21 +33,69 @@ export default {
     },
     methods:{
         logingSystem(){
-            console.log('username')
-            switch(this.userName){
-                case '1':
-                this.$router.push({name:'LabManagerIndex'});//管理员
-                break;
-                case '2':
-                this.$router.push({name: 'TestengineerIndex'});//试验工程师
-                break;
-                case '3':
-                this.$router.push({name: 'EquipmentengineerIndex'});//试验设备工程师
-                break;
+            if(!this.VerificationData()) return;
+            let params ={
+                "username": this.userName,//手机号
+                "password": this.passWord,//密码
             }
-        }
+            this.$http.post(this.$conf.env.uesrRegister,params).then(res =>{
+                    console.log(res)
+                if(res.status == '201'){
+                    sessionStorage.setItem('jp_token',res.data.token);//存入token值
+                    localStorage.setItem('userName',res.data.name);//存放用户名
+                    switch(res.data.role){
+                        case 1:
+                        this.$router.replace({name:'LabManagerIndex'});//管理员
+                        break;
+                        case 2:
+                        this.$router.replace({name: 'PMenegeIndex'});//产品经理
+                        break;
+                        case 3:
+                        this.$router.replace({name:'LaboratoryManagerIndex'});//实验室经理
+                        break;
+                        case 4:
+                        this.$router.replace({name:'ProjectManagerIndex'});//项目经理
+                        break;
+                        case 5:
+                        this.$router.replace({name: 'TestengineerIndex'});//试验工程师
+                        break;
+                        case 6:
+                        this.$router.replace({name: 'gaugerIndex'});//实验设备计量员工
+                        break;
+                        case 7:
+                        this.$router.replace({name: 'EquipmentengineerIndex'});//试验设备工程师
+                        break;
+                        case 8:
+                        this.$router.replace({name: 'materialIndex'});//物料管理员
+                        break;
+                    }
+                }
+            }).catch(err =>{
+                if(err.response.status == '401'){
+                    this.$message({message: err.response.data.message,type: 'error'});
+                }else if(err.response.state == '500'){
+                    this.$message({message: '服务器错误',type: 'error'});
+                }else{
+                    this.$message({message: '登陆失败，请稍候',type: 'error'});
+                }
+            })
+        },
+        VerificationData(){
+            if(!this.userName && this.passWord){
+                this.$message({message: '请输入您的用户名',type: 'warning'});
+                return false;
+            }else if(this.userName && !this.passWord){
+                this.$message({message: '请输入您的密码',type: 'warning'});
+                return false;
+            }else if(!this.userName && !this.passWord){
+                this.$message({message: '请输入您的用户名和密码',type: 'warning'});
+            }else{
+                return true;
+            }
+        },
     },
     mounted(){
+        this.$message.closeAll()
         this.$emit('headerShow',false)
     },
     destroyed(){

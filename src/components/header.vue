@@ -1,11 +1,11 @@
 <template>
         <header>
             <div class="left_title">
-                <p>实验室信息化管理系统</p>
+                <p>{{setHeaderTitle}}</p>
             </div>
             <div class="right_trake">
-                <div><img src="../assets/img/commont/header/inform.png" alt=""><span>通知</span></div>
-                <div><img src="../assets/img/commont/header/user.png" alt=""><span>张三</span></div>
+                <div @click="goNotification()"><img src="../assets/img/commont/header/inform.png" alt=""><span>通知</span></div>
+                <div><img src="../assets/img/commont/header/user.png" alt=""><span>{{userName}}</span></div>
                 <div @click="goOutSystem()"><img src="../assets/img/commont/header/userOut.png" alt=""><span>退出</span></div>
             </div>
         </header>
@@ -13,10 +13,23 @@
 <script>
 export default {
     name:'header',
+    props:{
+        setHeaderTitle:String
+    },
+    data(){
+        return{
+            userName: localStorage.getItem('userName'),
+        }
+    },
     methods:{
         goOutSystem(){
-            this.$router.push({name:'loging'})
+            this.$router.replace({name:'loging'})
+        },
+        goNotification(){
+            this.$router.push({name:'notification'})
         }
+    },
+    mounted(){
     }
 }
 </script>
@@ -53,6 +66,12 @@ header{
                 font-size: .22rem;
                 font-weight:400;
                 color:#333333;
+                font-size: .22rem;
+                max-width: .9rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: block;
             }
         }
     }

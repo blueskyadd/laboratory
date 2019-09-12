@@ -1,6 +1,6 @@
 <template>
-    <div class="management_historyManagement">
-        <div class="Search">
+    <div class="management_historyManagement scrollTableScrollNoTop">
+        <!-- <div class="Search">
             <ul>
                 <li style="margin-bottom:.24rem">
                     <span class="equipmentName">项目类型</span>
@@ -51,30 +51,29 @@
                 <el-button type="primary">搜索</el-button>
                 <el-button type="primary">重置</el-button>
             </div>
-        </div>
-        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
+        </div> -->
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table-column prop="number"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="项目名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目类型" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目创建时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目完成时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目结果" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="project_type"  label="项目类型" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="create_time"  label="项目创建时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="report_time"  label="项目完成时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="status"  label="项目结果" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="项目介绍" header-align='center' align='center'> 
                 <template slot-scope="scoped"><span class="underline lookmanagement"  @click="historyEditDeteil(scoped)">详情</span></template>
             </el-table-column>
             <el-table-column prop="address"  label="操作" header-align='center' align='center'>
-                 <template slot-scope="scoped"><span class="underline lookmanagement"  @click="allocation(scoped)">查看</span></template>
+                 <template slot-scope="scoped"><span class="underline lookmanagement" style="margin-right:0!important"  @click="allocation(scoped)">查看</span></template>
             </el-table-column>
         </el-table>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -86,57 +85,15 @@ export default {
     name:'historyManagement',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        },{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+        tableData: [],
+        options: [],
         value: '',
-        CurrentChange: 0,
+        isLoading: true,
+        totalSum:1,
+        CurrentChange:1,
+        page_size: 9,
+        isSearch: false,//是否为搜索
+        searchText:'',//搜索文字
       }
     },
     methods:{
@@ -150,6 +107,12 @@ export default {
         changecolor(data){
             if (data.columnIndex == 0) {
                 return "color:#07a695";
+            }else if(data.columnIndex == 5){
+                if(data.row.status == '关闭'){
+                    return "color:#f30000";
+                }else{
+                    return "color:#444444";
+                }
             }else{
                 return "color:#444444";
             }
@@ -162,28 +125,72 @@ export default {
         allocation(data){
             this.$router.push({name: 'histoyDetail' })
         },
-
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch ?this.getmaintenanceRecordList(pageNumber):this.historySearch(this.searchText,pageNumber);
+            
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        /**@name搜索 */
+        historySearch(data,pageNumber){
+            this.isLoading = true;
+             this.searchText = data;
+             this.isSearch = true;
+             this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?search=' + data + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '500'){
+                    this.$message({message: '服务器错误',type: 'error'});
+                }
+            })
+        },
+        /**@name数据加载 */
+        gethistoryProjectList(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '500'){
+                    this.$message({message: '服务器错误',type: 'error'});
+                }
+            })
         }
+    },
+    mounted(){
+        this.gethistoryProjectList(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch ?this.getmaintenanceRecordList(this.CurrentChange):this.historySearch(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>
 <style lang="scss">
-@import '../../../../../style/LabManager/management/index.scss';
+
 .management_historyManagement{
-    position: relative;
-    height: 100%;
+    // position: relative;
+    // height: 100%;
+@import '../../../../../style/LabManager/management/index.scss';
+     margin-top: .53rem;
     .Search ul{
         margin-bottom: 0;
     }
     .editTableButton{
-        margin-top: 0;
+       
     }
      th{
             font-size: .2rem;

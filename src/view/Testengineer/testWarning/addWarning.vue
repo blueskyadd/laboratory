@@ -128,7 +128,6 @@ export default {
             font-size: .2rem;
             font-weight: 200;
         }
-            // }
         .measure_main{
             width: 100%;
             display: flex;
@@ -142,6 +141,7 @@ export default {
                 span{
                     font-size: .24rem;
                     color: #333333;
+                    width: 1.2rem;
                 }
                 p{
                     font-size: .24rem;

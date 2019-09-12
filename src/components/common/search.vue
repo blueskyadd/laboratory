@@ -1,6 +1,6 @@
 <template>
     <div class="header_search">
-        <input type="text" v-model="search_value" :placeholder="placeholderTexe">
+        <input type="text" v-model="search_value" @keyup.enter="searchDetail" :placeholder="placeholderTexe">
         <span @click="searchDetail">
             <img src="../../assets/img/commont/search/search.png" alt="">
         </span>
@@ -21,6 +21,11 @@ export default {
         searchDetail(){
             this.$emit('searchDetail', this.search_value)
         }
+    },
+    watch:{
+        $route(to,from){
+            this.search_value = ''
+        }
     }
 }
 </script>
@@ -39,6 +44,7 @@ export default {
         border-right: 0;
         padding: 0.05rem .24rem 0;
         font-size: .23rem;
+        border-radius: 0;
     }
     input::-webkit-input-placeholder{
         color: #cccccc;

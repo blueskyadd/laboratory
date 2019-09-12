@@ -33,12 +33,12 @@
                 <el-button type="primary">重置</el-button>
             </div>
         </div>
-        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
             <el-table-column prop="date"  label="工装编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="工装名称" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="负责人" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="工装状态" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address" fixed='right' label="下载" header-align='center' align='center'>
+            <el-table-column prop="address"   label="下载" header-align='center' align='center'>
                  <template slot-scope="scoped"><span class="underline deletemanagement"  @click="allocation(scoped)">￥10</span></template>
             </el-table-column>
         </el-table>

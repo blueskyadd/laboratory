@@ -9,12 +9,12 @@
             </div>
         </header>
         <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"   style="width: 100%"  :row-class-name="tabRowClassName">
                 <el-table-column prop="date"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="试验方法名称" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="上传单位" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="上传时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="address" fixed='right' label="试验结果" header-align='center' align='center'>
+                <el-table-column prop="address"   label="试验结果" header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline lookmanagement"  @click="allocation(scoped)">编辑</span><span class="underline"  @click="allocation(scoped)">查看</span> </template>
                 </el-table-column>
             </el-table>

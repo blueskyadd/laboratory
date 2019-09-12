@@ -1,10 +1,10 @@
 <template>
     <div class="Taskreview_infrastructure">
-        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
             <el-table-column prop="date"  label="设施编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="实验室" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="保修时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address" fixed='right' label="详情" header-align='center' align='center'>
+            <el-table-column prop="address"   label="详情" header-align='center' align='center'>
                 <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
             </el-table-column>
         </el-table>

@@ -6,7 +6,7 @@
             <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.push({name:'InfrastructurePropose'})">申请报修</span>
         </header>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
                 <el-table-column  min-width="20%" prop="date"  label="设施名称" header-align='center'  align='center'> </el-table-column>
                 <el-table-column  min-width="20%" prop="date"  label="实验室" header-align='center'  align='center'> </el-table-column>
                 <el-table-column  min-width="30%" prop="date"  label="保修时间" header-align='center'  align='center'> </el-table-column>
@@ -79,6 +79,14 @@ export default {
         },
         goUpdataFile(){
             this.$router.push({name: 'updataFile'})
+        },
+        /**@name 分页 */
+        handleSizeChange(val) {
+            console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            this.CurrentChange =  val;
+            console.log(`当前页: ${val}`);
         }
     }
 }

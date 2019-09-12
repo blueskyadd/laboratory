@@ -10,14 +10,14 @@
             <p>控福智能-硬件部</p>
         </div>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - 1.5rem)" style="width: 100%"  :row-class-name="tabRowClassName">
                 <el-table-column prop="date"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="试验名称" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="负责人" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="试验数据"  fixed='right'   header-align='center' align='center'>
+                <el-table-column prop="name" label="试验数据"      header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">详情</span></template>
                 </el-table-column>
-                <el-table-column prop="address" fixed='right' label="试验结果" header-align='center' align='center'>
+                <el-table-column prop="address"   label="试验结果" header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">分配</span> </template>
                 </el-table-column>
             </el-table>

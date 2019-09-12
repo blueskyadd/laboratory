@@ -1,5 +1,5 @@
 <template>
-    <div class="frockProcess body_main">
+    <div class="frockProcess body_main" v-loading.fullscreen.lock="isLoading">
         <header class="frockProcess_index_header">
             <h3>工装流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,29 +8,62 @@
         <div class="main">
             <div class="main_list">
                 <ul>
-                    <li><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>申请工装</span></li>
-                    <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>合同</span></li>
-                    <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>上传调试报告</span></li>
+                    <li @mouseover="islookReport = true" @mouseout="islookReport = false" :style="{background:islookReport? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport.png" alt="" v-if="!islookReport">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport_actively.png" alt="" v-else>
+                        <span :style="{color:islookReport? '#fff':'#07A695'}">申请工装</span>
+                    </li>
+                    <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt="" ></li>
+                    <li @mouseover="iscontract= true" @mouseout="iscontract = false" :style="{background:iscontract? '#07A695':'#fff'}">
+                        <a :href="contractUrl" download="w3logo">
+                            <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="!iscontract">
+                            <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
+                            <span :style="{color:iscontract?'#fff':'#07A695'}">合同</span>
+                        </a>
+                    </li>
+                    <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt="" ></li>
+                    <li @mouseover="isUplaod= true" @mouseout="isUplaod = false" :style="{background:isUplaod? '#07A695':'#fff'}">
+                        <a :href="reportUrl" download="w3logo">
+                            <img src="../../../../../assets/img/LabManager/management/equipment/frockProcess/updataFile.png" alt="" v-if="!isUplaod">
+                            <img src="../../../../../assets/img/LabManager/management/equipment/frockProcess/updataFile_actively.png" alt="" v-else>
+                            <span :style="{color:isUplaod?'#fff':'#07A695'}">上传调试报告</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 </template>
 <script>
+import { get } from 'http';
 export default { 
     name:'frockProcess',
     data(){
         return{
-            cause: '',
+            isLoading: true,
+            islookReport:false,
+            iscontract: false,
+            isUplaod:false,
+            contractUrl: '',
+            reportUrl: '',
         }
     },
     methods:{
         goHome(){
             this.$router.push({name:'LabManagerIndex'})
         },
-        
+        getFrockApplyDetailInfo(){
+            this.$http.get(this.$conf.env.getFrockApplyDetailInfo + this.$route.query.frockID ).then( res =>{
+                this.contractUrl = res.data.contract?res.data.contract:'';
+                this.reportUrl = res.data.report?res.data.report:'';
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+            })
+        }
+    },
+    mounted(){
+        this.getFrockApplyDetailInfo()
     }
 }
 </script>
@@ -70,12 +103,11 @@ export default {
             ul{
                 display: flex;
                 display: flex;
-                // justify-content: ;
-                padding: 0 4.82rem;
+                padding: 0 22%;
                 li{
                     position: relative;
                     background:#fff;
-                    width: 2.4rem;
+                    width: 33%;
                     height: 2.28rem;
                     box-shadow:0px .05rem .05rem 0px rgba(12,3,6,0.3);
                     border-radius: .05rem;
@@ -84,6 +116,11 @@ export default {
                     align-items: center;
                     padding-top: .22rem;
                     border: 1px solid #07A695;
+                    a{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
                     img{
                         width: 1.25rem;
                         height: 1.25rem;
@@ -94,15 +131,9 @@ export default {
                         color: #07A695;
                     }
                 }
-                li:hover{
-                   background:#07A695;
-                   span{
-                       color: #fff;
-                   }
-                }
                 li:nth-child(2), li:nth-child(4){
                     position: inherit;
-                    width: 1.18rem;
+                   width: 21%;
                     display: flex;
                     align-items: center;
                     background: #fff;
@@ -110,7 +141,7 @@ export default {
                     box-shadow: none;
                     overflow: hidden;
                     img{
-                        width: 1.18rem;
+                        width: 100%;
                         height: auto;
                         display: block;
                         margin: auto;

@@ -8,11 +8,25 @@
         <div class="main">
             <div class="main_list">
                 <ul>
-                    <li><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>申请保养设备</span></li>
+                    <li  @mouseover="ismalfunction = true" @mouseout="ismalfunction = false" :style="{background:ismalfunction? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/malfunction.png"  v-if="!ismalfunction">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/malfunction_actively.png" alt="" v-else>
+                        <span :style="{color:ismalfunction? '#fff':'#07A695'}">故障现象</span>
+                    </li>
                     <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>维修工具、材料</span></li>
+                    <li @mouseover="ismaintain = true" @mouseout="ismaintain = false" :style="{background:ismaintain? '#07A695':'#fff'}">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/maintain.png" alt="" v-if="!ismaintain">
+                        <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/maintain_actively.png" alt="" v-else>
+                        <span>维修工具、材料</span>
+                    </li>
                     <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li><img src="../../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>上传保养报告</span></li>
+                    <li @mouseover="islookReport = true" @mouseout="islookReport = false" :style="{background:islookReport? '#07A695':'#fff'}">
+                        <a :href="reportDownUrl" download="w3logo">
+                            <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport.png" alt="" v-if="!islookReport">
+                            <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport_actively.png" alt="" v-else>
+                            <span>查看维修报告</span>
+                         </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -24,13 +38,26 @@ export default {
     data(){
         return{
             cause: '',
+            ismalfunction: false,
+            ismaintain:false,
+            reportDownUrl:'',
+            islookReport: false
         }
     },
     methods:{
         goHome(){
             this.$router.push({name:'LabManagerIndex'})
         },
-        
+        getmaintenanceRecordDetailInfo(){
+            this.$http.get(this.$conf.env.getupkeeprecordInfo + this.$route.query.maintenanceProcessID + '/').then( res =>{
+                this.reportDownUrl = res.data.report
+            }).catch(err =>{
+                 this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        }
+    },
+    mounted(){
+        this.getmaintenanceRecordDetailInfo()
     }
 }
 </script>
@@ -71,11 +98,11 @@ export default {
                 display: flex;
                 display: flex;
                 // justify-content: ;
-                padding: 0 4.82rem;
+                padding: 0 22%;
                 li{
                     position: relative;
                     background:#fff;
-                    width: 2.4rem;
+                    width: 33%;
                     height: 2.28rem;
                     box-shadow:0px .05rem .05rem 0px rgba(12,3,6,0.3);
                     border-radius: .05rem;
@@ -84,6 +111,11 @@ export default {
                     align-items: center;
                     padding-top: .22rem;
                     border: 1px solid #07A695;
+                    a{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
                     img{
                         width: 1.25rem;
                         height: 1.25rem;
@@ -102,7 +134,7 @@ export default {
                 }
                 li:nth-child(2), li:nth-child(4){
                     position: inherit;
-                    width: 1.18rem;
+                    width: 21%;
                     display: flex;
                     align-items: center;
                     background: #fff;
@@ -110,7 +142,7 @@ export default {
                     box-shadow: none;
                     overflow: hidden;
                     img{
-                        width: 1.18rem;
+                        width: 100%;
                         height: auto;
                         display: block;
                         margin: auto;

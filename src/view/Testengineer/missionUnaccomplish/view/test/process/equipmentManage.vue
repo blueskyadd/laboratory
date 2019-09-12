@@ -1,12 +1,12 @@
 <template>
     <div class="taskAllocation_distributed_equipment ">
-        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"   style="width: 100%"  :row-class-name="tabRowClassName">
             <el-table-column prop="date"  label="设备编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="date"  label="设备名称" header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="date"  label="设备操作指导书" header-align='center'  align='center'>
                 <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">下载</span></template>
             </el-table-column>
-            <el-table-column prop="address" fixed='right' label="设备人员安全指导书" header-align='center' align='center'>
+            <el-table-column prop="address"   label="设备人员安全指导书" header-align='center' align='center'>
                 <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">下载</span></template>
             </el-table-column>
         </el-table>

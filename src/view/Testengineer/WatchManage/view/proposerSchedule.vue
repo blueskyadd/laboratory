@@ -4,14 +4,14 @@
             <h3>培养人员管理</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
-        <el-table :data="tableData"  style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData"  style="width: 100%" height="calc(100%  - 1.5rem)" :row-class-name="tabRowClassName">
             <el-table-column prop="date"  label="值班开始时间"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="值班结束时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="值班地点" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address" fixed='right' label="申请状态" header-align='center' align='center'>
+            <el-table-column prop="address"   label="申请状态" header-align='center' align='center'>
                  <template slot-scope="scoped"><span class="underline lookmanagement deletemanagement"  @click="allocation(scoped)">未批准</span></template>
             </el-table-column>
-            <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
+            <el-table-column prop="address"   label="操作" header-align='center' align='center'>
                  <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span></template>
             </el-table-column>
         </el-table>

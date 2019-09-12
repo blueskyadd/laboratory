@@ -7,18 +7,17 @@
             <div class="Taskreview_index_header_link">
                 <router-link replace  to="/Testengineer/environmentActive/material" tag="span">物料清单</router-link>
                 <router-link replace  to="/Testengineer/environmentActive/equipment" tag="span">设备清单</router-link>
-                <router-link replace  to="/Testengineer/environmentActive/methods" tag="span">试验方法</router-link>
+                <router-link replace  to="/Testengineer/environmentActive/methods" tag="span">试验操作</router-link>
             </div>
         </header>
         <div class="taskName">
             <span>项目名称：</span>
             <p class="ProjectName" :style="{'width': $route.path == '/Testengineer/environmentActive/equipment' ? 'auto':'3rem'}">控福控福智能控福智能智能-硬件部</p>
-            <span  v-if="$route.path != '/Testengineer/environmentActive/equipment'">委托公司部门：</span>
+            <span  v-if="$route.path != '/Testengineer/environmentActive/equipment'">公司-部门：</span>
             <p class="companyName"  v-if="$route.path != '/Testengineer/environmentActive/equipment'">控福控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能智能-硬件部</p>
             <span @click="addmaterial" v-if="$route.path == '/Testengineer/environmentActive/material'" class="underline addmaterial">添加</span>
         </div>
          <router-view ref="methods"></router-view> 
-        
     </div>
 </template>
 <script>

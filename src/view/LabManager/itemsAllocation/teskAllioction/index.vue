@@ -9,17 +9,17 @@
             <p>东风柳汽</p>
         </div>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
                 <el-table-column prop="date"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="试验名称" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="date"  label="试验性质" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="name"  label="预期开始时间" header-align='center' align='center'> </el-table-column>
                 <el-table-column prop="date"  label="预期结束时间"  header-align='center' align='center'> </el-table-column>
                 <el-table-column prop="date"  label="试验周期"  header-align='center' align='center'> </el-table-column>
-                <el-table-column prop="name" label="查看"  fixed='right'   header-align='center' align='center'>
+                <el-table-column prop="name" label="查看"      header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">详情</span></template>
                 </el-table-column>
-                <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
+                <el-table-column prop="address"   label="操作" header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">分配</span> </template>
                 </el-table-column>
             </el-table>
@@ -30,7 +30,6 @@
                     <ul>
                         <li><span>试验简介：</span><div>魏鹏飞陪我放假人家</div></li>
                         <li><span>试验方法：</span><div></div></li>
-                        <li><span>试验文件：</span><div></div></li>
                     </ul>
                 </div>
                 <div v-if="isUpslot == 2" class="taskTest">
@@ -160,7 +159,13 @@ export default {
             this.popUptitle = title;
             this.isUpslot = flag;
             this.$refs.popUp.dialogVisible = true;
-        }
+        },
+        
+
+        
+    },
+    mounted(){
+        
     }
 }
 </script>

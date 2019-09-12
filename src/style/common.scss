@@ -3,6 +3,15 @@
     height: calc(100% - .8rem);
     width: 100%;
 }
+.table_box{
+    height: calc(100% - 2.5rem);
+    overflow: hidden;
+    .el-table {
+        width: 100%;
+        overflow-y: scroll;
+        height: calc(100% - 1rem);
+    }
+}
 .show_background{
     box-shadow:0px 2px 2px 0px rgba(0, 0, 0, 0.35);
 }
@@ -42,22 +51,33 @@
 }
 //弹框
 .popUp{
+    .upload_img{
+        width: 2rem;
+         height: 1rem;
+         border: 1px dashed #eee;
+    }
     .el-dialog{
         border-radius: .14rem;
         height: 58.3%;
         overflow: hidden;
         ul{
             margin-top: .33rem;
+            margin-top: .33rem;
+            overflow-y: scroll;
+            height: 100%;
             li{
                 margin-bottom: .4rem;
                 display: flex;
-
+               
                 span{
                     font-size: .26rem;
                     color: #333333;
-                    width: 1.6rem;
+                    width: 1.7rem;
                     text-align: right;
                     display: block;
+                }
+                .el-input__prefix{
+                    width: 0!important;
                 }
                 p{
                     font-size: .26rem;
@@ -78,7 +98,7 @@
                 }
                 div{
                     input{
-                        width: 4.42rem;
+                        width: 4.42rem!important;
                     }
                 }
                 button{
@@ -89,7 +109,12 @@
                 }
 
             }
+            
             .upload{
+                .upload_img{
+                    width: 2rem;
+                    height: 1rem;
+                }
                 div{
                     width: 1.17rem;
                     height: 1.17rem;
@@ -106,6 +131,7 @@
                             width: 100%;
                         }
                     }
+                    
                 }
                 .accessory{
                     width: .65rem;
@@ -119,13 +145,20 @@
                     margin-right: .27rem;
                     span{
                         width: auto;
-                        margin-left: 0;
+                        margin-left: 0; 
                         align-items: flex-start;
                     }
                 }
                 p{
                     font-size: .22rem;
                     color: #666666;
+                    max-height: .88rem;
+                    max-width: 5.5rem;
+                    overflow: hidden;
+                    display: -webkit-box;
+                    text-overflow: ellipsis;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 3;
                 }
                 .deleteFile{
                     color: #f20000;
@@ -133,6 +166,7 @@
                     line-height: .23rem;
                     margin-top: .13rem;
                 }
+                
                 
             }
             li:last-child{
@@ -145,7 +179,7 @@
                 button:first-child{
                     background: #fff;
                     margin-right: .69rem;
-                    border: 1px solid #999999;
+                    border: 1px solid #999999!important;
                     span{
                         color:#999999;
                     }
@@ -158,5 +192,84 @@
                 }
             }
         }
+        ul::-webkit-scrollbar{
+            display: none;
+        }
     }
+}
+
+.proposer_index_header{
+    padding-left: .41rem;
+    height: .38rem;
+    display: flex;
+    margin-left: .19rem;
+    align-items: flex-end;
+    padding-bottom: .38rem;
+    h3{
+        font-size: .36rem;
+        color: #333333;
+        font-weight: 500;
+        margin-bottom: .04rem;
+        line-height: .36rem;
+    }
+    // 公共span
+    span{
+        font-size: .23rem;
+        cursor:pointer;
+    }
+    //返回按钮
+    .goBack{
+        margin-left: .28rem;
+    }
+}
+.taskName{
+    margin-left: .19rem;
+    margin-bottom: .14rem;
+    padding-left: .41rem;
+    display: flex;
+    font-size: .25rem;
+}
+
+//按钮
+.lookmanagement{
+    margin-right: 16%!important;
+}
+.deletemanagement{
+    color: #f30000;
+}
+//红星
+.importantData{
+    color: #f30000;
+}
+//表格滚动
+.scrollTable{
+    
+    height: calc(100% - 1.7rem);
+    overflow: hidden;
+    .el-table{
+        overflow-y: scroll;
+        height: calc(100% - 1rem);
+    }
+}
+.scrollTableScrollNoTop{
+    height: calc(100% - .38rem);
+}
+a:hover{
+    text-decoration: underline;
+}
+//清楚margin
+.no_margiRright{
+    margin-right: 0!important;
+}
+//不可编辑
+.disabled{
+    background-color: #F5F7FA;
+    color: #C0C4CC;
+    border-color: #E4E7ED!important;
+}
+input{
+    border-radius: .05rem;
+}
+li>a{
+    text-decoration: none!important;
 }

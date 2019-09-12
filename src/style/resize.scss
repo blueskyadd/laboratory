@@ -34,10 +34,30 @@
    height : 100% ;
    overflow : hidden;
  }
+//  body::-webkit-scrollbar{
+// 	 width: auto;
+// 	 height: auto;
+//  }
+//  #app{
+// 	min-width:1920px;
+// 	min-height:1080px;
+	
+//  }
+ @media screen and (max-width: 1920px){ 
+    body { 
+        // overflow-x: scroll!important;
+    } 
+}
+@media screen and (max-height:1080px){ 
+    body { 
+        // overflow-y: scroll!important;
+    } 
+}
  body, #app{
    width : 100% ;
    height : 100% ;
    overflow : hidden;
+   
  }
  fieldset,img {border:0}
  address,caption,cite,code,dfn,em,strong,th,var {font-style:normal;font-weight:normal}

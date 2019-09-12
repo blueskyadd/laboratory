@@ -5,14 +5,14 @@
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <Search @searchDetail='searchDetail' class="management_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
             <el-table-column prop="date"  label="序号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="工号" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="姓名" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address" fixed='right' label="合作项目" header-align='center' align='center'>
+            <el-table-column prop="address"   label="合作项目" header-align='center' align='center'>
                  <template slot-scope="scoped"><span class="underline lookmanagement deletemanagement"  @click="allocation(scoped)">详情</span></template>
             </el-table-column>
-            <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
+            <el-table-column prop="address"   label="操作" header-align='center' align='center'>
                  <template slot-scope="scoped"><span class="underline lookmanagement deletemanagement"  @click="allocation(scoped)">查看</span></template>
             </el-table-column>
         </el-table>

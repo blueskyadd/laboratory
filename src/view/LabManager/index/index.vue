@@ -23,8 +23,12 @@ export default {
     data() {
       return {
       }
-    },  
-    mounted() {
+    },
+    mounted(){
+        this.$emit('headerTitle','实验室信息化管理系统-实验室管理员')
+    },
+    destroyed(){
+        this.$emit('headerTitle','实验室信息化管理系统')
     },
     computed:{
     },
@@ -32,7 +36,7 @@ export default {
         /**@name 页面跳转 */
         //项目分配页
         goTaskAllocation(){
-            this.$router.push({name:'unAllocation'})
+            this.$router.push({name:'unAllocation'}) 
         },
         //任务审核
         goTaskreview(){

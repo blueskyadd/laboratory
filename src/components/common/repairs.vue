@@ -13,8 +13,7 @@
 export default {
     methods:{
         hiddenBox(){
-            console.log(this.$parent.showReplairs)
-            this.$router.push({name:'guarantee'})
+            this.$emit('changeHiden')
         }
     }
 }

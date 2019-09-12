@@ -7,10 +7,7 @@
                     <swiper :options="swiperOption_text" v-if="swiperOption_text">
                         <swiper-slide>
                             <h3>实验室能力介绍</h3>
-                            <p>
-                            VUX 并不是一个能解决所有场景的完美解决方案(实际上也没有一个方案能解决所有问题)，也会出现某些bug或者某些特性不支持，所以如果遇到问题麻烦及时不带情绪正确反馈，我们乐于及时解决描述详细方便重现的问题。即使你不直接使用 VUX 组件代码, 你依然可以参考 VUX 代码来实现自己的组件库。如果一定程度上帮助到了你，那么维护这个项目也就有所意义。UX 并不是一个能解决所有场景的完美解决方案(实际上也没有一个方案能解决所有问题)，也会出现某些bug或者某些特性不支持，所以如果遇到问题麻烦及时不带情绪正确反馈，我们乐于及时解决描述详细方便重现的问题。
-                            即使你不直接使用 VUX 组件代码, 你依然可以参考 VUX 代码来实现自己的组件库。如果一定程度上帮助到了你，那么维护这个项目也就有所意义。VUX 并不是一个能解决所有场景的完美解决方案(实际上也没有一个方案能解决所有问题)，也会出现某些bug或者某些特性不支持，所以如果遇到问题麻烦及时不带情绪正确反馈，我们乐于及时解决描述详细方便重现的问题。即使你不直接使用 VUX 组件代码, 你依然可以参考 VUX 代码来实现自己的组件库。如果一定程度上帮助到了你，那么维护这个项目也就有所意义。
-                            </p>
+                            <p>{{Ability_introduce}}</p>
                         </swiper-slide>
                     </swiper>
                 </div>
@@ -80,22 +77,9 @@
         <div class="right_main">
             <div class="bulletin_board main_body_html show_background">
                 <h3>实验室公告栏</h3>
-                <swiper :options="swiperOption_text" v-if="swiperOption_text">
-                    <swiper-slide>
-                    <ul>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                        <li><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>实验室公告实验室公告栏实验室公告栏栏</p> </li>
-                    </ul>
-                    </swiper-slide>
-                </swiper>
+                <ul ref="bulletin_board_scrollbar">
+                    <li v-for="item in Bulletin_board" :key="item.id"><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>{{item.content}}</p> </li>
+                </ul>
             </div>
             <div class="calendar_board main_body_html show_background">
                 <Calendar :sundayStart='false' ></Calendar>
@@ -112,9 +96,10 @@ export default {
     components: {swiper, swiperSlide, Calendar},
     data() {
       return {
+        Ability_introduce:'',//实验室能力介绍
+        Bulletin_board: [],//实验室公告栏列表
         swiperOption: {
             slidesPerView: 'auto',
-            spaceBetween: 12,
             freeMode: true,
             pagination: {
                 el: '.swiper-pagination',
@@ -136,6 +121,18 @@ export default {
       }
     },  
     mounted() {
+        this.$message.closeAll()
+        /**@name 接口请求 */
+        this.getAbilityintroduce();//获取实验室信息
+        this.getBulletinBoard();//获取公告栏列表数据
+        
+        /**@name 函数处理 */
+        this.$refs.bulletin_board_scrollbar.addEventListener('scroll',()=>{
+            console.log('加载')
+        })
+    },
+    destroyed(){
+        
     },
     computed:{
         changeRotate(){
@@ -165,6 +162,32 @@ export default {
         //信息发布
         goinformationPublish(){
             this.$router.push({name:'informationPublish'})
+        },
+        /**@name 接口数据 */
+        //获取实验室信息
+        getAbilityintroduce(){
+            this.$http.get(this.$conf.env.getAbilityintroduce).then(res =>{
+                if(res.data.text){
+                    this.Ability_introduce = res.data.text;
+                }
+            }).catch(err =>{
+                console.log(err.response)
+                if(err.response.status == '401'){
+                    if(err.response.data.detail == 'Signature has expired.'){
+                        this.$message({message: '签名已过期,请重新登录',type: 'error',duration:0});
+                    }
+                }else if(err.response.state == '500'){
+                    this.$message({message: '服务器错误',type: 'error'});
+                }
+            })
+        },
+        //获取公告栏列表数据
+        getBulletinBoard(){
+            this.$http.get(this.$conf.env.getBulletinBoard).then( res =>{
+                this.Bulletin_board = res.data.results;
+            }).catch(err =>{
+
+            })
         }
     }
 }
@@ -458,25 +481,24 @@ $setColor:#7f0dde;
                 text-align: center;
                 color: #333333;
             }
-            .swiper-container{
+            ul{
+                padding: 0 .18rem;
                 height: calc(100% - .72rem);
-                ul{
-                    padding: 0 .18rem;
-                    li{
-                        font-size: .2rem;
-                        line-height: .3rem;
-                        color: #555555;
-                        margin-bottom: .16rem;
-                        padding-left: .21rem;
-                        display: flex;
-                        img{
-                            width: .22rem;
-                            height: .22rem;
-                            margin-right: .13rem;
-                            margin-top: .05rem;
-                        }
-
+                overflow-y: scroll;
+                li{
+                    font-size: .2rem;
+                    line-height: .3rem;
+                    color: #555555;
+                    margin-bottom: .16rem;
+                    padding-left: .21rem;
+                    display: flex;
+                    img{
+                        width: .22rem;
+                        height: .22rem;
+                        margin-right: .13rem;
+                        margin-top: .05rem;
                     }
+
                 }
             }
         }
@@ -495,11 +517,26 @@ $setColor:#7f0dde;
                     height: .71rem;
                     align-items: center;
                     border-bottom: 1px solid #f4f4f4;
+                    justify-content: center;
                     li{
                         color: #3f3f3f;
                         div{
                             border-color: #3f3f3f;
                         }
+                    }
+                     li:nth-child(2){
+                         flex: inherit;
+                         margin: 0 .2rem;
+                     }
+                    li:first-child,li:last-child{
+                            width: .3rem;
+                            height: .3rem;
+                            background: #cccccc;
+                            flex: inherit;
+                            border-radius: 50%;
+                            div{
+                                border-color: #fff;
+                            }
                     }
                 }
                 .wh_content_all{

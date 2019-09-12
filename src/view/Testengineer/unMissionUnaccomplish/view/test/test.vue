@@ -1,6 +1,6 @@
 <template>
     <div class="unMissionUnaccomplishTestengineer_unMissionUnaccomplishTest">
-        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%" height="calc(100%  - 1.5rem)" :row-class-name="tabRowClassName">
             <el-table-column prop="date"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="试验名称" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name"  label="试验类型" header-align='center' align='center'> </el-table-column>
@@ -12,7 +12,7 @@
                 <template slot-scope="scoped">
                   <div>
                     <el-popover placement="top-start" @hide='hiddenBox'  width="340" height='280' title='选择设备实验' popper-class='popover_unMissionUnaccomplishTest' trigger="click">
-                        <Repairs></Repairs>
+                        <Repairs @changeHiden='changeHiden'></Repairs>
                         <span class="underline lookmanagement"  style="color: #f23536"  slot="reference" @click="getrepairs(scoped)">报修</span>
                     </el-popover>
                   </div>
@@ -133,8 +133,8 @@ export default {
         getrepairs(data){
             // this.showReplairs = true;
         },
-        hiddenBox(){
-          console.log(';a')
+        changeHiden(){
+          this.$router.push({name:'guarantee'})
         }
     }
 }

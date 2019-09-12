@@ -1,7 +1,7 @@
 <template>
-    <div class="management_testManagement">
+    <div class="management_testManagement scrollTable">
         <div class="Search">
-            <ul>
+            <!-- <ul>
                 <li>
                     <span class="equipmentName">标准名称</span>
                     <el-select v-model="value" placeholder="请选择标准名称">
@@ -28,92 +28,89 @@
             <div class="editTableButton">
                 <el-button type="primary" @click="searchPersonnel">搜索</el-button>
                 <el-button type="primary">重置</el-button>
-            </div>
+            </div> -->
             <div class="addequipment">
                 <el-button  type="primary" @click="editquipment('新增试验标准', true)">新增</el-button>
             </div>
         </div>
-        <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="标准编号"  header-align='center'  align='center'> </el-table-column>
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table-column prop="num"  label="标准编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="标准名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="上传单位" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="上传时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address" fixed='right' label="操作" header-align='center' align='center'>
-                 <template slot-scope="scoped"><span class="underline lookmanagement deletemanagement"  @click="allocation(scoped)">下载</span><span class="underline deletemanagement"  @click="allocation(scoped)">删除</span> </template>
+            <el-table-column prop="company"  label="上传单位" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="address"   label="操作" header-align='center' align='center'>
+                 <template slot-scope="scoped">
+                     <a class="underline lookmanagement deletemanagement" :href="scoped.row.file" download="w3logo">下载</a>
+                     <span class="underline deletemanagement"  @click="deletegettestManagement(scoped.row.id)">删除</span> </template>
             </el-table-column>
         </el-table>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
         <popUp ref="popUp" setWidth='45%' :popUptitle='popUptitle' class="popUp">
             <template>
                 <ul>
                     <li>
-                        <span>实验标准名称：</span>
-                        <input type="text"  placeholder="填写实验标准名称">
+                        <span><i class="importantData">*</i>实验标准名称：</span>
+                        <input type="text" v-model="standard.name" maxlength="50"  placeholder="填写实验标准名称">
                     </li>
                     <li>
-                        <span>试验标准编号：</span>
-                        <input   type="text" placeholder="填写试验标准编号">
+                        <span><i class="importantData">*</i>试验标准编号：</span>
+                        <input   type="text" v-model="standard.num" placeholder="填写试验标准编号">
                     </li>
                     <li>
-                        <span>上传单位：</span>
-                        <input type="text" placeholder="填写上传单位">
+                        <span><i class="importantData">*</i>上传单位：</span>
+                        <input type="text" maxlength="50" v-model="standard.company" placeholder="填写上传单位">
                     </li>
                     <li class="upload">
-                        <span>上传图片：</span>
+                        <span><i class="importantData">*</i>上传图片：</span>
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
-                        <div>
+                        <div v-if="isCreated">
                             <span @click="updataFileChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span>
                         </div>
+                        <img v-else  @click="updataFileChange" :src="standard.file" class="upload_img" alt="">
                     </li>
-                    <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button type="primary">完成</el-button></li>
+                    <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button type="primary" @click="createdtestStandard">完成</el-button></li>
                 </ul>
-                
             </template>
         </popUp>
     </div>
 </template>
 <script>
 import popUp from '../../../../../components/common/popUp';
+import { get } from 'http';
 export default {
     name:'testManagement',
     components:{popUp},
+    inject:['reload'],
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+        tableData: [],
         value: '',
         popUptitle: '',
         isUpslot: false,
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        CurrentChange:1,
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        standard:{
+            "name":'',//名称
+            "num":'',//编号
+            "file":'',//文件url
+            "company":'',//上传单位
+        },
+        isCreated: true,
+        isSearch: false,//是否为搜索
+        searchText:'',//搜索文字
       }
     },
     methods:{
@@ -132,18 +129,12 @@ export default {
             }
         },
 
-        /**@name 页面跳转 */
-        lookDetail(data){
-
-        },
-        allocation(data){
-            this.$router.push({name: 'applicationtestManagement' })
-        },
         /**@name功能按键 */
         //弹框
         editquipment(title, flag, data){
             this.popUptitle = title;
             this.isUpslot = flag;
+            flag?this.DeleteSection():'';
             this.$refs.popUp.dialogVisible = true;
         },
         //上传按钮
@@ -158,17 +149,129 @@ export default {
         updataFile(e){
             this.file =  e.target.files[0];
             this.fileName =  e.target.files[0].name;
+            let _this = this;
+             this.$updataFile.updataFile(e.target.files[0], res =>{
+                _this.standard.file = res.data.file;
+                _this.isCreated = false;
+                console.log( _this.standard.file)
+            })
         },
         //文件删除
         deleteFile(){
             this.file = {};
             this.fileName = '';
         },
+        //取消数据重置
+        DeleteSection(){
+            this.standard={
+                "name":'',//名称
+                "num":'',//编号
+                "file":'',//文件url
+                "company":'',//上传单位
+            };
+        },
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch ?  this.gettestManagementList(pageNumber):this.testManageSearch(this.searchText,pageNumber);
+        },
+        /**@name搜索 */
+        testManageSearch(data,pageNumber){
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            console.log(res)
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '500'){
+                    this.$message({message: '服务器错误',type: 'error'});
+                }
+            })
+        },
+        /**@name获取数据 */
+        gettestManagementList(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            console.log(res)
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '500'){
+                    this.$message({message: '服务器错误',type: 'error'});
+                }
+            })
+        },
+        /**@name删除 */
+        deletegettestManagement(ID){
+            this.$http.delete(this.$conf.env.deletegettestManagement + ID + '/').then(res =>{
+                if(res.status == '204'){
+                    this.$message({ message: '删除成功', type: 'success'});
+                     this.reload();
+                }else{
+                    this.$message({ message: '删除失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data, type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        },
+        /**@name创建 */
+        createdtestStandard(){
+            if(!this.VerificationData()) return;
+            this.$http.post(this.$conf.env.createdtestStandard, this.standard).then( res =>{
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    this.reload();
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        },
+        VerificationData(){
+            for(var i in this.standard){
+                if(!this.standard[i]){
+                    this.$message({message: '*为必填项哦',type: 'warning'});
+                    return false
+                }
+            }
+            return true;
+        }
+    },
+     mounted(){
+        this.gettestManagementList(1);
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch ?  this.gettestManagementList(this.CurrentChange):this.testManageSearch(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>
 <style lang="scss">
 .management_testManagement{
+    @import '../../../../../style/LabManager/management/index.scss';
     .Search{
         overflow: hidden;
         display: flex;
@@ -207,6 +310,7 @@ export default {
          button{
             font-size: .25rem;
             padding: .1rem .32rem;
+            margin-top: .23rem;
             background: #08a795;
             color: #fff;
             border: 0;
@@ -283,7 +387,7 @@ export default {
                  margin-bottom: .4rem!important;
              }
              li>span{
-                width: 1.9rem!important;
+                width: 2rem!important;
             }
         }
 }

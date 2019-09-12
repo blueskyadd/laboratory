@@ -2,7 +2,7 @@
     <div  class="body_main watchManage_index">
         <!-- 公共头部 -->
         <header class="watchManage_index_header">
-            <h3>任务审核</h3>
+            <h3>值班管理</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <div class="watchManage_index_header_link">
                 <router-link class="underline"  to="/Testengineer/watchManage/proposerWatch" tag="span">申请值班</router-link>
@@ -10,16 +10,15 @@
             </div>
         </header>
         <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="试验名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="负责人" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="试验开始时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="试验数据"  fixed='right'   header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">试验数据</span></template>
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"   style="width: 100%"  :row-class-name="tabRowClassName">
+                <el-table-column prop="name" min-width="30%" label="值班开始时间"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name" min-width="30%" label="值班结束时间" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name" min-width="30%" label="值班地点" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name" label="申请状态"      header-align='center' align='center'>
+                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">审核中</span></template>
                 </el-table-column>
-                <el-table-column prop="address" fixed='right' label="试验结果" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">合格</span> </template>
+                <el-table-column  min-width="30%" prop="address"   label="操作" header-align='center' align='center'>
+                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
                 </el-table-column>
             </el-table>
         </div>

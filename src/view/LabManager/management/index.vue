@@ -13,9 +13,9 @@
                 <router-link replace  to="/management/historyManagement" tag="span">历史项目</router-link>
                 <router-link replace  to="/management/frockManagement" tag="span">工装管理</router-link>
             </div>
-            <Search @searchDetail='searchDetail' class="management_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <Search class="management_header_Search" @searchDetail='searchDetail' :placeholderTexe = 'placeholderTexe'/>
         </header>
-       <router-view></router-view> 
+       <router-view ref='childer' ></router-view> 
     </div>
 </template>
 <script>
@@ -26,11 +26,91 @@ export default {
     data(){
         return{
             placeholderTexe:'搜索报告编号、名称',
+            routerPath:''
         }
     },
     methods:{
         searchDetail(data){
-            console.log(data)
+            switch(this.routerPath){
+                case '/management/personnelManagement':
+                    this.$refs.childer.personnelSearch(data,1);//物料管理
+                    break;
+                case '/management/equipmentManagement':
+                    this.$refs.childer.equipmentSearch(data,1);//物料管理
+                    break;
+                case '/management/materialManagement':
+                    this.$refs.childer.materialSearch(data,1);//物料管理
+                    break;
+                case '/management/testManagement':
+                    this.$refs.childer.testManageSearch(data,1);//试验标准
+                    break;
+                case '/management/methodsManagement':
+                    this.$refs.childer.testMethodsSearch(data,1);//试验方法
+                    break;
+                case '/management/historyManagement':
+                    this.$refs.childer.historySearch(data,1);//历史
+                    break;
+                case '/management/frockManagement':
+                    this.$refs.childer.frockSearch(data,1);//工装
+                    break;
+                
+            }
+        }
+    },
+    mounted(){
+        this.routerPath = this.$route.path;
+        switch(this.$route.path){
+            case '/management/personnelManagement':
+                this.placeholderTexe = '搜索工号、姓名'
+                break;
+            case '/management/equipmentManagement':
+                this.placeholderTexe = '搜索设备编号、名称'
+                break;
+            case '/management/materialManagement':
+                this.placeholderTexe = '搜索物料编号、名称'
+                break;
+            case '/management/testManagement':
+                this.placeholderTexe = '搜索标准名称、编号'
+                break;
+            case '/management/methodsManagement':
+                this.placeholderTexe = '搜索试验方法名称、编号'
+                break;
+            case '/management/historyManagement':
+                this.placeholderTexe = '搜索项目编号、名称'
+                break;
+            case '/management/frockManagement':
+                this.placeholderTexe = '搜索工装编号、名称'
+                break;
+            }
+    },
+    watch:{
+        $route(to, from){
+            this.routerPath = to.path;
+            console.log(to.path)
+            switch(to.path){
+                case '/management/personnelManagement':
+                    this.placeholderTexe = '搜索工号、姓名'
+                    break;
+                case '/management/equipmentManagement':
+                    this.placeholderTexe = '搜索设备编号、名称'
+                    break;
+                case '/management/materialManagement':
+                    this.placeholderTexe = '搜索物料名称、编号'
+                    break;
+                case '/management/testManagement':
+                    this.placeholderTexe = '搜索标准名称、编号'
+                    break;
+                case '/management/methodsManagement':
+                    this.placeholderTexe = '搜索试验方法名称、编号'
+                    break;
+                case '/management/historyManagement':
+                    this.placeholderTexe = '搜索项目编号、名称'
+                    break;
+                case '/management/frockManagement':
+                    this.placeholderTexe = '搜索工装编号、名称'
+                    break;
+            }
+            
         }
     }
 }
