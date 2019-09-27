@@ -269,4 +269,5 @@ module.exports = {
     /**--2019-09-27--*/
     created_produce: winchaingroupApi + 'ex/v1/produce/',//创建产品(产品经理201)
     getPm_noticeList: winchaingroupApi + 'ex/v1/notice/',//公告栏 (产品经理223)
+    getPm_delayedList: winchaingroupApi + 'ex/v1/delayed/',//延时报警 (产品经理222)
 }

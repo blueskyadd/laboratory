@@ -183,22 +183,8 @@
             <div class="footer_table ">
                 <div class="bulletin_table show_background list">
                     <header>公告栏</header>
-                    <div class="main_list">
-                        <ul ref="bulletin_table_scroll">
-                            <li v-for="item in noticeList" :key="item.id">
-                                <span class="main_list_headerImg"><img src="../../../assets/img/PMenege/index/smallBell.png" alt=""> </span>
-                                <div class="list_table">
-                                    <span class="title">实验通知</span>
-                                    <div><span>{{item.info}}</span><span>{{item.test_end_time}}</span></div>
-                                </div>
-                            </li>
-                            <li v-for="item in noticeList" :key="item.id">
-                                <span class="main_list_headerImg"><img src="../../../assets/img/PMenege/index/smallBell.png" alt=""> </span>
-                                <div class="list_table">
-                                    <span class="title">实验通知</span>
-                                    <div><span>{{item.info}}</span><span>{{item.test_end_time}}</span></div>
-                                </div>
-                            </li>
+                    <div class="main_list" >
+                        <ul ref="bulletin_table_scroll" @scroll="getPm_noticeListLoadmore" >
                             <li v-for="item in noticeList" :key="item.id">
                                 <span class="main_list_headerImg"><img src="../../../assets/img/PMenege/index/smallBell.png" alt=""> </span>
                                 <div class="list_table">
@@ -211,28 +197,20 @@
                 </div>
                 <div class="delayed_alarm show_background list">
                     <header>延时报警</header>
-                    <table>
-                        <tr>
-                            <th>项目</th>
-                            <th>试验</th>
-                            <th>负责人</th>
-                        </tr>
-                        <tr>
-                            <td>实验三</td>
-                            <td>高温试验箱</td>
-                            <td>9:45</td>
-                        </tr>
-                        <tr>
-                            <td>实验三</td>
-                            <td>高温试验箱</td>
-                            <td>9:45</td>
-                        </tr>
-                        <tr>
-                            <td>实验三</td>
-                            <td>高温试验箱</td>
-                            <td>9:45</td>
-                        </tr>
-                    </table>
+                    <div>
+                        <table>
+                            <tr>
+                                <th>项目</th>
+                                <th>试验</th>
+                                <th>负责人</th>
+                            </tr>
+                            <tr v-for="item in delayedList" :key="item.id">
+                                <td>{{item.experiment_project}}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.engineer}}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
             
@@ -262,6 +240,9 @@ export default {
             editUserInfo:{"avatar":'', "intro":''},//修改个人信息
             produceInfo:{"name":'', "number":''},//创建产品信息
             noticeList:[],//公告栏列表
+            isNoticeListScroll: true,//公告栏上拉加载
+            noticeList_pagenumber: 1,
+            delayedList:[],//延时报警列表
         }
     },
     computed:{
@@ -292,16 +273,30 @@ export default {
         },
         /**@name 公告栏 */
         getPm_noticeList(){
-            this.$http.get(this.$conf.env.getPm_noticeList).then(res =>{
+            this.$http.get(this.noticeList_pagenumber == 1 ? this.$conf.env.getPm_noticeList: this.$conf.env.getPm_noticeList + '?p=' + this.noticeList_pagenumber).then(res =>{
+                this.isNoticeListScroll = res.data.next? true:false;
                 this.noticeList = res.data.results;
+            }).catch(err =>{
+                this.isNoticeListScroll = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        //公告栏加载
+        getPm_noticeListLoadmore(e){
+            if(e.target.scrollTop > e.target.clientHeight - 15 && this.isNoticeListScroll){
+                this.noticeList_pagenumber += 1;
+                this.getPm_noticeList();
+            }
+        },
+        /**@name延时报警 */
+        getPm_delayedList(){
+            this.$http.get(this.$conf.env.getPm_delayedList).then(res =>{
+                this.delayedList = res.data;
                 this.isLoading = false;
             }).catch(err =>{
                 this.isLoading = false;
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
-        },
-        getPm_noticeListLoadmore(){
-            console.log("公告栏滚动")
         },
         /**@name 修改个人信息 */
         //头像上传
@@ -349,7 +344,7 @@ export default {
     mounted(){
         this.getUser_infoDetail();//获取个人信息
         this.getPm_noticeList();//公告栏
-        this.$refs.bulletin_table_scroll.addEventListener("scroll",this.getPm_noticeListLoadmore())
+        this.getPm_delayedList();//延时报警
     }
 }
 </script>
