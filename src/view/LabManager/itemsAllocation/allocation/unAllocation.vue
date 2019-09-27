@@ -96,9 +96,7 @@ export default {
                 this.totalSum = res.data.count
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         }
     },

@@ -1,26 +1,49 @@
 <template>
-    <div class="equipmentFlow body_main">
+    <div class="equipmentFlow body_main"  v-loading.fullscreen.lock="isLoading">
         <header class="equipmentFlow_index_header">
             <h3>设备流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <span class="goBack underline" @click="goHome">首页</span>
         </header>
         <div class="main">
-            <div class="titleEquipment"><span>设备名称：</span><p>老化试验箱</p></div>
+            <div class="titleEquipment"><span>设备名称：</span><p>{{equipmentSection.name}}</p></div>
             <div class="main_list">
                 <ul class="flow">
-                    <li @click="gopurchaseEquipment()"><img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt=""><span>申请设备</span></li>
+                    <li @click="gopurchaseEquipment" @mouseover="isapplyEquipment = false" @mouseout="isapplyEquipment = true" :style="{background:isapplyEquipment? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment.png" alt="" v-if="isapplyEquipment">
+                        <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment_actively.png" alt="" v-else>
+                        <span :style="{color:isapplyEquipment?'#07A695': '#fff'}">申请设备</span>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="godocumentEquipment()"><img src="../../../assets/img/Equipmentengineer/malfunction/contract.png" alt=""><span>合同</span></li>
+                    <li @mouseover="iscontract= false" @mouseout="iscontract = true" :style="{background:iscontract? '#fff':'#07A695'}">
+                        <a :href="equipmentSection.contract" download="w3logo">
+                            <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="iscontract">
+                            <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
+                            <span :style="{color:iscontract?'#07A695': '#fff'}">合同</span>
+                        </a>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="gomaintenanceRecord()"><img src="../../../assets/img/Equipmentengineer/malfunction/debugging.png" alt=""><span>上传调试报告</span></li>
-                    
+                    <li @mouseover="isUplaod= false" @mouseout="isUplaod = true" :style="{background:isUplaod? '#fff':'#07A695'}">
+                        <a :href="equipmentSection.equipment_debug" download="w3logo">
+                            <img src="../../../assets/img/LabManager/management/equipment/frockProcess/updataFile.png" alt="" v-if="isUplaod">
+                            <img src="../../../assets/img/LabManager/management/equipment/frockProcess/updataFile_actively.png" alt="" v-else>
+                            <span :style="{color:isUplaod?'#07A695': '#fff'}">上传调试报告</span>
+                        </a>
+                    </li>
                 </ul>
                 <ul class="arrows">
                     <li><img src="../../../assets/img/Equipmentengineer/malfunction/arrowsTop.png" alt=""></li>
-                    <li @click="goRecord()"><img src="../../../assets/img/Equipmentengineer/malfunction/maintain.png" alt=""><span>保养记录</span></li>
+                    <li @click="goRecord" @mouseover="ismaintain = false" @mouseout="ismaintain = true" :style="{background:ismaintain? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/maintain.png" alt="" v-if="ismaintain">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/maintain_actively.png" alt="" v-else>
+                        <span :style="{color:ismaintain?'#07A695': '#fff'}">保养记录</span>
+                    </li>
                     <li><img src="../../../assets/img/Equipmentengineer/malfunction/arrowsBottom.png" alt=""></li>
-                    <li @click="goMaintain()"><img src="../../../assets/img/Equipmentengineer/malfunction/service.png" alt=""><span>维修记录</span></li>
+                    <li @click="goMaintain" @mouseover="isservice = false" @mouseout="isservice = true" :style="{background:isservice? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/service.png" alt="" v-if="isservice">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/service_actively.png" alt="" v-else>
+                        <span :style="{color:isservice?'#07A695': '#fff'}">维修记录</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -31,7 +54,15 @@ export default {
     name:'equipmentFlow',
     data(){
         return{
-            cause: '',
+            isLoading: true,
+            equipmentSection:{},
+            isapplyEquipment: true,
+            iscontract: true,
+            isUplaod: true,
+            isservice: true,
+            ismaintain: true,
+            EquipmentpurchaseContract: '',
+            reportUrl: '',
         }
     },
     methods:{
@@ -39,20 +70,26 @@ export default {
             this.$router.push({name:'EquipmentengineerIndex'})
         },
         gopurchaseEquipment(){
-            this.$router.push({name:'purchaseEquipment'})
-        },
-        godocumentEquipment(){
-            this.$router.push({name:'documentEquipment'})
-        },
-        gomaintenanceRecord(){
-            this.$router.push({name:'maintenanceRecord'})
+            this.$router.push({name:'proposerEquipment'})
         },
         goRecord(){
-            this.$router.push({name:'record'})
+            this.$router.push({path:'/Equipmentengineer/record', query:{"equipmentID": this.$route.query.equipmentID,"equipmentName": this.equipmentSection.name}})
         },
         goMaintain(){
-            this.$router.push({name:'maintain'})
+            this.$router.push({path:'/Equipmentengineer/maintain', query:{"equipmentID": this.$route.query.equipmentID,"equipmentName": this.equipmentSection.name}})
+        },
+        getEquipment_lookreport(){
+            this.$http.get(this.$conf.env.getEquipment_lookreport + this.$route.query.equipmentID + '/').then( res =>{
+                this.isLoading =  false;
+                this.equipmentSection = res.data;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
         }
+    },
+    mounted(){
+        this.getEquipment_lookreport()
     }
 }
 </script>
@@ -119,8 +156,12 @@ export default {
                     align-items: center;
                     padding-top: .22rem;
                     border: 1px solid #07A695;
+                    a{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
                     img{
-                        width: 1.25rem;
                         height: 1.25rem;
                         margin-bottom: .37rem;
                     }

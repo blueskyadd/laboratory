@@ -1,5 +1,5 @@
 <template>
-    <div class="InfrastructurePropose body_main">
+    <div class="InfrastructurePropose body_main" v-loading.fullscreen.lock="isLoading">
         <header class="proposeFeock_index_header">
             <h3>申请报修</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -7,69 +7,133 @@
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text first_child">
-                    <span>设施名称：</span>
-                    <input type="text" placeholder="填写设备名称">
-                    <span style="margin-left:.7rem">所属实验室：</span>
-                    <el-select v-model="principal"  popper-class='principal_element' placeholder="选择负责人">
+                    <span><i class="importantData">*</i>设施名称：</span>
+                    <input type="text" placeholder="填写设施名称" v-model="equipmentSection.name">
+                    <span style="margin-left:.7rem"><i class="importantData">*</i>所属实验室：</span>
+                    <el-select v-model="equipmentSection.room"  popper-class='principal_element' placeholder="选择所属实验室">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in laboratoryList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
                 </div>
                 <div class="mian_text textarea">
-                    <span>故障描述：</span>
+                    <span><i class="importantData">*</i>故障描述：</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="描述故障描述原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="equipmentSection.info" placeholder="描述故障描述原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{equipmentSection.info.length}}/800</p>
                     </div>
                 </div>
                 <div class="main_list updata">
-                    <span class="file_title">上传故障照片：</span>
+                    <span class="file_title"><i class="importantData">*</i>上传故障照片：</span>
                     <div class="file_box">
-                        <input type="file" ref="file"  @change='updataFile' style="display:none" >
+                        <input type="file" ref="file" accept="image/*" @change='updataFile' style="display:none" >
                         <div>
-                            <div><span @click="updataFileChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
-                            <!-- <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span> -->
-                            <!-- <p>{{fileName}}</p> -->
+                            <div @click="updataFileChange"><span ><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
+                            <div class="upload_img">
+                                <div v-for="(item, index) in image_list" :key="index" @mouseover="item.flag = true" @mouseout="item.flag = false">
+                                    <img  :src="item.url" alt="" >
+                                    <span v-show="item.flag" @click="deleteImg(index)">删除</span>
+                                </div>
+                            </div>
                         </div>
-                        <!-- <span class="underline deleteFile" @click="deleteFile()">删除</span> -->
                     </div>
                 </div>
                  
             </div>
             <footer>
-                <el-button type="primary">提交</el-button>
+                <el-button type="primary" @click="createdEquipment_servicerecord()">提交</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData'
 export default {
     name:'InfrastructurePropose',
+    inject:['reload'],
     data(){
         return{
             cause: '',//申请原因
             fileName: '指导书',
-             options: [{
-                value: '选项1',
-                label: '黄金糕'
-                }, {
-                value: '选项2',
-                label: '双皮奶'
-                }, {
-                value: '选项3',
-                label: '蚵仔煎'
-                }, {
-                value: '选项4',
-                label: '龙须面'
-                }, {
-                value: '选项5',
-                label: '北京烤鸭'
-                }],
-            value: ''
+            laboratoryList: [],
+            equipmentSection: {
+                "name":'',
+                "room":'',
+                "info":'',
+                "image_list": [],
+            },
+            image_list:[{
+                'url':'http://pic68.nipic.com/file/20150601/8164280_104301508000_2.jpg',
+                flag:true
+            }],
+            isLoading: false,
+        }
+    },
+    mounted(){
+        this.getlaboratoryList()
+    },
+    methods:{
+         updataFileChange(){
+            this.$refs.file.click();
+        },
+        deleteImg(index){
+            this.image_list.splice(index, 1)
+        },
+        updataFile(e){
+            if(this.image_list.length == 10){
+                 this.$message({ message:'最多上传十张故障照片' , type: 'warning'});
+            }else{
+                this.$updataFile.updataFile(e.target.files[0], res =>{
+                    var obj ={
+                        'url':res.data.file,
+                        'flag': false,
+                    }
+                    this.image_list.push(obj);
+                    this.fileName = e.target.files[0].name;
+                },this)
+            }
+        },
+        /**@name实验室列表 */
+        getlaboratoryList(){
+            this.$http.get(this.$conf.env.getlaboratoryList).then( res =>{
+                this.laboratoryList = res.data
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        createdEquipment_servicerecord(){
+            if(this.image_list.length > 0){
+                this.image_list.forEach( Element =>{
+                   this.equipmentSection.image_list.push(Element.url)
+                })
+                if(!VerificationData.VerificationData(this.equipmentSection)) return;
+                    this.isLoading = true;
+                    this.$http.post(this.$conf.env.createdEquipment_servicerecord,this.equipmentSection).then(res =>{
+                    this.isLoading = false;
+                    if(res.status == '201'){
+                        this.$message({ message: '申请成功', type: 'success'});
+                        setTimeout(()=>{
+                            this.reload();
+                        },200)
+                    }else{
+                        this.$message({ message: '申请失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    this.isLoading = false;
+                    if(err.response.status == '400'){
+                        this.$message({ message:err.response.data , type: 'warning'});   
+                    }else{
+                        this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                    }
+                })
+            }else{
+                this.$message({ message:'*为必填项哦' , type: 'warning'});
+            }
+
+
         }
     }
 }
@@ -177,13 +241,46 @@ export default {
                     font-size: .24rem;
                     color: #333333;
                 }
+                .upload_img{
+                    border: 0!important;
+                    width: 85%!important;
+                    height:auto!important;
+                    margin-right: 0!important;
+                    display: flex;
+                    flex-wrap:wrap;
+                    justify-content: flex-start!important;
+                    div{
+                        width: 2rem!important;
+                        border: 1px dashed #eee!important;
+                        height: 1rem!important;
+                        margin-right: .1rem!important;
+                        margin-bottom: .1rem!important;
+                        overflow: hidden;
+                        position: relative;
+                        img{
+                            width: 100%;
+                        }
+                        span{
+                            position: absolute;
+                            width: 100% !important;
+                            height: 100%!important;
+                            background: rgba(0,0,0,.5);
+                            font-size: .22rem;
+                            color: #fff;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                    }
+                }
                 .file_box{
                     flex-direction: column;
-                    
+                    width: 80%;
                     div{
                         margin-right: 0.27rem;
                         align-items: flex-end;
                         display: flex;
+                        align-items: flex-start;
                         div{
                         width: .8rem;
                         height: .8rem;

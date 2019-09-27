@@ -17,7 +17,7 @@
                 </div>
             </div>
             <footer>
-                <el-button type="primary" @click="$refs.popUp.dialogVisible = false">提交</el-button>
+                <el-button type="primary" @click="updataEquipment_applyReport()">提交</el-button>
             </footer>
         </div>
         
@@ -28,23 +28,42 @@ export default {
     name:'updataReport',
     data(){
         return{
-            fileName: '调试报告',
-            file:{},
+            fileName: '点击上传调试报告',
+            equipment_debug: '',
             isupload: false,
         }
     },
     methods:{
         updataReportChange(){
-            this.$refs.file.click()
-
-        },
-        updataReport(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
+            this.$refs.file.click();
         },
         deleteFile(){
-            this.file = {};
-            this.fileName = '';
+            this.fileName = '点击上传调试报告';
+            this.equipment_debug = '';
+        },
+        updataReport(e){
+            this.$updataFile.updataFile(e.target.files[0], res =>{
+                this.equipment_debug = res.data.file;
+                this.fileName =  e.target.files[0].name;
+            },this)
+        },
+        updataEquipment_applyReport(){
+            if(!this.equipment_debug){
+                this.$message({ message: '请先上传文件', type: 'warning'});  
+            }else{
+                this.$http.put(this.$conf.env.updataEquipment_applyReport + this.$route.query.equipmentID + '/' ,{'equipment_debug': this.equipment_debug}).then(res =>{
+                   if(res.status == '201'){
+                        this.$message({ message: '提交成功', type: 'success'});
+                        setTimeout(()=>{
+                            this.reload();
+                        },100)
+                    }else{
+                        this.$message({ message: '提交失败', type: 'warning'});              
+                    } 
+                }).catch(err =>{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+                })
+            }
         }
     }
 }

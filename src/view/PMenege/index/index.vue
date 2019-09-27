@@ -1,22 +1,46 @@
 <template>
-    <div class="PMenegeIndex body_main">
+    <div class="PMenegeIndex body_main" v-loading.fullscreen.lock="isLoading">
         <div class="userInfo listInfo">
             <div class="show_background userInfo">
                 <div class="user_header">
                     <span>
-                        <img src="http://pic40.nipic.com/20140424/18085978_175633400193_2.jpg" alt="">
+                        <img :src="userInfoDetail.avatar" alt="">
                     </span>
                 </div>
                 <div class="user_content">
-                    <h3>康复的·克拉克</h3>
+                    <h3>{{userInfoDetail.name}}</h3>
                     <div class="edit_userinfo">
                         <span>个性便签</span>
-                        <span></span>
+                        <el-popover
+                            placement="top-start"
+                            v-model="isUserEdit"
+                            width="200"
+                            trigger="click"
+                            popper-class='PMenegeIndex_upload'
+                            >
+                            <div class="upload_BOX">
+                                <header>编辑信息<span></span></header>
+                                <div class="from">
+                                    <div class="userImgurl" style="margin-bottom:.26rem;margin-top:.22rem;">
+                                        <span class="userTitle"><i class="importantData">*</i>头像</span>
+                                        <div>
+                                            <input type="file" ref="file" style="display:none" @change="updataFile">
+                                            <span class="fileImg"><img :src="editUserInfo.avatar"  alt=""></span>
+                                            <span class="addfile"  @click="updataUserImg()"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom:.14rem"><span><i class="importantData">*</i>个性签名</span><input v-model="editUserInfo.intro" type="text"></div>
+                                    <el-button type="primary" @click="editUser_infoDetail()">确定</el-button>
+                                </div>
+                            </div>
+                            <span slot="reference" style="cursor:pointer;"><img src="../../../assets/img/PMenege/index/editUser.png" alt=""></span>
+                        </el-popover>
+                        
                     </div>
-                    <p>修养的话额修养的话额娃儿在寂静中开放娃儿在寂静中开放</p>
+                    <p>{{userInfoDetail.intro}}</p>
                     <footer >
                         <div  @click="$router.push({name:'LaboratoryPrincipalProject'})" class="list_table list_table_first" style="cursor:pointer;">
-                            <span>23</span><span>负责产品</span>
+                            <span>{{userInfoDetail.product}}</span><span>负责产品</span>
                         </div>
                         <div class="list_table">
                         <el-popover
@@ -29,13 +53,13 @@
                             <div class="upload_BOX">
                                 <header>添加产品<span></span></header>
                                 <div class="from">
-                                    <div style="margin-bottom:.26rem;margin-top:.22rem;"><span>产品编号</span><input type="text"></div>
-                                    <div style="margin-bottom:.14rem"><span>产品名称</span><input type="text"></div>
-                                    <el-button type="primary" @click="setAddproject()">确定</el-button>
+                                    <div style="margin-bottom:.26rem;margin-top:.22rem;"><span><i class="importantData">*</i>产品编号</span><input v-model="produceInfo.name" type="text"></div>
+                                    <div style="margin-bottom:.14rem"><span><i class="importantData">*</i>产品名称</span><input type="text" v-model="produceInfo.number"></div>
+                                    <el-button type="primary" @click="created_produce()">确定</el-button>
                                 </div>
                             </div>
                             <div slot="reference" style="cursor:pointer;">
-                                <span >23</span><span>添加产品</span>
+                                <span ><img src="../../../assets/img/PMenege/index/plus.png" alt=""></span><span>添加产品</span>
                             </div>
                         </el-popover>
                         </div>
@@ -108,17 +132,10 @@
                                             <span class="element_principal_border"></span>
                                             <span class="element_principal_name">张张磊磊</span>
                                         </div>
-                                       <div class="progress_bar"></div>
-                                       <div class="element_status">正常</div>
-                                    </li>
-                                    <li>
-                                        <div class="element_test">
-                                            
-                                            <span></span>
-                                            <span>这栋实验</span>
-                                        </div>
-                                       <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"></div>
+                                       <div class="progress_bar">
+                                           <span></span>
+                                           <i>80%</i>
+                                       </div>
                                        <div class="element_status">正常</div>
                                     </li>
                                     <li>
@@ -127,7 +144,7 @@
                                             <span>这栋实验</span>
                                         </div>
                                        <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"></div>
+                                       <div class="progress_bar"><span></span><i>80%</i></div>
                                        <div class="element_status">正常</div>
                                     </li>
                                     <li>
@@ -136,7 +153,7 @@
                                             <span>这栋实验</span>
                                         </div>
                                        <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"></div>
+                                       <div class="progress_bar"><span></span><i>80%</i></div>
                                        <div class="element_status">正常</div>
                                     </li>
                                     <li>
@@ -145,7 +162,16 @@
                                             <span>这栋实验</span>
                                         </div>
                                        <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"></div>
+                                       <div class="progress_bar"><span></span><i>80%</i></div>
+                                       <div class="element_status">正常</div>
+                                    </li>
+                                    <li>
+                                        <div class="element_test">
+                                            <span></span>
+                                            <span>这栋实验</span>
+                                        </div>
+                                       <div class="element_principal lastChild"><span>张磊</span></div>
+                                       <div class="progress_bar"><span></span><i>80%</i></div>
                                        <div class="element_status">正常</div>
                                     </li>
                                 </ul>
@@ -158,19 +184,26 @@
                 <div class="bulletin_table show_background list">
                     <header>公告栏</header>
                     <div class="main_list">
-                        <ul>
-                            <li>
-                                <span class="main_list_headerImg"><img src="" alt=""> </span>
+                        <ul ref="bulletin_table_scroll">
+                            <li v-for="item in noticeList" :key="item.id">
+                                <span class="main_list_headerImg"><img src="../../../assets/img/PMenege/index/smallBell.png" alt=""> </span>
                                 <div class="list_table">
-                                    <span>实验通知</span>
-                                    <div><span>二夫人二哥二分</span><span>2018-12-04</span></div>
+                                    <span class="title">实验通知</span>
+                                    <div><span>{{item.info}}</span><span>{{item.test_end_time}}</span></div>
                                 </div>
                             </li>
-                            <li>
-                                <span class="main_list_headerImg"><img src="" alt=""> </span>
+                            <li v-for="item in noticeList" :key="item.id">
+                                <span class="main_list_headerImg"><img src="../../../assets/img/PMenege/index/smallBell.png" alt=""> </span>
                                 <div class="list_table">
-                                    <span>实验通知</span>
-                                    <div><span>二夫人二哥二分</span><span>2018-12-04</span></div>
+                                    <span class="title">实验通知</span>
+                                    <div><span>{{item.info}}</span><span>{{item.test_end_time}}</span></div>
+                                </div>
+                            </li>
+                            <li v-for="item in noticeList" :key="item.id">
+                                <span class="main_list_headerImg"><img src="../../../assets/img/PMenege/index/smallBell.png" alt=""> </span>
+                                <div class="list_table">
+                                    <span class="title">实验通知</span>
+                                    <div><span>{{item.info}}</span><span>{{item.test_end_time}}</span></div>
                                 </div>
                             </li>
                         </ul>
@@ -208,7 +241,8 @@
     </div>
 </template>
 <script>
-import imgInfo from './timeTable'
+import imgInfo from './timeTable';
+import VerificationData from '../../../components/VerificationData'
 export default {
     name:'PMenegeIndex',
     components:{imgInfo},
@@ -219,9 +253,15 @@ export default {
             percentage: 50,
             isHiddenBox: false,
             isAddproject: false,
+            isUserEdit: false,
             colors: [
                 {color: '#09a695'},
-            ]
+            ],
+            isLoading: true,
+            userInfoDetail:{},//个人信息(显示)
+            editUserInfo:{"avatar":'', "intro":''},//修改个人信息
+            produceInfo:{"name":'', "number":''},//创建产品信息
+            noticeList:[],//公告栏列表
         }
     },
     computed:{
@@ -233,9 +273,6 @@ export default {
         setElementHidden(){
             this.isHiddenBox = !this.isHiddenBox
         },
-        setAddproject(){
-            this.isAddproject = false
-        },
         listInfoDetail(){
             this.$router.push({name:'listInfoDetail'})
         },
@@ -243,7 +280,76 @@ export default {
             console.log(command)
             this.fileItemIndex = command;
         },
-        
+        /**@name 获取个人信息 */
+        getUser_infoDetail(){
+            this.$http.get(this.$conf.env.getUser_infoDetail).then(res =>{
+                this.userInfoDetail = res.data;
+                this.editUserInfo.avatar = res.data.avatar;
+                this.editUserInfo.intro = res.data.intro;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        /**@name 公告栏 */
+        getPm_noticeList(){
+            this.$http.get(this.$conf.env.getPm_noticeList).then(res =>{
+                this.noticeList = res.data.results;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getPm_noticeListLoadmore(){
+            console.log("公告栏滚动")
+        },
+        /**@name 修改个人信息 */
+        //头像上传
+        updataUserImg(){
+            this.$refs.file.click();
+        },
+        updataFile(e){
+            this.$updataFile.updataFile(e.target.files[0],res =>{
+                this.editUserInfo.avatar = res.data.file;
+            },this)
+        },
+        editUser_infoDetail(){
+            if(!VerificationData.VerificationData(this.editUserInfo)) return;
+            this.$http.put(this.$conf.env.editUser_infoDetail,this.editUserInfo).then( res =>{
+                if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                    this.getUser_infoDetail();
+                    this.isUserEdit = false;
+                }else{
+                    this.$message({ message: '修改失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        /**@name 创建产品 */
+        created_produce(){
+            if(!VerificationData.VerificationData(this.produceInfo)) return;
+            this.$http.post(this.$conf.env.created_produce,this.produceInfo).then( res =>{
+                if(res.status == '201'){
+                    this.$message({ message: '添加成功', type: 'success'});
+                    this.getUser_infoDetail();
+                    this.isAddproject = false;
+                    this.produceInfo = {"name":'', "number":''};
+                }else{
+                    this.$message({ message: '添加失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+
+
+    },
+    mounted(){
+        this.getUser_infoDetail();//获取个人信息
+        this.getPm_noticeList();//公告栏
+        this.$refs.bulletin_table_scroll.addEventListener("scroll",this.getPm_noticeListLoadmore())
     }
 }
 </script>
@@ -273,6 +379,16 @@ export default {
             justify-content: space-between;
             .edit_userinfo{
                 padding: 11.3% .26rem 3.1% .34rem;
+                display: flex;
+                justify-content: space-between;
+                span:last-child{
+                    width: .2rem;
+                    height: .2rem;
+                    display: flex;
+                    img{
+                        width: 100%;
+                    }
+                }
             }
         }
         .userInfo{
@@ -454,36 +570,48 @@ export default {
                 .main_list{
                     width: 100%;
                     height: calc(100% - .5rem);
-                    li{
-                         display: flex;
-                         height: .6rem;
-                         padding-top: .06rem;
-                         padding-left: .16rem;
-                        .main_list_headerImg{
-                            width: .3rem;
-                            height: .3rem;
-                            background: #08a695;
-                            display: block;
-                            margin-right: .08rem;
-                        }
-                        .list_table{
+                    ul{
+                        overflow-y: scroll;
+                        height: 100%;;
+                         li{
                             display: flex;
-                            flex: 1;
-                            flex-direction: column;
-                            padding-right: .56rem;
-                            span{
-                                font-size: .14rem;
+                            height: .6rem;
+                            padding-top: .06rem;
+                            padding-left: .16rem;
+                            .main_list_headerImg{
+                                width: .3rem;
+                                height: .3rem;
+                                display: flex; 
+                                margin-right: .08rem;
+                                img{
+                                    width: 90%;
+                                }
                             }
-                            div{
+                            .list_table{
                                 display: flex;
-                                justify-content: space-between;
-                                span:last-child{
-                                    color: #999;
-                                    margin-top: -.16rem;
+                                flex: 1;
+                                flex-direction: column;
+                                padding-right: .56rem;
+                                .title{
+                                    font-size: .16rem;
+                                }
+                                span{
+                                    font-size: .14rem;
+                                }
+                                div{
+                                    display: flex;
+                                    justify-content: space-between;
+                                    span:last-child{
+                                        color: #999;
+                                        margin-top: -.16rem;
+                                    }
                                 }
                             }
                         }
                     }
+                   ul::-webkit-scrollbar{
+                       width: 0.05rem;
+                   }
                     
                 }
                 table{
@@ -519,7 +647,7 @@ export default {
         // padding: .12rem .14rem .14rem;
         padding: 0 .14rem;
         height: .4rem;
-        border-bottom: 1px solid #08a695;
+        border-bottom: 1px solid #eee;
         color: #333;
         display: flex;
         justify-content: space-between;
@@ -533,12 +661,45 @@ export default {
             flex-direction: column;
             justify-content: space-around;
             font-size: .14rem;
-            
+            .userImgurl{
+                display: flex;
+                align-items: center;
+                .userTitle{
+                    margin-right: .14rem;
+                }
+                div{
+                    display: flex;
+                    .addfile{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: .4rem;
+                        height: .4rem;
+                        border:1px dashed #08a695;
+                        margin-left: .24rem;
+                        img{
+                            width: 70%;
+                        }
+                    }
+                    .fileImg{
+                        width: .4rem;
+                        height: .4rem;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        display: flex;
+                        
+                        img{
+                            width: 100%;
+                        }
+                    }
+                }
+            }
             input{
                 width: 2rem;
                 height: .26rem;
                 border: 1px solid #08a695;
                 margin-left: .08rem;
+                padding: 0 .08rem;
             }
             button{
                 padding: .1rem .22rem;

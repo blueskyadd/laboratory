@@ -1,27 +1,26 @@
 <template>
     <div class="Infrastructure">
         <header class="ReWire_header">
-            <h3>基础设施管理</h3>
+            <h3>基础设施报修</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="$router.push({name:'InfrastructurePropose'})">申请报修</span>
         </header>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column  min-width="20%" prop="date"  label="设施名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column  min-width="20%" prop="date"  label="实验室" header-align='center'  align='center'> </el-table-column>
-                <el-table-column  min-width="30%" prop="date"  label="保修时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column  prop="date"  label="故障描述" header-align='left'  align='left'> </el-table-column>
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - .5rem)"  style="width: 100%"  :row-class-name="tabRowClassName"  v-loading='isLoading'>
+                <el-table-column  min-width="20%" prop="name"  label="设施名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  min-width="20%" prop="room"  label="实验室" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  min-width="30%" prop="create_time"  label="报修时间" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  prop="info"  label="故障描述" header-align='left'  align='left'> </el-table-column>
             </el-table>
         </div>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange" 
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -33,27 +32,14 @@ export default {
     
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                },{
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
-            popUptitle:'',
-            isUpslot:1,
+            tableData: [ ],
+            CurrentChange: 1,
             placeholderTexe:'搜索试验编号、名称',
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            CurrentChange:1,
+            currentPage: 1,//当前页
+            page_size : 9,//一页数据条数
         }
     },
     methods:{
@@ -71,23 +57,36 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
-        },
-        allocation(){
-            this.$router.push({name:'NewEquipmentFlow'})
-        },
-        goUpdataFile(){
-            this.$router.push({name: 'updataFile'})
-        },
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getEquipment_servicerecord(pageNumber);
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        getEquipment_servicerecord(pageNumber){
+           this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipment_servicerecord + '?page_size=' +this.page_size : this.$conf.env.getEquipment_servicerecord + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            }) 
         }
+    },
+    mounted(){
+        this.getEquipment_servicerecord(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.getEquipment_servicerecord(this.CurrentChange);
+            }
+        },
     }
 }
 </script>
@@ -129,7 +128,7 @@ export default {
         background:#f6f6f6;
     }
     .taskAllocation_distributed{
-        height: calc(100% - 4.5rem);
+        height: calc(100% - 3rem);
         th{
             font-size: .2rem;
             line-height: .48rem;

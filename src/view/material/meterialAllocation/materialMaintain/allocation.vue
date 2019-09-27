@@ -6,49 +6,35 @@
         </header>
         <div class="taskName">
             <span>试验名称：</span>
-            <p>控福智能-硬件部</p>
+            <p>{{equipmentName}}</p>
             <span>试验编号：</span>
-            <p>控福智能-硬件部</p>
+            <p>{{equipmentNum}}</p>
         </div>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData"  :cell-style="changecolor" height="calc(100%  - 1.5rem)"   style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  min-width="30%" label="物料名称"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  min-width="30%" label="物料数量" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  min-width="30%" label="物料种类" header-align='center'  align='center'> </el-table-column>
+            <el-table :data="tableData"  :cell-style="changecolor" height="calc(100%  - .5rem)"   style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+                <el-table-column prop="name"  min-width="30%" label="物料名称"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="num"  min-width="30%" label="物料数量" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="device_type"  min-width="30%" label="物料种类" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="address" label="是否需要归还" header-align='left' align='left'>
-                    <template><span class="underline" style="margin:0 .24rem" >是</span><span class="underline" style="margin:0 .24rem" >否</span> </template>
+                    <template slot-scope="scoped" ><span class="underline" style="margin:0 .24rem" @click="setMaintainallot(scoped,true)" :style="{color:scoped.row.is_return?'':'#999'}">是</span><span @click="setMaintainallot(scoped,false)" class="underline" style="margin:0 .24rem"  :style="{color:!scoped.row.is_return?'#f10000':'#999'}">否</span> </template>
                 </el-table-column>
             </el-table>
         </div>
-        <footer><el-button type="primary">完成</el-button></footer>
+        <footer><el-button type="primary" @click="setEquipmentMaterial()">完成</el-button></footer>
     </div>
 </template>
 <script>
 export default {
     name: 'allocationMaintain',
+    inject:['reload'],
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
-            popUptitle:'',
+            tableData: [],
+            equipmentName:'',
+            equipmentNum:'',
             isUpslot:1,
             placeholderTexe:'搜索试验编号、名称',
+            isLoading:true,
         }
     },
     methods:{
@@ -66,17 +52,63 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
+        getEquipmentMaterialList(){
+            this.$http.get(this.$conf.env.getEquipmentMaterialList + this.$route.query.equipmentID + '/').then(res =>{
+                if(res.data.servicetools&&res.data.servicetools.length){
+                    res.data.servicetools.forEach(element =>{
+                        element.is_return = false;
+                    })
+                }
+                this.tableData = res.data.servicetools;
+                this.equipmentName = res.data.name;
+                this.equipmentNum = res.data.num;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
         },
-        allocation(){
-
+        setMaintainallot(data,flag){
+            data.row.is_return = flag;
+        },
+        setEquipmentMaterial(){
+            let params = {"servicetools":[]}
+            if(this.tableData.length >0){
+                this.tableData.forEach(item =>{
+                    var Obj={
+                        "id": item.id,
+                        "is_return": item.is_return,
+                    }
+                    params.servicetools.push(Obj)
+                })
+                this.isLoading = true;
+                this.$http.put(this.$conf.env.setEquipmentMaterial + this.$route.query.equipmentID + '/',params).then(res =>{
+                    this.isLoading = false;
+                    if(res.status == '200'){
+                        this.$message({ message: '分配成功', type: 'success'});
+                        this.reload();
+                    }else{
+                        this.$message({ message: '分配失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    this.isLoading = false;
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                })
+            }else{
+                this.$message({ message: '暂时没有待分配的物料', type: 'warning'});
+            }
+            
+            
         }
+    },
+    mounted(){
+        this.getEquipmentMaterialList()
     }
 }
 </script>
 <style lang="scss">
 .allocationMaintain_index{
+    @import '../../../../style/Testengineer/teskName.scss';
     padding-top: .42rem;
     height: 100%;
     .allocationMaintain_index_header{

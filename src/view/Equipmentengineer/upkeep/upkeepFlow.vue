@@ -8,11 +8,23 @@
         <div class="main">
             <div class="main_list">
                 <ul class="flow">
-                    <li @click="goUpkeepProposer()"><img src="../../../assets/img/Equipmentengineer/malfunction/malfunction.png" alt=""><span>申请保养设备</span></li>
+                    <li @click="goUpkeepProposer()" @mouseover="ismalfunction = false" @mouseout="ismalfunction = true" :style="{background:ismalfunction? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/malfunction.png" alt="" v-if="ismalfunction">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/malfunction_actively.png" alt="" v-else>
+                        <span :style="{color:ismalfunction?'#07A695': '#fff'}">申请保养设备</span>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="goUpkeepChange()"><img src="../../../assets/img/Equipmentengineer/malfunction/changeEquipment.png" alt=""><span>维修工具、材料</span></li>
+                    <li @click="goUpkeepChange()" @mouseover="ischangeEquipment= false" @mouseout="ischangeEquipment = true" :style="{background:ischangeEquipment? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/changeEquipment.png" alt="" v-if="ischangeEquipment">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/changeEquipment_actively.png" alt="" v-else>
+                        <span :style="{color:ischangeEquipment?'#07A695': '#fff'}">维修工具、材料</span>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="goUpkeepUpdataFile()"><img src="../../../assets/img/Equipmentengineer/malfunction/lookReport.png" alt=""><span>上传保养报告</span></li>
+                    <li @click="goUpkeepUpdataFile()" @mouseover="islookReport= false" @mouseout="islookReport = true" :style="{background:islookReport? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/lookReport.png" alt="" v-if="islookReport">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/equipment_actively.png" alt="" v-else>
+                        <span :style="{color:islookReport?'#07A695': '#fff'}">上传保养报告</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -23,7 +35,10 @@ export default {
     name:'upkeepFlow',
     data(){
         return{
-            cause: '',
+            ismalfunction: true,
+            islookReport: true,
+            ischangeEquipment: true,
+            equipmentStatus: ''
         }
     },
     methods:{
@@ -31,14 +46,34 @@ export default {
             this.$router.push({name:'EquipmentengineerIndex'})
         },
         goUpkeepProposer(){
-            this.$router.push({name:'upkeepProposer'})
+            if(this.equipmentStatus == 0){
+                this.$router.push({path:'/Equipmentengineer/upkeepProposer', query:{"equipmentID":this.$route.query.equipmentID}})
+            }else{
+                this.$message({ message: '该保养设备已申请', type: 'warning'});  
+            }
         },
         goUpkeepChange(){
-            this.$router.push({name:'upkeepChange'})
+            this.$router.push({path:'/Equipmentengineer/upkeepChange', query:{"equipmentID":this.$route.query.equipmentID}})
         },
         goUpkeepUpdataFile(){
-            this.$router.push({name:'upkeepUpdataFile'})
+            if(this.equipmentStatus != 8){
+                this.$router.push({path:'/Equipmentengineer/upkeepUpdataFile', query:{"equipmentID":this.$route.query.equipmentID}})
+            }else{
+                this.$message({ message: '该保养报告已上传', type: 'warning'});  
+            }
         },
+        getEquipment_upkeepDetail(){
+            this.$http.get(this.$conf.env.getEquipment_upkeepDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.isLoading = false;
+                this.equipmentStatus= res.data.status;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+    },
+    mounted(){
+        this.getEquipment_upkeepDetail()
     }
 }
 </script>

@@ -3,10 +3,9 @@
         <header class="testMethods_index_header">
             <h3>试验标准</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
-
+            <Search @searchDetail='testManageSearch' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-        <div class="Search">
+        <!-- <div class="Search">
             <ul>
                 <li>
                     <span class="equipmentName">上传单位</span>
@@ -24,6 +23,7 @@
                     <el-date-picker
                         v-model="statusTime"
                         type="date"
+                        value-format="yyyy-MM-dd"
                         placeholder="选择日期">
                     </el-date-picker>
                 </li>
@@ -32,16 +32,27 @@
                 <el-button type="primary" @click="searchPersonnel">搜索</el-button>
                 <el-button type="primary">重置</el-button>
             </div>
-        </div>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="工装编号"  header-align='center'  align='center'> </el-table-column>
-            <el-table-column prop="name"  label="工装名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="负责人" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="工装状态" header-align='center' align='center'> </el-table-column>
+        </div> -->
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table-column prop="num"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
+            <el-table-column prop="name"  label="试验方法名称" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="company"  label="上传单位" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address"   label="下载" header-align='center' align='center'>
-                 <template slot-scope="scoped"><span class="underline deletemanagement"  @click="allocation(scoped)">￥10</span></template>
+                 <template slot-scope="scoped"><a style="margin-right:0!important;" class="underline lookmanagement deletemanagement" :href="scoped.row.file" download="w3logo">下载</a></template>
             </el-table-column>
         </el-table>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
     </div>
 </template>
 <script>
@@ -51,43 +62,16 @@ export default {
     name:'testStandard',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
+        tableData: [],
         popUptitle: '',
         placeholderTexe:'上传试验编号、名称',
-        isUpslot:false
+        isSearch: false,//是否为搜索
+        searchText:'',//搜索文字
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        CurrentChange:1,
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
       }
     },
     methods:{
@@ -105,41 +89,54 @@ export default {
                 return "color:#444444";
             }
         },
-
-        /**@name 页面跳转 */
-        lookDetail(data){
-
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch ?  this.gettestManagementList(pageNumber):this.testManageSearch(this.searchText,pageNumber);
         },
-        allocation(data){
-            this.$router.push({name: 'frockProcess' })
+        /**@name搜索 */
+        testManageSearch(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            console.log(res)
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         },
-        /**@name功能按键 */
-        //弹框
-        editquipment(title, flag, data){
-            this.popUptitle = title;
-            this.isUpslot = flag;
-            this.$refs.popUp.dialogVisible = true;
+        /**@name获取数据 */
+        gettestManagementList(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            console.log(res)
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         },
-        //上传按钮
-        updataFileChange(){
-            this.$refs.file.click()
-        },
-        //搜索按钮
-        searchPersonnel(){
-
-        },
-        //上传按钮
-        updataFile(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
-        },
-        //文件删除
-        deleteFile(){
-            this.file = {};
-            this.fileName = '';
-        },
-        searchDetail(){
-
+    },
+    mounted(){
+        this.gettestManagementList(1);
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch ?  this.gettestManagementList(this.CurrentChange):this.testManageSearch(this.searchText,this.CurrentChange);
+            }
         },
     }
 }
@@ -154,7 +151,7 @@ export default {
         display: flex;
         margin-left: .19rem;
         align-items: flex-end;
-        // padding-bottom: .5rem;
+        padding-bottom: .5rem;
     //    border-bottom: 1px solid #cccccc;
         h3{
             font-size: .36rem;

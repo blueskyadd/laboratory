@@ -53,7 +53,7 @@ export default {
             this.$http.get(this.$conf.env.getmaintenanceRecordDetailInfo + this.$route.query.maintenanceProcessID + '/').then( res =>{
                 this.reportDownUrl = res.data.report
             }).catch(err =>{
-                 this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         }
     },

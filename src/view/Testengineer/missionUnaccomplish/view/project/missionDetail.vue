@@ -1,7 +1,7 @@
 <template>
     <div class="missionDetail_index">
         <header class="missionDetail_index_header">
-            <h3>项目名称</h3>
+            <h3>{{projectName}}</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
@@ -10,19 +10,17 @@
             <p>控福智能-硬件部</p>
         </div>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - 1.5rem)" style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="试验名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="负责人" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="试验数据"      header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">详情</span></template>
-                </el-table-column>
-                <el-table-column prop="address"   label="试验结果" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">分配</span> </template>
-                </el-table-column>
+            <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - .2rem)" style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+                <el-table-column prop="experiment_num"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="试验名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="engineer"  label="负责人" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="result"   label="试验结果" header-align='center' align='center'></el-table-column>
             </el-table>
         </div>
-        
+        <footer>
+             <span>{{projectName}}项目：<i :style="{color: report_result == '不合格'? '#f10956':''}">{{report_result}}</i></span>
+            <a class="underline" download="w3logo" :href="projecrReport">查看项目文件</a>
+        </footer>
     </div>
 </template>
 <script>
@@ -32,27 +30,14 @@ export default {
     components:{Search},
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
             popUptitle:'',
             isUpslot:1,
             placeholderTexe:'搜索试验编号、名称',
+            projectName: '',
+            projecrReport: '',
+            isLoading: true,
+            report_result:''
         }
     },
     methods:{
@@ -70,14 +55,41 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
+        searchProject_finishprojectDetailList(data){
+            this.isLoading = true;
+            this.currentPage = 1;
+            this.$http.get(this.$conf.env.getProject_finishprojectDetailList + '?search=' + data + '&page_size=' +this.page_size).then( res =>{
+                this.tableData = res.data.experiments;
+                this.projectName = res.data.name;
+                this.projecrReport = res.data.report;
+                this.report_result = res.data.report_result;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getProject_finishprojectDetailList(){
+            this.$http.get(this.$conf.env.getProject_finishprojectDetailList + this.$route.query.equipmentID + '/').then(res =>{
+                this.tableData = res.data.experiments;
+                this.projectName = res.data.name;
+                this.projecrReport = res.data.report;
+                this.report_result = res.data.report_result;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getProject_finishprojectDetailList()
     }
 }
 </script>
 <style lang="scss">
 .missionDetail_index{
+    height: 100%;
     padding-top: .42rem;
     .missionDetail_index_header{
         padding-left: .41rem;
@@ -113,6 +125,7 @@ export default {
         background:#f6f6f6;
     }
     .taskAllocation_distributed{
+        height: calc(100% - 4.2rem);
         th{
             font-size: .2rem;
             line-height: .48rem;
@@ -134,68 +147,16 @@ export default {
             }
         }
     }
-    .popUp{
-        .el-dialog{
-            height: 59.4%;
-            overflow: hidden;
-        }
-        ul{
-            overflow-y: scroll;
-        }
-        ul::-webkit-scrollbar{
-            display: none;
-        }
-        ul>li{
-            display: flex;
-            p{
-                font-size: .2rem;
-            }
-        }
-        li>span{
-            font-size: .28rem;
-            color: #333333;
-        }
-        .taskDetail{
-            padding-top: .39rem;
-            li{
-                // line-height: .9rem;
-                height: .6rem;
-                padding: .15rem 0;
-            }
-            
-        }
-        .taskTest{
-            margin-top: .18rem;
-            li{
-                // height: .6rem;
-                line-height: .6rem;
-                padding: .05rem 0;
-                p{
-                   font-size: .28rem; 
-                    color: #333333;
-                    width: 60%;
-                }
-            }
-            .el-select{
-                width: 4rem;
-                height: .52rem;
-                .el-input__inner{
-                    height: .52rem; 
-                    font-size: .2rem;
-                    font-weight: 200;
-                }
-            }
-            button{
-                background: #08a795;
-                color: #fff;
-                height:.45rem;
-                width: 1.81rem;
-                font-size: .26rem;
-                margin-left: 30%;
-                margin-top: .54rem;
-                  
-            }
-        }
+    footer {
+        float: right;
+        color: rgb(7, 166, 149);
+        margin-right: 1.66rem;
+       display: flex;
+       flex-direction: column;
+       font-size: .26rem;
+       span{
+           margin-bottom: .2rem;
+       }
     }
 }
 </style>

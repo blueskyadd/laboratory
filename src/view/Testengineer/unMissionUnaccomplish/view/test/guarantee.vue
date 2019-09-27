@@ -1,5 +1,5 @@
 <template>
-    <div class="guarantee body_main">
+    <div class="guarantee body_main"  v-loading.fullscreen.lock="isLoading">
         <header class="guarantee_index_header">
             <h3>申请保修</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,13 +8,13 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>设备名称：</span>
-                    <p class="guaranteeName">烟雾试验箱</p>
+                    <p class="guaranteeName">{{$route.query.equipmentName}}</p>
                     <span>设备编号：</span>
-                    <p>烟雾试验箱</p>
+                    <p>{{$route.query.equipmentNum}}</p>
                 </div>
                 <div class="mian_text first_child ">
                     <span>设备所属实验室：</span>
-                    <p>2012.02.12</p>
+                    <p>{{$route.query.equipmentRoom}}</p>
                 </div>
                
                 <div class="main_list updata">
@@ -23,6 +23,7 @@
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
                             <div><span @click="updataFileChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span></div>
+                            <img :src="Equipment_exeq.image" alt="" class="upload_img">
                             <!-- <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span> -->
                             <!-- <p>{{fileName}}</p> -->
                         </div>
@@ -32,24 +33,65 @@
                  <div class="mian_text textarea">
                     <span>故障现象</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="编辑故障现象" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="Equipment_exeq.cause" placeholder="编辑故障现象" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{Equipment_exeq.cause.length}}/800</p>
                     </div>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">提交</el-button>
+                <el-button type="primary" @click="createdEquipment_exeq()">提交</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../../../components/VerificationData'
 export default {
     name:'guarantee',
+    inject:['reload'],
     data(){
         return{
             cause: '',//申请原因
             fileName: '指导书',
+            Equipment_exeq:{
+                "exeq": this.$route.query.equipmentID,
+                "image":'',
+                "cause":''
+            },
+            isLoading: false,
+        }
+    },
+    methods:{
+        updataFileChange(){
+            this.$refs.file.click()
+        },
+        updataFile(e){
+            this.$updataFile.updataFile(e.target.files[0], res =>{
+                this.Equipment_exeq.image = res.data.file;
+                this.fileName = e.target.files[0].name;
+            },this)
+        },
+        createdEquipment_exeq(){
+            if(!VerificationData.VerificationData(this.Equipment_exeq)) return;
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.createdEquipment_exeq,this.Equipment_exeq).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '申请成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },200)
+                }else{
+                    this.$message({ message: '申请失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
         }
     }
 }
@@ -146,6 +188,11 @@ export default {
                     font-size: .24rem;
                     color: #333333;
                     margin-right: .26rem;
+                }
+                .upload_img{
+                    width: 2rem;
+                    height: 1rem;
+                    border: 1px dashed #eee;
                 }
                 .file_box{
                     flex-direction: column;

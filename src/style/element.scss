@@ -33,6 +33,7 @@
 }
 .el-button--primary{
     border: 0!important;
+   
 }
 //弹框字体
 .el-message--warning,.el-message--success,.el-message--error{
@@ -44,6 +45,7 @@
 }
 .el-button--primary:hover,.el-button--primary:focus{
     background: #08a795!important;
+    color: #fff!important;
 }
 //鼠标滑过
 .el-table--enable-row-hover .el-table__body tr:hover>td{
@@ -52,4 +54,11 @@
 //表格高度
 .el-table--scrollable-y .el-table__body-wrapper{
     // height:auto!important;
+}
+.primary_err:hover,.primary_err:focus{
+    background: #f10000!important;
+}
+//时间选择器
+.el-input--small .el-input__inner{
+    width: 1.45rem!important;
 }

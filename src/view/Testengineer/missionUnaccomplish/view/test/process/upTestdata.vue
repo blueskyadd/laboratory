@@ -26,6 +26,7 @@
             <footer>
                 <el-button type="primary" @click="$refs.popUp.dialogVisible = false">提交</el-button>
             </footer>
+            
         </div>
         
     </div>

@@ -1,5 +1,5 @@
 <template>
-    <div class="upkeepProposer body_main">
+    <div class="upkeepProposer body_main" v-loading.fullscreen.lock="isLoading">
         <header class="upkeepProposer_index_header">
             <h3>申请保养</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,50 +8,77 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>设备名称：</span>
-                    <p class="upkeepProposer_name">热了就发给配如果</p>
+                    <p class="upkeepProposer_name">{{equipmentSection.name}}</p>
                     <span>设备编号：</span>
-                    <p class="upkeepProposer_number">佛违法福建人发</p>
+                    <p class="upkeepProposer_number">{{equipmentSection.num}}</p>
                 </div>
                 <div class="mian_text first_child">
-                    <span>保养开始时间：</span>
+                    <span><i class="importantData">*</i>保养开始时间：</span>
                     <el-date-picker
-                        v-model="statusTime"
-                        type="date"
+                        v-model="equipmentSection.start_time"
+                        type="datetime"
+                        value-format="yyyy-MM-ddTHH:mm:ss"
                         placeholder="选择日期">
                     </el-date-picker>
-                    <span>保养截止时间：</span>
-                    
+                    <span><i class="importantData">*</i>保养截止时间：</span>
+                    <el-date-picker
+                        v-model="equipmentSection.end_time"
+                        type="datetime"
+                        value-format="yyyy-MM-ddTHH:mm:ss"
+                        placeholder="选择日期">
+                    </el-date-picker>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">保存</el-button>
+                <el-button type="primary" @click="editEquipment_upkeepDetail">保存</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData';
 export default {
     name:'upkeepProposer',
     data(){
         return{
             cause: '',//申请原因
             fileName: '指导书',
-            options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+            isLoading: true,
+            equipmentSection:{}
+        }
+    },
+    mounted(){
+        this.getEquipment_upkeepDetail()
+    },
+    methods:{
+        getEquipment_upkeepDetail(){
+            this.$http.get(this.$conf.env.getEquipment_upkeepDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.isLoading = false;
+                res.data.start_time = res.data.start_time.split(' ')[0]+'T'+res.data.start_time.split(' ')[1]
+                res.data.end_time = res.data.end_time.split(' ')[0]+'T'+res.data.end_time.split(' ')[1]
+                this.equipmentSection= res.data;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        editEquipment_upkeepDetail(){
+            delete this.equipmentSection.status;
+            if(!VerificationData.VerificationData(this.equipmentSection)) return;
+            delete this.equipmentSection.name;
+            delete this.equipmentSection.num;
+            this.$http.post(this.$conf.env.editEquipment_upkeepDetail, this.equipmentSection).then(res =>{
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back(-1)
+                    },200)
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="frockFlow body_main">
+    <div class="frockFlow body_main" v-loading.fullscreen.lock="isLoading">
         <header class="frockFlow_index_header">
             <h3>设备流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,11 +8,25 @@
         <div class="main">
             <div class="main_list">
                 <ul class="flow">
-                    <li @click="goProposeFeock()"><img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt=""><span>申请工装</span></li>
+                    <li @click="isapplyFrock&&goProposeFeock()"  :style="{background:!isapplyFrock? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment.png" alt="" v-if="!isapplyFrock">
+                        <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment_actively.png" alt="" v-else>
+                        <span :style="{color:!isapplyFrock?'#07A695': '#fff'}">申请详情</span>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="godocumentEquipment()"><img src="../../../assets/img/Equipmentengineer/malfunction/contract.png" alt=""><span>合同</span></li>
+                    <li  :style="{background:!iscontract? '#fff':'#07A695'}">
+                        <a :href="contractUrl" download="w3logo">
+                            <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="!iscontract">
+                            <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
+                            <span :style="{color:!iscontract?'#07A695': '#fff'}">合同</span>
+                        </a>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="goUpdatafrockReport()"><img src="../../../assets/img/Equipmentengineer/malfunction/debugging.png" alt=""><span>上传调试报告</span></li>
+                    <li @click="isUplaod&&goUpdatafrockReport()" :style="{background:!isUplaod? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/LabManager/management/equipment/frockProcess/updataFile.png" alt="" v-if="!isUplaod">
+                        <img src="../../../assets/img/LabManager/management/equipment/frockProcess/updataFile_actively.png" alt="" v-else>
+                        <span :style="{color:!isUplaod?'#07A695': '#fff'}">上传调试报告</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -23,7 +37,11 @@ export default {
     name:'frockFlow',
     data(){
         return{
-            cause: '',
+            isapplyFrock: true,
+            iscontract: false,
+            isUplaod: false,
+            contractUrl: '',
+            isLoading: true,
         }
     },
     methods:{
@@ -31,14 +49,27 @@ export default {
             this.$router.push({name:'EquipmentengineerIndex'})
         },
         goProposeFeock(){
-            this.$router.push({name:'proposeFeock'})
-        },
-        godocumentEquipment(){
-            this.$router.push({name:'documentEquipment'})
+            this.$router.push({path:'/Equipmentengineer/proposeFeock', query:{"equipmentID": this.$route.query.equipmentID}})
         },
         goUpdatafrockReport(){
-            this.$router.push({name:'updatafrockReport'})
+            this.$router.push({path:'/Equipmentengineer/updatafrockReport', query:{"equipmentID": this.$route.query.equipmentID}})
         },
+        getApplyequipment_frockDetail(){
+            this.$http.get(this.$conf.env.getApplyequipment_frockDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.isLoading =  false;
+                this.contractUrl = res.data.contract;
+                if(res.data.status  == 3 ||  res.data.status  > 3){
+                    this.iscontract = true;
+                    this.isUplaod = true;
+                }
+            }).catch( err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        }
+    },
+    mounted(){
+        this.getApplyequipment_frockDetail()
     }
 }
 </script>

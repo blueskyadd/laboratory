@@ -1,5 +1,5 @@
 <template>
-    <div class="ediitMaterial body_main">
+    <div class="ediitMaterial body_main" v-loading.fullscreen.lock="isLoading">
         <header class="ediitMaterial_index_header">
             <h3>申请物料</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,28 +8,28 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>物料编号：</span>
-                    <input class="inputText" type="text" placeholder="填写物料编号">
+                    <input class="inputText disabled" disabled  v-model="MateriaDetail.nateriel_num" type="text" placeholder="填写物料编号">
                 </div>
                 <div class="mian_text first_child">
                     <span>物料名称：</span>
-                    <p>仍旧乳杆菌他</p>
+                    <p>{{MateriaDetail.name}}</p>
                 </div>
                 <div class="mian_text first_child">
                     <span>物料数量：</span>
-                    <input class="inputText" type="number" placeholder="填写物料数量">
+                    <input class="inputText" type="number" placeholder="填写物料数量" v-model="materialInventory">
                     <span>单位：</span>
-                    <input class="inputText" type="text" placeholder="填写单位">
+                    <input class="inputText disabled" disabled  type="text" v-model="MateriaDetail.unit" placeholder="填写单位">
                 </div>
                  <div class="mian_text textarea">
                     <span>申请原因</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="编辑申请原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="materialCause" placeholder="编辑申请原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{materialCause.length}}/800</p>
                     </div>
                 </div>
             </div>
-            <footer>
-                <el-button type="primary">保存</el-button>
+            <footer v-if="this.$route.query.flag">
+                <el-button type="primary" @click="createdApplyMateria()">保存</el-button>
             </footer>
         </div>
     </div>
@@ -37,26 +37,61 @@
 <script>
 export default {
     name:'ediitMaterial',
+    inject:['reload'],
     data(){
         return{
-            cause: '',//申请原因
             fileName: '指导书',
-            options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+            options: [],
+            materialCause:'',
+            materialInventory:'',
+            MateriaDetail:{},
+            isLoading: true,
+        }
+    },
+    mounted(){
+        this.$route.query.flag?this.getApplyMateriaDetail():this.getEquipmentMateriaDetail()
+    },
+    methods:{
+        getApplyMateriaDetail(){
+            this.$http.get(this.$conf.env.getApplyMateriaDetail + this.$route.query.materialID + '/').then(res =>{
+                this.MateriaDetail = res.data;
+                
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        getEquipmentMateriaDetail(){
+            this.$http.get(this.$conf.env.getEquipmentMateriaDetail + this.$route.query.materialID + '/').then(res =>{
+                this.MateriaDetail = res.data;
+                this.materialInventory = res.data.num;
+                this.materialCause = res.data.num;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        createdApplyMateria(){
+            let params ={
+                "warehouse": this.$route.query.materialID,
+                "num": this.materialInventory,
+                "cause": this.materialCause
+            }
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.createdApplyMateria, params).then( res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '申请成功', type: 'success'});
+                     this.reload();
+                }else{
+                    this.$message({ message: '申请失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
         }
     }
 }

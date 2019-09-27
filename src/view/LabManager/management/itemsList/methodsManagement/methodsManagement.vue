@@ -68,48 +68,56 @@ export default {
              this.searchText = data;
              this.isSearch = true;
              this.currentPage = 1;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestMethodsList + '?search=' + data   + '&page_size=' +this.page_size : this.$conf.env.gettestMethodsList + '?search=' + data + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestMethodsList + '?search=' + data   + '&page_size=' +this.page_size : this.$conf.env.gettestMethodsList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         /**@name数据获取 */
         gettestMethodsList(pageNumber){
             this.isSearch = false;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestMethodsList + '?page_size=' +this.page_size : this.$conf.env.gettestMethodsList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestMethodsList + '?page_size=' +this.page_size : this.$conf.env.gettestMethodsList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
             console.log(res)
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         /**@name删除数据 */
         deletetestMethods(ID){
-            this.$http.delete(this.$conf.env.deletetestMethods + ID + '/').then(res =>{
-                if(res.status == '204'){
-                    this.$message({ message: '删除成功', type: 'success'});
-                     this.reload();
-                }else{
-                    this.$message({ message: '删除失败', type: 'warning'});              
-                }
-            }).catch(err =>{
-                if(err.response.status == '400'){
-                    this.$message({ message:err.response.data, type: 'warning'});   
-                }else{
-                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
-                }
-            })
+            this.$confirm('此操作将删除该试验方法, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$http.delete(this.$conf.env.deletetestMethods + ID + '/').then(res =>{
+                    if(res.status == '204'){
+                        this.$message({ message: '删除成功', type: 'success'});
+                        this.reload();
+                    }else{
+                        this.$message({ message: '删除失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    if(err.response.status == '400'){
+                        this.$message({ message:err.response.data, type: 'warning'});   
+                    }else{
+                        this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                    }
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+            
         }
     },
     mounted(){

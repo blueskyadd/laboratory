@@ -1,5 +1,5 @@
 <template>
-    <div class="applicationMethod body_main">
+    <div class="applicationMethod body_main" v-loading.fullscreen.lock="isLoading">
         <header class="applicationMethod_index_header">
             <h3>申请试验方法</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,20 +8,21 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>试验方法名称：</span>
-                    <p>烟雾试验箱</p>
+                    <p>{{testMethodsSection.name}}</p>
                 </div>
                 <div class="mian_text two_child ">
                     <span>申请时间：</span>
-                    <p>2012.02.12</p>
+                    <p>{{testMethodsSection.create_time}}</p>
                 </div>
                 <div class="mian_text two_child">
                     <span>试验方法：</span>
-                     <p class="underline">点击查看</p>
+                     <p class="underline">
+                        <a :href="testMethodsSection.file" download="w3logo">点击查看</a></p>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">不同意</el-button>
-                <el-button type="primary">审批</el-button>
+                <el-button type="primary" class="primary_err"  @click="editUnTestMethodsDetail(3)"> 不同意</el-button>
+                <el-button type="primary" @click="editUnTestMethodsDetail(2)">审批</el-button>
             </footer>
         </div>
     </div>
@@ -31,7 +32,45 @@ export default {
     name:'applicationMethod',
     data(){
         return{
-            cause: '',//申请原因
+            testMethodsSection:{
+                "name": '',
+                "num": '',
+                "file": '',
+                "create_time":''
+            },
+            isLoading: true,
+        }
+    },
+    mounted(){
+        this.getUnTestMethodsDetail()
+    },
+    methods:{
+        getUnTestMethodsDetail(){
+            this.$http.get(this.$conf.env.getUnTestMethodsDetail + this.$route.query.testMethodsID + '/').then(res =>{
+                this.testMethodsSection = res.data;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        editUnTestMethodsDetail(number){
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.editUnTestMethodsDetail + this.$route.query.testMethodsID + '/',{"status":number}).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '审批成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back(-1);
+                    },100)
+                }else{
+                    this.$message({ message: '审批失败', type: 'warning'});              
+                }
+
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     }
 }
@@ -96,7 +135,7 @@ export default {
                 }
             }
             .two_child{
-                p{
+                p,a{
                     color: #07a695;
                 }
             }

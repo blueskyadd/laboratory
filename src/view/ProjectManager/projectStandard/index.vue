@@ -96,7 +96,7 @@ export default {
 
         },
         allocation(data){
-            this.$router.push({name: 'measureFlow' })
+            this.$router.push({path: '/gaugerIndex/measureFlow' ,query:{equipmentID: data.row.id} });
         },
         /**@name功能按键 */
         //弹框

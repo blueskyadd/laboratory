@@ -1,5 +1,5 @@
 <template>
-    <div class="proposerEquipment body_main">
+    <div class="proposerEquipment body_main" v-loading.fullscreen.lock="isLoading">
         <header class="proposerEquipment_index_header">
             <h3>申请设备</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -7,47 +7,88 @@
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text first_child">
-                    <span>设备名称：</span>
-                    <input type="text" placeholder="填写设备名称">
+                    <span><i class="importantData">*</i>设备名称：</span>
+                    <input type="text" v-model="Equipment_applycation.name" placeholder="填写设备名称">
                 </div>
                 <div class="mian_text first_child">
-                    <span>增加的台数：</span>
-                    <input type="text" placeholder="填写设备名称">
+                    <span><i class="importantData">*</i>增加的数量：</span>
+                    <input type="number" v-model="Equipment_applycation.num" placeholder="填写设备数量">
                 </div>
                 <div class="mian_text textarea">
-                    <span>申请原因：</span>
+                    <span><i class="importantData">*</i>申请原因：</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="填写申请原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="Equipment_applycation.cause" placeholder="填写申请原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{Equipment_applycation.cause.length}}/800</p>
                     </div>
                 </div>
                 <div class="main_list updata">
-                    <span class="file_title">采购技术指导书：</span>
+                    <span class="file_title"><i class="importantData">*</i>采购技术指导书：</span>
                     <div class="file_box">
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
                             <div><span @click="updataFileChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
-                            <!-- <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span> -->
-                            <!-- <p>{{fileName}}</p> -->
+                            <span class="accessory" ><img src="../../../assets/img/commont/file/accessory.png" alt=""></span>
+                            <p>{{fileName}}</p>
                         </div>
-                        <!-- <span class="underline deleteFile" @click="deleteFile()">删除</span> -->
+                        <span class="underline deleteFile" @click="deleteFile()">删除</span>
                     </div>
                 </div>
                  
             </div>
             <footer>
-                <el-button type="primary">提交</el-button>
+                <el-button type="primary" @click="createdEquipment_applycation()">提交</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData';
 export default {
     name:'proposerEquipment',
+    inject:['reload'],
     data(){
         return{
-            cause: '',//申请原因
-            fileName: '指导书',
+            fileName: '点击上传指导书',
+            Equipment_applycation:{
+                "name":'',
+                "cause":'',
+                "databook": '',
+                "num":'',
+            },
+            isLoading: false,
+        }
+    },
+    methods:{
+        deleteFile(){
+            this.fileName = '点击上传指导书';
+            this.Equipment_applycation.databook = '';
+        },
+        updataFileChange(){
+            this.$refs.file.click();
+        },
+        updataFile(e){
+            this.$updataFile.updataFile(e.target.files[0], res =>{
+                this.Equipment_applycation.databook = res.data.file;
+                this.fileName = e.target.files[0].name;
+            },this)
+        },
+        createdEquipment_applycation(){
+            if(!VerificationData.VerificationData(this.Equipment_applycation)) return;
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.createdEquipment_applycation, this.Equipment_applycation).then(res =>{
+                this.isLoading = true;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },100)
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = true;
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
         }
     }
 }

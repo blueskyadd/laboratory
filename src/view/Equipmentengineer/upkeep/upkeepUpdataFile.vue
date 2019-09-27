@@ -1,5 +1,5 @@
 <template>
-    <div class="upkeepUpdataFile_detail body_main">
+    <div class="upkeepUpdataFile_detail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="upkeepUpdataFile_index_header">
             <h3>保养报告</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -9,67 +9,120 @@
                 <div class="mian_text first_child">
                     <div class="mian_text  ">
                         <span>设备名称：</span>
-                        <p>烟雾试验箱</p>
+                        <p>{{upkeep_name}}</p>
                     </div>
                     <div class="mian_text ">
                         <span>设备编号：</span>
-                        <p>2012.02.12</p>
+                        <p>{{upkeep_num}}</p>
                     </div>
                 </div>
             </div>
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <div class="mian_text"  style=" align-items: center;">
-                        <span>下次保养时间：</span>
+                        <span><i class="importantData">*</i>下次保养时间：</span>
                         <el-date-picker
-                            v-model="statusTime"
+                            v-model="upkeep_section.next_upkeep_time"
                             type="date"
+                            :picker-options="pickerOptions"
+                            value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                         </el-date-picker>
                     </div>
                 </div>
             </div>
             <div class="updata main_text">
-                <span class="projectupdataName">维修报告上传</span>
+                <span class="projectupdataName"><i class="importantData">*</i>维修报告上传</span>
                 <div class="file_box">
                     <input type="file" ref="file"  @change='upkeepUpdataFile' style="display:none" >
                     <div class="uploadFile">
                         <div ><span @click="upkeepUpdataFileChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
-                        <span class="accessory"><img src="../../../assets/img/commont/file/accessory.png" alt=""></span>
-                        <!-- <p>{{fileName}}</p> -->
+                        <span class="accessory"><img src="../../../assets/img/commont/file/accessory.png" alt=""><span class="underline deleteFile" @click="deleteFile()">删除</span></span>
+                        <p>{{fileName}}</p>
                     </div>
                 </div>
             </div>
             <footer>
-                <el-button type="primary" @click="$refs.popUp.dialogVisible = false">提交</el-button>
+                <el-button type="primary" @click="fanhui()">fanhu </el-button>
+
+                <el-button type="primary" @click="updataUpkeep_report()">提交</el-button>
             </footer>
         </div>
         
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData';
 export default {
     name:'upkeepUpdataFile',
     data(){
         return{
-            fileName: '维修报告',
+            fileName: '点击上传保养报告',
             file:{},
             isupload: false,
+            upkeep_name:'',
+            upkeep_num:'',
+            upkeep_section:{
+                "next_upkeep_time":'',
+                "report":'',
+            },
+            isLoading: true,
+            pickerOptions: {
+                disabledDate(time) {
+                    return time.getTime() < Date.now();
+                },
+            }
         }
     },
     methods:{
         upkeepUpdataFileChange(){
             this.$refs.file.click()
-
         },
         upkeepUpdataFile(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
+            let _this = this;
+             this.$updataFile.updataFile(e.target.files[0], res =>{
+                _this.upkeep_section.report = res.data.file
+                this.fileName =  e.target.files[0].name;
+            },this)
         },
         deleteFile(){
-            this.file = {};
-            this.fileName = '';
+            this.upkeep_section.report = '';
+            this.fileName = '点击上传保养报告';
+        },
+        getEquipment_upkeepDetail(){
+            this.$http.get(this.$conf.env.getEquipment_upkeepDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.isLoading = false;
+                this.upkeep_name = res.data.name;
+                this.upkeep_num = res.data.num;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        updataUpkeep_report(){
+            if(!VerificationData.VerificationData(this.upkeep_section)) return;
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.updataUpkeep_report + this.$route.query.equipmentID + '/', this.upkeep_section).then( res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '提交成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.replace({name:'upkeepEqupment'});
+                    },100)
+                }else{
+                    this.$message({ message: '提交失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        fanhui(){
+            this.$router.replace({name:'upkeepEqupment'});
         }
+    },
+    mounted(){
+        this.getEquipment_upkeepDetail()
     }
 }
 </script>
@@ -128,10 +181,11 @@ export default {
                 }
                 div:first-child{
                     p{
-                        width: 1.77rem;
+                        max-width: 7.77rem;
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
+                        margin-right: .2rem;
                         color: #666666;
                     }
                 }
@@ -173,6 +227,7 @@ export default {
                     flex-direction: column;
                     justify-content: flex-end;
                     height: auto;
+                    margin-bottom: -.3rem;
                     img{
                         margin-top: .21rem;
                     }

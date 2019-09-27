@@ -64,6 +64,7 @@ export default {
 </script>
 <style lang="scss">
 .management_proposerSchedule{
+    
         padding-top: .6rem;
         .management_index_header{
         padding-left: .41rem;

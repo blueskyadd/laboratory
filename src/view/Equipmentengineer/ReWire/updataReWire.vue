@@ -1,5 +1,5 @@
 <template>
-    <div class="updataReWire body_main">
+    <div class="updataReWire body_main"  v-loading.fullscreen.lock="isLoading">
         <header class="updataReWire_index_header">
             <h3>申请设备</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -7,28 +7,28 @@
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text first_child">
-                    <span>选择设备编号：</span>
-                    <el-select v-model="principal"  popper-class='principal_element' placeholder="选择负责人">
+                    <span><i class="importantData">*</i>选择设备编号：</span>
+                    <el-select   v-model="equipmentSection.equipment"  popper-class='principal_element'  @change='changeEquipment' :disabled="$route.query.equipmentID"  placeholder="选择设备编号">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in equipmentList"
+                        :key="item.id"
+                        :label="item.num"
+                        :value="item.id">
                         </el-option>
                     </el-select>
-                    <span style="margin-left:.98rem;">选择设备编号：</span>
-                    <p>为覅ii 而无法看</p>
+                    <span style="margin-left:.98rem;"><i class="importantData">*</i>设备名称：</span>
+                    <p>{{equipmentSection.name}}</p>
                 </div>
                 <div class="mian_text first_child">
-                    <span>设备操作指导书名称：</span>
-                    <input type="text" placeholder="填写设备操作指导书名称">
+                    <span><i class="importantData">*</i>设备操作指导书名称：</span>
+                    <input type="text" v-model="equipmentSection.operation" placeholder="填写设备操作指导书名称">
                 </div>
                 <div class="mian_text first_child">
-                    <span>设备操作指导书编码：</span>
-                    <input type="text" placeholder="填写设备操作指导书编码">
+                    <span><i class="importantData">*</i>设备操作指导书编码：</span>
+                    <input type="text" v-model="equipmentSection.operation_num" placeholder="填写设备操作指导书编码">
                 </div>
                 <div class="main_list updata">
-                    <span class="file_title">采购技术指导书：</span>
+                    <span class="file_title"><i class="importantData">*</i>采购技术指导书：</span>
                     <div class="file_box">
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
@@ -42,40 +42,127 @@
                  
             </div>
             <footer>
-                <el-button type="primary">提交</el-button>
+                <el-button type="primary" @click="$route.query.equipmentID?editEquipment_operationInfo():createdEquipmentOperation()">提交</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData'
 export default {
     name:'updataReWire',
+    inject:['reload'],
     data(){
         return{
             cause: '',//申请原因
             fileName: '设备操作指导书',
-            options: [{
-                value: '选项1',
-                label: '黄金糕'
-                }, {
-                value: '选项2',
-                label: '双皮奶'
-                }, {
-                value: '选项3',
-                label: '蚵仔煎'
-                }, {
-                value: '选项4',
-                label: '龙须面'
-                }, {
-                value: '选项5',
-                label: '北京烤鸭'
-                }],
-            value: ''
+            equipmentList: [],
+            equipmentSection:{
+                "operation":'',
+                "equipment":'',
+                "operation_file":'',
+                "operation_num":''
+            },
+            isLoading: false,
         }
     },
     methods:{
         updataFileChange(){
-
+            this.$refs.file.click();
+        },
+        updataFile(e){
+            this.$updataFile.updataFile(e.target.files[0], res =>{
+                this.equipmentSection.operation_file = res.data.file;
+                this.fileName = e.target.files[0].name;
+            },this)
+        },
+        deleteFile(){
+            this.equipmentSection.operation_file = '';
+            this.fileName = '点击上传设备操作指导书';
+        },
+        getEquipment_nooperationist(){
+            this.$http.get(this.$conf.env.getEquipment_nooperationist).then(res =>{
+                this.equipmentList = res.data;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        changeEquipment(){
+            if(this.equipmentList.length > 0){
+                this.equipmentList.forEach( Element =>{
+                    if(Element.id == this.equipmentSection.equipment){
+                        this.equipmentSection.name = Element.name;
+                    }
+                })
+            }
+        },
+        createdEquipmentOperation(){
+            if(!VerificationData.VerificationData(this.equipmentSection)) return;
+            delete this.equipmentSection.name;
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.createdEquipmentOperation,this.equipmentSection).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back();
+                    },100)
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        },
+        editEquipment_operationInfo(){
+            if(!VerificationData.VerificationData(this.equipmentSection)) return;
+            delete this.equipmentSection.name;
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.editEquipment_operationInfo  + this.$route.query.equipmentID + '/',this.equipmentSection).then(res =>{
+                this.isLoading = false;
+                 if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },200)
+                }else{
+                    this.$message({ message: '修改成失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        },
+        getOperationEquipment_safetyDetail(){
+            this.isLoading = true;
+            this.$http.get(this.$conf.env.getOperationEquipment_safetyDetail + this.$route.query.equipmentID + '/').then(res =>{
+                res.data.equipment = res.data.num;
+                this.equipmentSection = res.data;
+                this.fileName = res.data.operation_file;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        }
+    },
+    mounted(){
+        this.getEquipment_nooperationist();
+        if(this.$route.query.equipmentID){
+            this.getOperationEquipment_safetyDetail();
         }
     }
 }

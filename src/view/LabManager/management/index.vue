@@ -2,7 +2,7 @@
     <div  class="body_main management_index">
         <!-- 公共头部 -->
         <header class="management_index_header">
-            <h3>任务审核</h3>
+            <h3>管理事项</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <div class="management_index_header_link">
                 <router-link replace  to="/management/personnelManagement" tag="span">人员管理</router-link>
@@ -40,7 +40,7 @@ export default {
                     break;
                 case '/management/materialManagement':
                     this.$refs.childer.materialSearch(data,1);//物料管理
-                    break;
+                    break; 
                 case '/management/testManagement':
                     this.$refs.childer.testManageSearch(data,1);//试验标准
                     break;
@@ -86,7 +86,6 @@ export default {
     watch:{
         $route(to, from){
             this.routerPath = to.path;
-            console.log(to.path)
             switch(to.path){
                 case '/management/personnelManagement':
                     this.placeholderTexe = '搜索工号、姓名'

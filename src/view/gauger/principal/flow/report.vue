@@ -8,15 +8,17 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>设备名称：</span>
-                    <p class="reportName">填写设备名称</p>
+                    <p class="reportName">{{meteringDetail.name}}</p>
                     <span>委托公司：</span>
-                    <p>填写设备名称</p>
+                    <p>{{meteringDetail.nominee_company}}</p>
                 </div>
                 <div class="mian_text first_child">
                     <span>下次计量时间：</span>
                     <el-date-picker
                         v-model="statusTime"
                         type="date"
+                        :picker-options="pickerOptions"
+                        value-format="yyyy-MM-dd"
                         placeholder="下次计量时间">
                     </el-date-picker>
                 </div>
@@ -32,23 +34,83 @@
                         <!-- <span class="underline deleteFile" @click="deleteFile()">删除</span> -->
                     </div>
                 </div>
-                 
             </div>
             <footer>
-                <el-button type="primary">保存</el-button>
+                <el-button type="primary" @click="createdGuager_metering()">保存</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../../components/VerificationData';
 export default {
     name:'measureFlowReport',
+    inject:['reload'],
     data(){
         return{
             cause: '',//申请原因
             fileName: '指导书',
-            statusTime:''
+            statusTime:'',
+            meteringDetail:{
+                "report":'',
+                "next_upkeep_time":'',
+                "name":'',
+                "nominee_company":''
+            },
+            pickerOptions: {
+                disabledDate(time) {
+                    return time.getTime() < Date.now();
+                },
+            }
         }
+    },
+    methods:{
+        updataFileChange(){
+            this.$refs.file.click();
+        },
+        updataFile(e){
+            this.$updataFile.updataFile(e.target.files[0], res =>{
+                this.meteringDetail.report = res.data.file;
+                this.fileName = e.target.files[0].name;
+            },this)
+        },
+        createdGuager_metering(){
+            console.log(this.meteringDetail)
+            this.meteringDetail.next_upkeep_time = this.statusTime;
+            delete  this.meteringDetail.name;
+            delete this.meteringDetail.nominee_company;
+            if(!VerificationData.VerificationData(this.meteringDetail)) return;
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.createdGuager_metering  +this.$route.query.equipmentID +'/', this.meteringDetail).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    this.$router.back();
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'}); 
+                    this.reload();             
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.reload();
+            })
+        },
+        getGuager_meteringDetail(){
+            this.$http.get(this.$conf.env.getGuager_meteringDetail +this.$route.query.equipmentID +'/' ).then(res =>{
+                this.meteringDetail.name = res.data.name ;
+                this.meteringDetail.nominee_company = res.data.nominee_company;
+                this.statusTime = res.data.next_upkeep_time ? res.data.next_upkeep_time:'';
+                console.log(this.statusTime)
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getGuager_meteringDetail();
     }
 }
 </script>

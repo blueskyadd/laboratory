@@ -1,18 +1,18 @@
 <template>
-    <div class="updataFileTest_detail body_main">
+    <div class="updataFileTest_detail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="updataFileTest_index_header">
             <h3>上传试验方法</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
         <div class="main">
             <div class="taskName">
-                <span>试验方法名称：</span>
-                <input type="text" style="margin-right:1.34rem">
-                <span >实验编码：</span>
-                <input type="text">
+                <span><i class="importantData">*</i>试验方法名称：</span>
+                <input type="text" v-model="testSection.name" class="el-input__inner" style="margin-right:1.34rem" placeholder="输入试验方法名称">
+                <span ><i class="importantData">*</i>实验编码：</span>
+                <input type="text" v-model="testSection.num" placeholder="输入试验编码" class="el-input__inner">
             </div>
             <div class="updata main_text">
-                <span class="projectupdataName">试验方法上传</span>
+                <span class="projectupdataName"><i class="importantData">*</i>试验方法上传</span>
                 <div class="file_box">
                     <input type="file" ref="file"  @change='updataFileTest' style="display:none" >
                     <div class="uploadFile">
@@ -23,13 +23,14 @@
                 </div>
             </div>
             <footer>
-                <el-button type="primary" @click="$refs.popUp.dialogVisible = false">提交</el-button>
+                <el-button type="primary" @click="$route.query.equipmentID?editTest_testway():creatTest_testway()">提交</el-button>
             </footer>
         </div>
         
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData'
 export default {
     name:'updataFileTest',
     data(){
@@ -37,20 +38,91 @@ export default {
             fileName: '',
             file:{},
             isupload: false,
+            isLoading: false,
+            testSection:{
+                "name":'',
+                "num":'',
+                "file":''
+            }
         }
     },
     methods:{
         updataFileTestChange(){
             this.$refs.file.click()
-
         },
         updataFileTest(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
+            this.$updataFile.updataFile(e.target.files[0], res =>{
+                this.testSection.file = res.data.file;
+                this.fileName = e.target.files[0].name;
+            },this)
         },
         deleteFile(){
-            this.file = {};
+            this.testSection.file = '';
             this.fileName = '';
+        },
+        creatTest_testway(){
+            if(!VerificationData.VerificationData(this.testSection)) return;
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.creatTest_testway,this.testSection).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back();
+                    },200)
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        },
+        editTest_testway(){
+            if(!VerificationData.VerificationData(this.testSection)) return;
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.editTest_testway + this.$route.query.equipmentID + '/',this.testSection).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back();
+                    },200)
+                }else{
+                    this.$message({ message: '修改失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        },
+        getTest_testwayDetail(){
+            this.isLoading = true;
+            this.$http.get(this.$conf.env.getTest_testwayDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.testSection = res.data;
+                this.fileName = res.data.file;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        }
+    },
+    mounted(){
+        if(this.$route.query.equipmentID){
+            this.getTest_testwayDetail();
         }
     }
 }

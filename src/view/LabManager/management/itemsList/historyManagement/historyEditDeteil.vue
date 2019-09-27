@@ -22,6 +22,7 @@
                         <el-date-picker
                             v-model="statusTime"
                             type="date"
+                            value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                         </el-date-picker>
                     </div>
@@ -30,6 +31,7 @@
                         <el-date-picker
                             v-model="statusTime"
                             type="date"
+                            value-format="yyyy-MM-dd"
                             placeholder="选择日期">
                         </el-date-picker>
                     </div>

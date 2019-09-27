@@ -10,7 +10,7 @@
             </div>
             <Search @searchDetail='searchDetail' class="missionUnaccomplish_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-       <router-view></router-view> 
+       <router-view ref="childer"></router-view> 
     </div>
 </template>
 <script>
@@ -21,13 +21,45 @@ export default {
     data(){
         return{
             placeholderTexe:'搜索项目编号、名称',
+            routerPath:''
         }
     },
     methods:{
         searchDetail(data){
-            console.log(data)
+            switch(this.routerPath){
+                case '/Testengineer/missionUnaccomplish/test':
+                    this.$refs.childer.searchEquipment_finishexperiment(data,1);//试验
+                    break;
+                case '/Testengineer/missionUnaccomplish/project':
+                    this.$refs.childer.searchProject_finishprojectList(data,1);//项目
+                    break;
+            }
         }
-    }
+    },
+    mounted(){
+        this.routerPath = this.$route.path;
+        switch(this.routerPath){
+            case '/Testengineer/missionUnaccomplish/test':
+                this.placeholderTexe = '搜索试验编号、名称'
+                break;
+            case '/Testengineer/missionUnaccomplish/project':
+                this.placeholderTexe = '搜索项目编号、名称'
+                break;
+        }
+    },
+     watch:{
+        $route(to, from){
+            this.routerPath = to.path;
+            switch(to.path){
+            case '/Testengineer/missionUnaccomplish/test':
+                this.placeholderTexe = '搜索试验编号、名称'
+                break;
+            case '/Testengineer/missionUnaccomplish/project':
+                this.placeholderTexe = '搜索项目编号、名称'
+                break;
+        }
+        }
+     }
 }
 </script>
 <style lang="scss" scoped> 

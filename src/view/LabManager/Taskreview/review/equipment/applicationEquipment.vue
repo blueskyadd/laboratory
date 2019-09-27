@@ -1,5 +1,5 @@
 <template>
-    <div class="applicationEquipment body_main">
+    <div class="applicationEquipment body_main" v-loading.fullscreen.lock="isLoading">
         <header class="applicationEquipment_index_header">
             <h3>申请设备</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,35 +8,32 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>设备名称：</span>
-                    <p>烟雾试验箱</p>
+                    <p>{{equipmentSection.cause}}</p>
                 </div>
                 <div class="mian_text two_child ">
                     <span>申请时间：</span>
-                    <p>2012.02.12</p>
+                    <p>{{equipmentSection.create_time}}</p>
                 </div>
                 <div class="mian_text textarea">
                     <span>申请原因</span>
-                    <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="需求设备量大" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                    <div class="disabled">
+                        <textarea name="" disabled  maxlength="800" v-model="equipmentSection.cause" placeholder="需求设备量大" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{equipmentSection.cause.length}}/800</p>
                     </div>
                 </div>
                 <div class="main_list updata">
                     <span class="file_title">采购技术指导书:</span>
                     <div class="file_box">
-                        <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
-                            <!-- <div><span @click="updataFileChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span></div> -->
-                            <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span>
-                            <p>{{fileName}}</p>
+                            <span class="accessory"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span>
+                            <p>{{equipmentSection.databook}}</p>
                         </div>
-                        <!-- <span class="underline deleteFile" @click="deleteFile()">删除</span> -->
                     </div>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">不同意</el-button>
-                <el-button type="primary">审批</el-button> 
+                <el-button type="primary" class="primary_err" @click="editApplyEquipment(0)">不同意</el-button>
+                <el-button type="primary" @click="editApplyEquipment(2)">审批</el-button> 
             </footer>
         </div>
     </div>
@@ -48,6 +45,47 @@ export default {
         return{
             cause: '',//申请原因
             fileName: '指导书',
+            equipmentSection:{
+                "cause":'',
+                "create_time":'',
+                "databook":'',
+                "name":'',
+                "status":'',
+                "num":'',
+            },
+             isLoading:true,
+        }
+    },
+    mounted(){
+        this.getApplyEquipmentDetail()
+    },
+    methods:{
+        getApplyEquipmentDetail(){
+            this.$http.get(this.$conf.env.getApplyEquipmentDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.equipmentSection = res.data
+                 this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        editApplyEquipment(number){
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.editApplyEquipment + this.$route.query.equipmentID + '/',{"status":number}).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '审批成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back(-1);
+                    },100)
+                }else{
+                    this.$message({ message: '审批失败', type: 'warning'});              
+                }
+
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     }
 }

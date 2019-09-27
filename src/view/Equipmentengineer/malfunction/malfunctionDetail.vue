@@ -1,5 +1,5 @@
 <template>
-    <div class="malfunctionDetail body_main">
+    <div class="malfunctionDetail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="malfunctionDetail_index_header">
             <h3>报修详情</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,27 +8,23 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>设备名称：</span>
-                    <p class="malfunctionDetail_name">烟雾试验箱</p>
+                    <p class="malfunctionDetail_name">{{equipmentDection.name}}</p>
                     <span>设备编号：</span>
-                    <p style="color:#08a695;">烟雾试验箱</p>
+                    <p style="color:#08a695;">{{equipmentDection.num}}</p>
                 </div>
                 <div class="mian_text first_child ">
                     <span>设备所属实验室：</span>
-                    <p>2012.02.12</p>
+                    <p>{{equipmentDection.room}}</p>
                 </div>
                 <div class="main_list updata">
                     <span class="file_title">上传图片:</span>
                     <div class="file_box">
-                        <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
-                            <div><span @click="updataFileChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
-                            <!-- <span class="accessory" @click="updataFileChange"><img src="../../../assets/img/commont/file/accessory.png" alt=""></span> -->
-                            <!-- <p>{{fileName}}</p> -->
+                            <img :src="equipmentDection.image" alt="" class="upload_img">
                         </div>
-                        <!-- <span class="underline deleteFile" @click="deleteFile()">删除</span> -->
                     </div>
                 </div>
-                <p class="malfunctionDetail_text">故障现象:机器右下角有烧焦现象，出现大量烟雾。</p>
+                <p class="malfunctionDetail_text">故障现象:{{equipmentDection.cause}}</p>
             </div>
         </div>
     </div>
@@ -40,6 +36,22 @@ export default {
         return{
             cause: '',//申请原因
             fileName: '指导书',
+            equipmentDection:{},
+            isLoading: true,
+        }
+    },
+    mounted(){
+        this.getEquipment_maintainDetail()
+    },
+    methods:{
+        getEquipment_maintainDetail(){
+            this.$http.get(this.$conf.env.getEquipment_maintainDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.equipmentDection = res.data;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     }
 }

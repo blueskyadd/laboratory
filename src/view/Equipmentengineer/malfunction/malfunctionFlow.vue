@@ -8,12 +8,23 @@
         <div class="main">
             <div class="main_list">
                 <ul class="flow">
-                    <li @click="goMalfunctionDetail()"><img src="../../../assets/img/Equipmentengineer/malfunction/malfunction.png" alt=""><span>故障现象</span></li>
-
+                    <li @click="goMalfunctionDetail()" @mouseover="ismalfunction = false" @mouseout="ismalfunction = true" :style="{background:ismalfunction? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/malfunction.png" alt="" v-if="ismalfunction">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/malfunction_actively.png" alt="" v-else>
+                        <span :style="{color:ismalfunction?'#07A695': '#fff'}">故障现象</span>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="goMalfunctionChange()"><img src="../../../assets/img/Equipmentengineer/malfunction/changeEquipment.png" alt=""><span>维修工具、材料</span></li>
+                    <li @click="goMalfunctionChange()" @mouseover="ischangeEquipment= false" @mouseout="ischangeEquipment = true" :style="{background:ischangeEquipment? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/changeEquipment.png" alt="" v-if="ischangeEquipment">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/changeEquipment_actively.png" alt="" v-else>
+                        <span :style="{color:ischangeEquipment?'#07A695': '#fff'}">维修工具、材料</span>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="goMalfunctionReport()"><img src="../../../assets/img/Equipmentengineer/malfunction/lookReport.png" alt=""><span>上传维修报告</span></li>
+                    <li @click="goMalfunctionReport()" @mouseover="islookReport= false" @mouseout="islookReport = true" :style="{background:islookReport? '#fff':'#07A695'}">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/lookReport.png" alt="" v-if="islookReport">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/equipment_actively.png" alt="" v-else>
+                        <span :style="{color:islookReport?'#07A695': '#fff'}">上传维修报告</span>
+                    </li>
                 </ul>
                 <p>提示：请扫描设备二维码开始维修</p>
             </div>
@@ -25,7 +36,9 @@ export default {
     name:'malfunctionFlow',
     data(){
         return{
-            cause: '',
+            ismalfunction: true,
+            islookReport: true,
+            ischangeEquipment: true
         }
     },
     methods:{
@@ -33,15 +46,16 @@ export default {
             this.$router.push({name:'EquipmentengineerIndex'})
         },
         goMalfunctionDetail(){
-            this.$router.push({name:'malfunctionDetail'})
+            this.$router.push({path:'/Equipmentengineer/malfunctionDetail',query:{"equipmentID":this.$route.query.equipmentID}})
         },
         goMalfunctionChange(){
-            this.$router.push({name:'malfunctionChange'})
+            this.$router.push({path:'/Equipmentengineer/malfunctionChange',query:{"equipmentID":this.$route.query.equipmentID}})
         },
         goMalfunctionReport(){
-            this.$router.push({name:'malfunctionReport'})
+            this.$router.push({path:'/Equipmentengineer/malfunctionReport',query:{"equipmentID":this.$route.query.equipmentID}})
+
         },
-    }
+    },
 }
 </script>
 <style lang="scss" scoped>
@@ -79,15 +93,10 @@ export default {
             display: flex;
             justify-content: center;
             flex-direction: column;
-            // align-items: center;
-            // padding-left: 2.26rem;
             ul{
                 display: flex;
                 width: 100%;
                 justify-content: center;
-                // display: flex;
-                // height: 6.09rem;
-                // justify-content: space-around;
                 li{
                     cursor: pointer;
                     background:#fff;
@@ -145,7 +154,7 @@ export default {
                 font-weight:400;
                 color:rgba(7,166,149,1);
                 font-size: .2rem;
-                margin-left: 4.6rem;
+                margin-left: 22%;
                 padding-top: .43rem;
             }
         }

@@ -1,5 +1,5 @@
 <template>
-    <div class="updatafrockReport_detail body_main">
+    <div class="updatafrockReport_detail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="updatafrockReport_index_header">
             <h3>上传调试报告</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -16,8 +16,8 @@
                     </div>
                 </div>
             </div>
-            <footer>
-                <el-button type="primary" @click="$refs.popUp.dialogVisible = false">提交</el-button>
+            <footer >
+                <el-button type="primary" @click="updataApply_frockReport()" >提交</el-button>
             </footer>
         </div>
         
@@ -28,9 +28,9 @@ export default {
     name:'updatafrockReport',
     data(){
         return{
-            fileName: '调试报告',
-            file:{},
-            isupload: false,
+            fileName: '点击上传调试报告',
+            report:'',
+            isLoading: false, 
         }
     },
     methods:{
@@ -38,12 +38,35 @@ export default {
             this.$refs.file.click()
         },
         updatafrockReport(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
+            this.$updataFile.updataFile( e.target.files[0], res =>{
+                this.report = res.data.file;
+                this.fileName =  e.target.files[0].name;
+            },this)
         },
         deleteFile(){
-            this.file = {};
-            this.fileName = '';
+            this.report = '';
+            this.fileName = '点击上传调试报告';
+        },
+        updataApply_frockReport(){
+            if(!this.report){
+                this.$message({ message:'您还未上传文件' , type: 'warning'});
+            }else{
+                this.isLoading = true;
+                this.$http.put(this.$conf.env.updataApply_frockReport + this.$route.query.equipmentID + '/', {"report": this.report}).then( res =>{
+                    this.isLoading = false;
+                    if(res.status == '200'){
+                        this.$message({ message: '提交成功', type: 'success'});
+                        setTimeout(()=>{
+                            this.$router.back(-1);
+                        },100)
+                    }else{
+                        this.$message({ message: '提交失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    this.isLoading = false;
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                })
+            }
         }
     }
 }

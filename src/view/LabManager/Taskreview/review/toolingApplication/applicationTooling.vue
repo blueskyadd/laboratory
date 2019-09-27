@@ -1,5 +1,5 @@
 <template>
-    <div class="applicationTooling body_main">
+    <div class="applicationTooling body_main" v-loading.fullscreen.lock="isLoading">
         <header class="applicationTooling_index_header">
             <h3>申请工装</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,33 +8,32 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>工装名称：</span>
-                    <p>烟雾试验箱</p>
+                    <p>{{frockSection.create_time}}</p>
                 </div>
                 <div class="mian_text two_child ">
                     <span>申请时间：</span>
-                    <p>2012.02.12</p>
+                    <p>{{frockSection.create_time}}</p>
                 </div>
                 <div class="mian_text textarea">
                     <span>申请原因</span>
-                    <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="工装严重老化" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                    <div class="disabled">
+                        <textarea name="" disabled maxlength="800" v-model="frockSection.cause" placeholder="工装严重老化" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{frockSection.cause.length}}/800</p>
                     </div>
                 </div>
                 <div class="main_list updata">
                     <span class="file_title">工装文件:</span>
                     <div class="file_box">
-                        <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
-                            <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span>
-                            <p>{{fileName}}</p>
+                            <span class="accessory" ><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span>
+                            <p>{{frockSection.databook}}</p>
                         </div>
                     </div>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">不同意</el-button>
-                <el-button type="primary">审批</el-button>
+                <el-button type="primary" class="primary_err" @click="editApplyFrockDetail(0)">不同意</el-button>
+                <el-button type="primary" @click="editApplyFrockDetail(2)">审批</el-button>
             </footer>
         </div>
     </div>
@@ -44,10 +43,43 @@ export default {
     name:'applicationTooling',
     data(){
         return{
-            cause: '',//申请原因
-            fileName: '工装文件',
+            frockSection:{},
+            isLoading: true,
+        }
+    },
+    mounted(){
+        this.getApplyFrockDetail()
+    },
+    methods:{
+        getApplyFrockDetail(){
+            this.$http.get(this.$conf.env.getApplyFrockDetail + this.$route.query.frockID + '/').then(res =>{
+                this.frockSection = res.data
+                 this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        editApplyFrockDetail(number){
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.editApplyFrockDetail + this.$route.query.frockID + '/',{"status":number}).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '审批成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back(-1);
+                    },100)
+                }else{
+                    this.$message({ message: '审批失败', type: 'warning'});              
+                }
+
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     }
+    
 }
 </script>
 <style lang="scss" scoped>
@@ -239,6 +271,7 @@ export default {
             }
         }
     }
+    
 }
 .applicationTooling::-webkit-scrollbar{
     display: none;

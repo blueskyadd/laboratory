@@ -1,5 +1,5 @@
 <template>
-    <div class="proposeFeock body_main">
+    <div class="proposeFeock body_main" v-loading.fullscreen.lock="isLoading">
         <header class="proposeFeock_index_header">
             <h3>申请工装</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -7,43 +7,106 @@
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text first_child">
-                    <span>工装名称：</span>
-                    <input type="text" placeholder="填写设备名称">
+                    <span><i class="importantData">*</i>工装名称：</span>
+                    <input type="text" v-model="equipmentSection.name" placeholder="填写设备名称">
+                </div>
+                <div class="mian_text first_child">
+                    <span><i class="importantData">*</i>工装数量：</span>
+                    <input type="number" v-model="equipmentSection.num" placeholder="填写设备数量">
                 </div>
                 <div class="mian_text textarea">
-                    <span>申请原因：</span>
+                    <span><i class="importantData">*</i>申请原因：</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="填写申请原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="equipmentSection.cause" placeholder="填写申请原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{equipmentSection.cause.length}}/800</p>
                     </div>
                 </div>
                 <div class="main_list updata">
-                    <span class="file_title">工装文件：</span>
+                    <span class="file_title"><i class="importantData">*</i>工装文件：</span>
                     <div class="file_box">
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
                             <div><span @click="updataFileChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
-                            <!-- <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span> -->
-                            <!-- <p>{{fileName}}</p> -->
+                            <span class="accessory" @click="updataFileChange"><img src="../../../assets/img/commont/file/accessory.png" alt=""></span>
+                            <p>{{fileName}}</p>
                         </div>
-                        <!-- <span class="underline deleteFile" @click="deleteFile()">删除</span> -->
+                        <span class="underline deleteFile" @click="deleteFile()">删除</span>
                     </div>
                 </div>
                  
             </div>
-            <footer>
-                <el-button type="primary">提交</el-button>
+            <footer v-if="isupload">
+                <el-button type="primary" @click="createdApply_frock()">提交</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData'
 export default {
     name:'proposeFeock',
     data(){
         return{
             cause: '',//申请原因
-            fileName: '指导书',
+            fileName: '点击上传指导书',
+            equipmentSection:{
+                "name":'',
+                "cause":'',
+                "databook":''
+            },
+            isupload: true,
+            isLoading: false,
+        }
+    },
+    methods:{
+        updataFileChange(){
+            this.$refs.file.click();
+        },
+        updataFile(e){
+            this.$updataFile.updataFile( e.target.files[0], res =>{
+                this.equipmentSection.databook = res.data.file;
+                this.fileName = e.target.files[0].name;
+            },this)
+        },
+        deleteFile(){
+            this.equipmentSection.databook = '';
+            this.fileName = '点击上传指导书';
+        },
+        getApplyequipment_frockDetail(){
+            this.isLoading = true;
+            this.$http.get(this.$conf.env.getApplyequipment_frockDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.isLoading =  false;
+                this.equipmentSection = res.data;
+                this.fileName = res.data.databook;
+            }).catch( err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        createdApply_frock(){
+            if(!VerificationData.VerificationData(this.equipmentSection)) return;
+            this.$http.post(this.$conf.env.createdApply_frock,this.equipmentSection).then(res =>{
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back();
+                    },200)
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        }
+    },
+    mounted(){
+        if(this.$route.query.equipmentID){
+            this.isupload = false;
+            this.getApplyequipment_frockDetail()
         }
     }
 }

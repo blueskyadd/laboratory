@@ -8,7 +8,7 @@
     overflow: hidden;
     .el-table {
         width: 100%;
-        overflow-y: scroll;
+        // overflow-y: scroll;
         height: calc(100% - 1rem);
     }
 }
@@ -55,6 +55,10 @@
         width: 2rem;
          height: 1rem;
          border: 1px dashed #eee;
+    }
+    .el-select__input{
+        border: 0!important;
+        margin: 0!important;
     }
     .el-dialog{
         border-radius: .14rem;
@@ -184,11 +188,19 @@
                         color:#999999;
                     }
                 }
+                button:first-child:hover{
+                    background: #fff!important;
+                }
                 button:last-child{
                     span{
                         color:#fff;
                     }
+                    .el-icon-loading{
+                        margin-right: .05rem;
+                    }
                     background: #08a795;
+                    display: flex;
+                    align-items: center;
                 }
             }
         }
@@ -228,11 +240,12 @@
     padding-left: .41rem;
     display: flex;
     font-size: .25rem;
+    align-items: center;
 }
 
 //按钮
 .lookmanagement{
-    margin-right: 16%!important;
+    margin-right: 10%!important;
 }
 .deletemanagement{
     color: #f30000;
@@ -247,7 +260,7 @@
     height: calc(100% - 1.7rem);
     overflow: hidden;
     .el-table{
-        overflow-y: scroll;
+        // overflow-y: scroll;
         height: calc(100% - 1rem);
     }
 }
@@ -263,8 +276,8 @@ a:hover{
 }
 //不可编辑
 .disabled{
-    background-color: #F5F7FA;
-    color: #C0C4CC;
+    background-color: #F5F7FA!important;
+    color: #C0C4CC!important;
     border-color: #E4E7ED!important;
 }
 input{
@@ -272,4 +285,116 @@ input{
 }
 li>a{
     text-decoration: none!important;
+}
+.rightText{
+    padding-right: 3.12rem!important;
+
+}
+.rightText_report{
+    padding-right: 1.12rem!important;
+
+}
+.main_list{
+    li{
+        a{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+    li:nth-child(2n-1){
+        cursor: pointer;
+    }
+}
+.footer_button{
+    display: flex;
+    justify-content: flex-end;
+    button{
+        font-size: .3rem;
+        padding: .12rem .24rem;
+    }
+    button:first-child{
+        background: #f10000;
+        border: 0;
+    }
+    button:last-child{
+        background: #08a695;
+    }
+}
+//上传样式
+.uploadFile{
+    margin-bottom: 4.3rem;
+    display: flex;
+    align-items: flex-start;
+    .accessory{
+        margin-left: .27rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: auto;
+        img{
+            // margin-top: .21rem;
+        }
+        span{
+            height: auto;
+            margin-top: .13rem;
+            margin-left: 0!important;
+        }
+    }
+    .deleteFile{
+        font-size: .23rem!important;
+        color: #f20000!important;
+        margin-left: 1.06rem;
+        line-height: .23rem;
+        margin-top: .13rem;
+    }
+}
+.table_box{
+    th{
+        font-size: .2rem;
+        line-height: .48rem;
+        padding: 0;
+        font-weight: 400;
+        .cell{
+            line-height: .48rem;
+        }
+    }
+    td{
+        border: 0;
+        padding: 0;
+        font-size: .23rem;
+         .cell{
+            line-height: .67rem;
+            span{
+                line-height: .67rem;
+            }
+        }
+    }
+}
+
+
+.management_index_header{
+    padding-left: .41rem;
+    height: .38rem;
+    display: flex;
+    margin-bottom: .66rem;
+    margin-left: .19rem;
+    align-items: flex-end;
+    h3{
+        font-size: .36rem;
+        color: #333333;
+        font-weight: 500;
+        margin-bottom: .04rem;
+        line-height: .36rem;
+    }
+    // 公共span
+    span{
+        font-size: .23rem;
+        cursor:pointer;
+    }
+    //返回按钮
+    .goBack{
+        margin-left: .28rem;
+        margin-right: 9.32rem;
+    }
 }

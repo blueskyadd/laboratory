@@ -131,7 +131,7 @@
                     </li>
                     <li class="upload">
                         <span><i class="importantData">*</i>上传图片：</span>
-                        <input type="file" ref="fileImg"  @change='updataFileImg' style="display:none" >
+                        <input type="file" ref="fileImg" accept="image/*"  @change='updataFileImg' style="display:none" >
                         <div v-if="!equipmentEngineer.image">
                             <span @click="updataFileChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span>
                         </div>
@@ -182,22 +182,7 @@ export default {
     data() {
       return {
         tableData: [],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+        options: [],
         value: '',
         popUptitle: '',
         isUpslot: false,
@@ -246,15 +231,10 @@ export default {
                 return "color:#444444";
             }
         },
-
         /**@name 页面跳转 */
-        lookDetail(data){
-
-        },
         allocation(data){
             this.$router.push({path: '/lookEquipment',query:{equipmentID:data.row.id} })
         },
-
         /**@name功能按键 */
         showListTab(){
             this.getunEquipmentList();//获取数据
@@ -311,7 +291,7 @@ export default {
                 _this.equipmentEngineer.image = res.data.file
                 console.log(res)
                 // this.fileName =  e.target.files[0].name;
-            })
+            },this)
         },
         updataFile(e){
             let _this = this;
@@ -319,7 +299,7 @@ export default {
                 _this.equipmentEngineer.instructions = res.data.file
                 _this.instructionsName = e.target.files[0].name;
                 _this.isUpslot = false;
-            })
+            },this)
         },
         //文件删除
         deleteFile(){
@@ -348,29 +328,25 @@ export default {
             this.isSearch = true;
             this.CurrentChange = 1;
             console.log(this.CurrentChange)
-            this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentManagementList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.getequipmentManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentManagementList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.getequipmentManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.isLoading = false;
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name获取设备数据 */
         getequipmentManagementList(pageNumber){
             this.isSearch = false;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentManagementList + '?page_size=' +this.page_size : this.$conf.env.getequipmentManagementList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentManagementList + '?page_size=' +this.page_size : this.$conf.env.getequipmentManagementList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.isLoading = false;
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name获取设备申请未录入列表 */
@@ -378,9 +354,7 @@ export default {
             this.$http.get(this.$conf.env.getunEquipmentList).then(res =>{
                 this.unEquipmentList = res.data
             }).catch(err =>{
-                 if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name实验室列表 */
@@ -388,9 +362,7 @@ export default {
             this.$http.get(this.$conf.env.getlaboratoryList).then( res =>{
                 this.laboratoryList = res.data
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name 设备工程师 */
@@ -398,9 +370,7 @@ export default {
            this.$http.get(this.$conf.env.getequipmentEngineerList).then( res =>{
                 this.equipmentEngineerList = res.data
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             }) 
         },
         /**@name计量工程师 */
@@ -408,9 +378,7 @@ export default {
             this.$http.get(this.$conf.env.getmeasurementEnginerrList).then( res =>{
                 this.measurementEnginerrList = res.data
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             }) 
         },
         /**@name 设备详情 */
@@ -422,7 +390,7 @@ export default {
                 res.data.room = res.data.room.id;
                 this.equipmentEngineer = res.data;
             }).catch(err =>{
-                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })  
         },
         /**@name 设备退回 */
@@ -435,25 +403,37 @@ export default {
                     this.$message({ message: '退回失败', type: 'warning'});              
                 }
             }).catch(err =>{
-                 this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })  
         },
         /**@name删除设备 */
         deleteEquipment(ID){
-            this.$http.delete(this.$conf.env.deleteEquipment + ID +'/').then( res =>{
-                 if(res.status == '204'){
-                    this.$message({ message: '删除成功', type: 'success'});
-                     this.reload();
-                }else{
-                    this.$message({ message: '删除失败', type: 'warning'});              
-                }
-            }).catch(err =>{
-                if(err.response.status == '400'){
-                    this.$message({ message:err.response.data, type: 'warning'});   
-                }else{
-                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
-                }
-            })
+            this.$confirm('此操作将删除该设备, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$http.delete(this.$conf.env.deleteEquipment + ID +'/').then( res =>{
+                    if(res.status == '204'){
+                        this.$message({ message: '删除成功', type: 'success'});
+                        this.reload();
+                    }else{
+                        this.$message({ message: '删除失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    if(err.response.status == '400'){
+                        this.$message({ message:err.response.data, type: 'warning'});   
+                    }else{
+                        this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                    }
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+            
         },
         /**@name 新增设备 */
         createdEquipment(){
@@ -475,7 +455,7 @@ export default {
                         this.$message({ message:err.response.data.money , type: 'warning'});   
                     }
                 }else{
-                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
                 }
             })
         },
@@ -499,7 +479,7 @@ export default {
                         this.$message({ message:err.response.data.money , type: 'warning'});   
                     }
                 }else{
-                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
                 }
             })
         },

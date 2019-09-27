@@ -1,15 +1,25 @@
 <template>
     <div class="unMissionUnaccomplishProjectengineer_unMissionUnaccomplishProject">
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
+            <el-table-column prop="number"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="项目名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目类型" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目开始时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="project_type"  label="项目类型" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="start_time"  label="项目开始时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address"  label="操作" header-align='center' align='center'>
-                 <template slot-scope="scoped"><span class="underline lookmanagement"  @click="allocation(scoped)">查看</span></template>
+                 <template slot-scope="scoped"><span style="margin-right:0!important;" class="underline lookmanagement"  @click="allocation(scoped)">查看</span></template>
             </el-table-column>
         </el-table>
-        
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
     </div>
 </template>
 <script>
@@ -17,42 +27,15 @@ export default {
     name:'unMissionUnaccomplishProject',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        },{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        
-        statusTime:'',
-        CurrentChange: 0,
+        tableData: [],
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        CurrentChange:1,
+        isSearch: 0,//是否为搜索
+        searchText:'',//搜索文字
+        searchType: 0,
       }
     },
     methods:{
@@ -72,21 +55,89 @@ export default {
         },
 
         /**@name 页面跳转 */
-        historyEditDeteil(data){
-            this.$router.push({name: 'historyEditDeteil' })
-        },
         allocation(data){
-            this.$router.push({name: 'unMissionDetail' })
+            this.$router.push({path: '/Testengineer/unMissionDetail',query:{equipmentID:data.row.id} })
         },
 
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            switch(this.isSearch){
+                case 0:
+                this.getEquipment_myprojectList(pageNumber);
+                break;
+                case 1:
+                this.searchTypeEquipment_myprojectList(this.searchType,pageNumber);
+                break;
+                case 2:
+                this.searchEquipment_myprojectList(this.searchText,pageNumber);
+                break;
+            }
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        searchEquipment_myprojectList(data,pageNumber){
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = 2;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipment_myprojectList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.getEquipment_myprojectList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        searchTypeEquipment_myprojectList(type,pageNumber){
+            this.searchType = type;
+            this.isLoading = true;
+            this.isSearch = 1;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipment_myprojectList + '?project_type=' + type + '&page_size=' +this.page_size : this.$conf.env.getEquipment_myprojectList + 'project_type=' + type + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+
+        },
+        getEquipment_myprojectList(pageNumber){
+            this.isSearch = 0;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipment_myprojectList + '?page_size=' +this.page_size : this.$conf.env.getEquipment_myprojectList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getEquipment_myprojectList(1);
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                switch(this.isSearch){
+                case 0:
+                this.getEquipment_myprojectList(this.CurrentChange);
+                break;
+                case 1:
+                this.searchTypeEquipment_myprojectList(this.searchType,this.CurrentChange);
+                break;
+                case 2:
+                this.searchEquipment_myprojectList(this.searchText,this.CurrentChange);
+                break;
+            }
+            }
+        },
     }
 }
 </script>
@@ -94,8 +145,8 @@ export default {
 @import '../../../../../style/LabManager/management/index.scss';
 .unMissionUnaccomplishProjectengineer_unMissionUnaccomplishProject{
     position: relative;
-    height: 100%;
-    
+    height: calc(100% - 2.5rem);
+    // padding-top: .42rem;
     .Search ul{
         margin-bottom: 0;
     }

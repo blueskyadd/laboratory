@@ -82,7 +82,7 @@ export default {
             this.getupkeepRecordList(pageNumber);
         },
         getupkeepRecordList(pageNumber){
-            this.$http.get(pageNumber == 1 ? this.$conf.env.getupkeepRecordList + this.$route.query.EquipmentpurchaseID + '&page_size=' +this.page_size : this.$conf.env.getupkeepRecordList +this.$route.query.EquipmentpurchaseID + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getupkeepRecordList + this.$route.query.EquipmentpurchaseID + '&page_size=' +this.page_size : this.$conf.env.getupkeepRecordList +this.$route.query.EquipmentpurchaseID + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 res.data = {
                     "count": 1,
                     "next": null,
@@ -102,7 +102,7 @@ export default {
                 this.isLoading = false;
             }).catch(err =>{
                 this.isLoading = false;
-                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         }
     },

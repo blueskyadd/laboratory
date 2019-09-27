@@ -1,6 +1,6 @@
 <template>
     <div class="management_historyManagement scrollTableScrollNoTop">
-        <!-- <div class="Search">
+        <div class="Search">
             <ul>
                 <li style="margin-bottom:.24rem">
                     <span class="equipmentName">项目类型</span>
@@ -24,7 +24,7 @@
                         </el-option>
                     </el-select>
                 </li>
-                <li style="margin-bottom:.24rem">
+                <!-- <li style="margin-bottom:.24rem">
                     <span class="equipmentName">项目创建时间</span>
                     <el-select v-model="value" placeholder="请选择项目创建时间">
                         <el-option
@@ -45,13 +45,13 @@
                         :value="item.value">
                         </el-option>
                     </el-select>
-                </li>
+                </li> -->
             </ul>
             <div class="editTableButton">
                 <el-button type="primary">搜索</el-button>
                 <el-button type="primary">重置</el-button>
             </div>
-        </div> -->
+        </div>
         <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
             <el-table-column prop="number"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="项目名称" header-align='center' align='center'> </el-table-column>
@@ -139,29 +139,25 @@ export default {
              this.searchText = data;
              this.isSearch = true;
              this.currentPage = 1;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?search=' + data + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name数据加载 */
         gethistoryProjectList(pageNumber){
             this.isSearch = false;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         }
     },
@@ -180,17 +176,16 @@ export default {
 }
 </script>
 <style lang="scss">
-
 .management_historyManagement{
     // position: relative;
     // height: 100%;
 @import '../../../../../style/LabManager/management/index.scss';
-     margin-top: .53rem;
+    //  margin-top: .53rem;
     .Search ul{
         margin-bottom: 0;
     }
     .editTableButton{
-       
+       margin-top: 0!important;
     }
      th{
             font-size: .2rem;

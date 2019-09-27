@@ -25,7 +25,8 @@
                         <h3>设备档案</h3>
                         <div class="efficient_data">
                             <div class="text_number">
-                                <span>12</span><span>份</span>
+                                <yd-countup :endnum="12" :duration="1" >{{allocation}}</yd-countup>
+                                <span>份</span>
                             </div>
                         </div>
                     </div>
@@ -91,6 +92,7 @@
 
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
 import Calendar from "vue-calendar-component";
+import { setTimeout } from 'timers';
 export default {
     name:'index',
     components: {swiper, swiperSlide, Calendar},
@@ -118,6 +120,7 @@ export default {
         },
         swiperSlides: [1, 2, 3, 4,5,6,7,8,9,10],
         operating: 1 ,
+        allocation:12
       }
     },  
     mounted() {
@@ -176,8 +179,8 @@ export default {
                     if(err.response.data.detail == 'Signature has expired.'){
                         this.$message({message: '签名已过期,请重新登录',type: 'error',duration:0});
                     }
-                }else if(err.response.state == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
                 }
             })
         },
@@ -274,6 +277,9 @@ $setColor:#7f0dde;
                     color: $setColor;
                     font-weight: 500;
                 }
+            }
+            .swiper-slide{
+                width: auto!important;
             }
             
         }
@@ -498,7 +504,9 @@ $setColor:#7f0dde;
                         margin-right: .13rem;
                         margin-top: .05rem;
                     }
-
+                    p{
+                        flex: 1;
+                    }
                 }
             }
         }
@@ -557,7 +565,7 @@ $setColor:#7f0dde;
                         color: #9e9e9e;
                         font-size: .16rem;
                         height: .5rem;
-                        width: .58rem;
+                        // width: .58rem;
                         font-weight: 500;
                         .wh_chose_day,.wh_item_date[data-v-2ebcbc83]:hover{
                             color: #32d5c7;

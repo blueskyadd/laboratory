@@ -3,29 +3,31 @@
         <header class="ReWire_header">
             <h3>设备操作指导书</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9rem;" @click="$router.push({name:'updataReWire'})">上传设备操作指导书</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <span class="goBack underline" style="margin-left:.3rem;margin-right: 40%;" @click="$router.push({name:'updataReWire'})">上传设备操作指导书</span>
+            <Search @searchDetail='searchEquipmentOperation_applyList' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="设备操作指导书编号" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="设备操作指导书名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="所属设备" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="上传时间" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="operation_num"  label="设备操作指导书编号" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="operation"  label="设备操作指导书名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="所属设备" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="operation_time"  label="上传时间" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline span_upload"  @click="allocation(scoped)">编辑</span><span class="underline span_upload"  @click="allocation(scoped)">查看</span><span class="underline"  @click="allocation(scoped)">下载</span></template>
+                    <template slot-scope="scoped">
+                        <span class="underline span_upload" :style="{'color':scoped.row.status == 1?'':'#999!important','cursor':scoped.row.status == 1 ?'':'not-allowed'}"  @click="scoped.row.status == 1 && goeditEquipment(scoped)">编辑</span>
+                        <a class="underline" download="w3logo" :href="scoped.row.operation_file">下载</a>
+                    </template>
                 </el-table-column>
             </el-table>
         </div>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange" 
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -38,27 +40,17 @@ export default {
     components:{Search},
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                },{
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
             popUptitle:'',
             isUpslot:1,
             placeholderTexe:'搜索试验编号、名称',
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            CurrentChange:1,
+            currentPage: 1,//当前页
+            page_size : 9,//一页数据条数
+            isSearch: false,//是否为搜索
+            searchText:'',//搜索文字
         }
     },
     methods:{
@@ -76,23 +68,56 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
-        },
-        allocation(){
-            this.$router.push({name:'NewEquipmentFlow'})
-        },
-        goUpdataFile(){
-            this.$router.push({name: 'updataFile'})
+        goeditEquipment(data){
+            this.$router.push({path: '/Equipmentengineer/updataReWire', query:{equipmentID:data.row.id } })
         },
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch?this.getEquipmentOperation_applyList(pageNumber):this.searchEquipmentOperation_applyList(this.searchText,pageNumber);
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+         /**@name搜索 */
+        searchEquipmentOperation_applyList(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipmentOperation_applyList + '?search=' + data   + '&page_size=' +this.page_size : this.$conf.env.getEquipmentOperation_applyList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+               this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getEquipmentOperation_applyList(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipmentOperation_applyList + '?page_size=' +this.page_size : this.$conf.env.getEquipmentOperation_applyList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            console.log(res)
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+     mounted(){
+        this.getEquipmentOperation_applyList(1)
+    },
+     watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch?this.getEquipmentOperation_applyList(this.CurrentChange):this.searchEquipmentOperation_applyList(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>

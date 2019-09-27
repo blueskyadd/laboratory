@@ -16,7 +16,7 @@
             </div>
             <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-       <router-view></router-view> 
+       <router-view ref="childer"></router-view> 
     </div>
 </template>
 <script>
@@ -31,7 +31,95 @@ export default {
     },
     methods:{
         searchDetail(data){
-            console.log(data)
+            switch(this.routerPath){
+                case '/Taskreview/report':
+                    this.$refs.childer.reportSearch(data,1);//报告
+                    break;
+                case '/Taskreview/measure':
+                    this.$refs.childer.mesureSearch(data,1);//计量
+                    break;
+                case '/Taskreview/material':
+                    this.$refs.childer.MaterialSearch(data,1);//物料
+                    break; 
+                case '/Taskreview/equipment':
+                    this.$refs.childer.EquipmentSearch(data,1);//设备
+                    break;
+                case '/Taskreview/Watch':
+                    this.$refs.childer.watchSearch(data,1);//值班
+                    break;
+                case '/Taskreview/teskMethod':
+                    this.$refs.childer.methodsSearch(data,1);//试验方法
+                    break;
+                case '/Taskreview/toolingApplication':
+                    this.$refs.childer.frockSearch(data,1);//工装申请
+                    break;
+                case '/Taskreview/infrastructure':
+                    this.$refs.childer.infrastructureSearch(data,1);//基础设施
+                    break;
+            }
+        },
+        
+    },
+    mounted(){
+        this.routerPath = this.$route.path;
+        switch(this.$route.path){
+            case '/Taskreview/report':
+                this.placeholderTexe = '搜索报告编号、名称'
+                break;
+            case '/Taskreview/measure':
+                this.placeholderTexe = '搜索设备编号、名称'
+                break;
+            case '/Taskreview/material':
+                this.placeholderTexe = '搜索物料编号、名称'
+                break;
+            case '/Taskreview/equipment':
+                this.placeholderTexe = '搜索设备编号、名称'
+                break;
+            case '/Taskreview/Watch':
+                this.placeholderTexe = '搜索员工工号、名称'
+                break;
+            case '/Taskreview/teskMethod':
+                this.placeholderTexe = '搜索试验方法编号、名称'
+                break;
+            case '/Taskreview/toolingApplication':
+                this.placeholderTexe = '搜索工装编号、名称'
+                break;
+            case '/Taskreview/infrastructure':
+                this.placeholderTexe = '搜索报告编号、名称'
+                break;
+            }
+    },
+    watch:{
+        $route(to, from){
+            this.routerPath = to.path;
+            console.log(to.path)
+            switch(this.$route.path){
+            case '/Taskreview/report':
+                this.placeholderTexe = '搜索报告编号、名称'
+                break;
+            case '/Taskreview/measure':
+                this.placeholderTexe = '搜索设备编号、名称'
+                break;
+            case '/Taskreview/material':
+                this.placeholderTexe = '搜索物料编号、名称'
+                break;
+            case '/Taskreview/equipment':
+                this.placeholderTexe = '搜索设备编号、名称'
+                break;
+            case '/Taskreview/Watch':
+                this.placeholderTexe = '搜索员工工号、名称'
+                break;
+            case '/Taskreview/teskMethod':
+                this.placeholderTexe = '搜索试验方法编号、名称'
+                break;
+            case '/Taskreview/toolingApplication':
+                this.placeholderTexe = '搜索工装编号、名称'
+                break;
+            case '/Taskreview/infrastructure':
+                this.placeholderTexe = '搜索报告编号、名称'
+                break;
+            }
+            
         }
     }
 }

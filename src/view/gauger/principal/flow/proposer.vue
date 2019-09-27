@@ -1,5 +1,5 @@
 <template>
-    <div class="proposer body_main">
+    <div class="proposer body_main"  v-loading.fullscreen.lock="isLoading">
         <header class="proposer_index_header">
             <h3>申请计量</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,61 +8,95 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>物料名称：</span>
-                    <p class="proposerName">仍旧乳杆菌他</p>
+                    <p class="proposerName">{{meteringDetail.name}}</p>
                     <span>物料编号：</span>
-                    <p>仍旧乳杆菌他</p>
+                    <p>{{meteringDetail.num}}</p>
                 </div>
                 <div class="mian_text first_child">
                     <span>计量开始时间：</span>
                     <el-date-picker
-                        v-model="statusTime"
-                        type="date"
+                        v-model="meteringDetailStart_time"
+                        type="datetime"
+                        value-format="yyyy-MM-ddTHH:mm:ss"
                         placeholder="计量开始时间">
                     </el-date-picker>
                     <span>计量截止时间：</span>
                     <el-date-picker
-                        v-model="statusTime"
-                        type="date"
+                        v-model="meteringDetailEnd_time"
+                        type="datetime"
+                        value-format="yyyy-MM-ddTHH:mm:ss"
                         placeholder="计量截止时间">
                     </el-date-picker>
                 </div>
                  <div class="mian_text textarea">
                     <span>计量原因</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="编辑申请原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="meteringDetail.cause" placeholder="编辑申请原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{meteringDetail.cause.length}}/800</p>
                     </div>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">保存</el-button>
+                <el-button type="primary" @click="createdGuager_metering">保存</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../../components/VerificationData';
 export default {
     name:'proposer',
+    inject:['reload'],
     data(){
         return{
             cause: '',//申请原因
             fileName: '指导书',
-            options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+            meteringDetail:{},
+            isLoading: true,
+            meteringDetailStart_time:'',
+            meteringDetailEnd_time:'',
+        }
+    },
+    mounted(){
+        this.getGuager_meteringDetail()
+    },
+    methods:{
+        createdGuager_metering(){
+            this.meteringDetail.end_time = this.meteringDetailEnd_time;
+            this.meteringDetail.start_time = this.meteringDetailStart_time;
+            if(!VerificationData.VerificationData(this.meteringDetail)) return;
+            delete  this.meteringDetail.name;
+            delete this.meteringDetail.num;
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.createdGuager_metering, this.meteringDetail).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    this.$router.back();
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'}); 
+                    this.reload();             
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.reload();
+            })
+        },
+        getGuager_meteringDetail(){
+            this.$http.get(this.$conf.env.getGuager_meteringDetail +this.$route.query.equipmentID +'/' ).then(res =>{
+                this.meteringDetail.id = res.data.id;
+                this.meteringDetail.name = res.data.name;
+                this.meteringDetail.num = res.data.num;
+                this.meteringDetailStart_time =res.data.start_time? res.data.start_time.split(' ')[0]+'T'+res.data.start_time.split(' ')[1]+':00':'';
+                this.meteringDetailEnd_time = res.data.end_time?res.data.end_time.split(' ')[0]+'T'+res.data.end_time.split(' ')[1]+':00':'';
+                this.meteringDetail.cause = res.data.cause;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                console.log(err)
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     }
 }

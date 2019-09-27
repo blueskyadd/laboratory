@@ -88,7 +88,7 @@
                         </li>
                         <li class="upload">
                             <span><i class="importantData">*</i>上传图片：</span>
-                            <input type="file" ref="fileImg"  @change='updataImg' style="display:none" >
+                            <input type="file" ref="fileImg" accept="image/*" @change='updataImg' style="display:none" >
                             <div v-if="!isUploadImg">
                                 <span @click="updataImgChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span>
                             </div>
@@ -228,7 +228,7 @@ export default {
              this.$updataFile.updataFile(e.target.files[0], res =>{
                 this.frockSectionInfo.image = res.data.file;
                 this.isUploadImg = true;
-            })
+            },this)
         },
         //上传文件按钮
         updataFile(e){
@@ -236,7 +236,7 @@ export default {
                 this.isUploadFile = true;
                 this.frockSectionInfo.service_manual = res.data.file;
                 this.fileName =  e.target.files[0].name;
-            })
+            },this)
         },
         //文件删除
         deleteFile(){
@@ -274,25 +274,21 @@ export default {
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
             }).catch(err =>{
-                console.log(err)
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             }) 
         },
         /**@name获取数据 */
         getfrockManageList(pageNumber){
           this.isSearch = false;
-          this.$http.get(pageNumber == 1 ? this.$conf.env.getfrockManageList + '?page_size=' +this.page_size : this.$conf.env.getfrockManageList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+          this.$http.get(pageNumber == 1 ? this.$conf.env.getfrockManageList + '?page_size=' +this.page_size : this.$conf.env.getfrockManageList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+
             })  
         },
         /**@name工装未录入列表数据 */
@@ -300,9 +296,7 @@ export default {
             this.$http.get(this.$conf.env.getNoentryFrockList).then(res =>{
                 this.NoentryFrockList = res.data
             }).catch(err =>{
-                 if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name 设备工程师 */
@@ -310,9 +304,7 @@ export default {
            this.$http.get(this.$conf.env.getequipmentEngineerList).then( res =>{
                 this.equipmentEngineerList = res.data
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             }) 
         },
         /**@name获取工装详情 */
@@ -324,7 +316,7 @@ export default {
                 this.isUploadImg = res.data.image ? true : false;
                 this.isUploadFile = res.data.service_manual ? true : false;
             }).catch(err =>{
-                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })  
         },
         /**@name 创建工装 */
@@ -338,7 +330,7 @@ export default {
                     this.$message({ message: '创建失败', type: 'warning'});              
                 }
             }).catch(err =>{
-                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         /**@name编辑工装 */
@@ -352,7 +344,7 @@ export default {
                     this.$message({ message: '修改失败', type: 'warning'});              
                 }
             }).catch(err =>{
-                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         }
     },

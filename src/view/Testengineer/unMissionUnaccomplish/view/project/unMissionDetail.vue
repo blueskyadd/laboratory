@@ -1,59 +1,39 @@
 <template>
     <div class="unMissionDetail">
         <header class="unMissionDetail">
-            <h3>项目名称</h3>
+            <h3>{{projectName}}</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
         <div class="taskName">
-            <span>委托公司部门：</span>
-            <p>控福智能-硬件部</p>
+            <span>公司-部门：</span>
+            <p>{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
         </div>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="试验名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="负责人" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="试验开始时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="试验数据"      header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">试验数据</span></template>
+            <el-table :data="tableData" :cell-style="changecolor" height="100%"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+                <el-table-column prop="experiment_num"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="试验名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="engineer"  label="负责人" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="start_time"  label="试验开始时间" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  label="试验数据"  header-align='center' align='center'>
+                    <template slot-scope="scoped"><a class="underline" download="w3logo" :href="scoped.row.result">试验数据</a></template>
                 </el-table-column>
-                <el-table-column prop="address"   label="试验结果" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">合格</span> </template>
-                </el-table-column>
+                <el-table-column prop="result"   label="试验结果" header-align='center' align='center'> </el-table-column>
             </el-table>
         </div>
         <footer class="underline" @click="goUpdataFile">上传项目文件</footer>
     </div>
 </template>
 <script>
-import Search from "../../../../../components/common/search";
 export default {
     name: 'unMissionDetail',
-    components:{Search},
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
             popUptitle:'',
             isUpslot:1,
-            placeholderTexe:'搜索试验编号、名称',
+            isLoading:true,//加载动画
+            projectName:'',
+            labManagrInfo:{}
         }
     },
     methods:{
@@ -61,6 +41,12 @@ export default {
         changecolor(data){
             if (data.columnIndex == 0 ) {
                 return "color:#07a695";
+            }else if (data.columnIndex == 5 ) {
+                if(data.row.result == '合格'){
+                    return "color:#07a695"
+                }else{
+                    return "color:#f30000"
+                }
             }else{
                 return "color:#444444";
             }
@@ -71,12 +57,32 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
-        },
         goUpdataFile(){
-            this.$router.push({name: 'updataFile'})
-        }
+            this.$router.push({path: '/Testengineer/updataFile',query:{equipmentName:this.projectName,equipmentLab:this.labManagrInfo.lab,equipmentDepartment:this.labManagrInfo.department,equipmentID: this.$route.query.equipmentID}})
+        },
+        getEquipment_myTextprojectList(data){
+            var url= data ? this.$conf.env.getEquipment_myTextprojectList+ this.$route.query.equipmentID + '/' + '?search=' + data : this.$conf.env.getEquipment_myTextprojectList+ this.$route.query.equipmentID + '/'
+            this.$http.get(url).then( res =>{
+                this.isLoading = false;
+                this.tableData = res.data.experiments;
+                this.projectName = res.data.name;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getEquipment_userinfoDetail(){
+            this.$http.get(this.$conf.env.getEquipment_userinfoDetail).then(res =>{
+                this.labManagrInfo = res.data;
+                
+            }).catch(err =>{
+                console.log(err)
+            })
+        },
+    },
+    mounted(){
+        this.getEquipment_myTextprojectList();
+        this.getEquipment_userinfoDetail();
     }
 }
 </script>

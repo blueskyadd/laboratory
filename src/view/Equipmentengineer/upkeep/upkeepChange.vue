@@ -5,7 +5,7 @@
       <h3>工具物料申请</h3>
       <span class="goBack underline" @click="$router.back(-1)">返回</span>
       <div class="upkeepChange_index_header_link">
-        <span class="underline" @click="addMalfunction()">添加物料</span>
+        <span class="underline" @click="addMalfunction(true)">添加物料</span>
       </div>
     </header>
     <div class="taskName">
@@ -15,54 +15,54 @@
       <p>控福智能-硬件部</p>
     </div>
     <div class="taskAllocation_distributed">
-      <el-table
-        :data="tableData"
-        :cell-style="changecolor"
-        style="width: 100%"
-        :row-class-name="tabRowClassName"
-      >
-        <el-table-column prop="date" label="物料名称" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="date" label="物料数量" header-align="center" align="center"></el-table-column>
-        <el-table-column prop="date" label="物料种类" header-align="center" align="center"></el-table-column>
+      <el-table :data="tableData" :cell-style="changecolor" style="width: 100%" height="calc(100%  - .5rem)" :row-class-name="tabRowClassName" v-loading='isLoading' >
+        <el-table-column prop="name" label="物料名称" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="num" label="物料数量" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="device_type" label="物料种类" header-align="center" align="center"></el-table-column>
+        <el-table-column prop="id" label="物料种类" header-align="center" align="center">
+          <template slot-scope="scoped"><span class="underline lookmanagement"    @click="addMalfunction(false, scoped)">编辑</span><span class="underline deletemanagement"  @click="deleteEquipment(scoped.row.id)">删除</span> </template>
+        </el-table-column>
       </el-table>
     </div>
     <footer>
-      <el-button type="primary">提交</el-button>
+      <el-button type="primary" @click="updataProject_upkeepFile()">提交</el-button>
     </footer>
     <popUp ref="popUp" setWidth="45%" :popUptitle="popUptitle" class="popUp">
       <template>
         <ul>
           <li>
             <span>物料名称：</span>
-            <el-select v-model="value" v-if="isUpslot" placeholder="请选择设备编号">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
+            <el-select
+                v-model="upkeep_section.tool"
+                :disabled='isDisabled_select'
+                filterable
+                remote
+                reserve-keyword
+                v-el-select-loadmore="loadMore"
+                placeholder="请输入关键词"
+                :remote-method="search_materialList"
+                @change='change_materialList'
+                :loading="isListloading">
+                <el-option
+                v-for="item in material_list"
+                :key="item.id"
+                :label="item.nateriel_num"
+                :value="item.id">
+                </el-option>
             </el-select>
-            <input type="text" v-else placeholder="请填写设备编号" />
+          </li>
+          <li>
+              <span><i class="importantData">*</i>物料名称：</span>
+              <p>{{upkeep_section.material_Name}}</p>
           </li>
           <li>
             <span>物料数量：</span>
             <p v-if="isUpslot"></p>
-            <input v-else type="text" placeholder="填写设备名称" />
-          </li>
-          <li>
-            <span>物料种类：</span>
-            <el-select v-model="value" placeholder="请选择">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
+            <input v-else type="number" v-model="upkeep_section.num"  placeholder="填写设备数量" />
           </li>
           <li>
             <el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button>
-            <el-button type="primary">完成</el-button>
+            <el-button type="primary" @click="!isDisabled_select?createdEquipment_upkeep():editEquipment_upkeep()">完成</el-button>
           </li>
         </ul>
       </template>
@@ -71,59 +71,52 @@
 </template>
 <script>
 import popUp from "../../../components/common/popUp";
+import VerificationData from '../../../components/VerificationData';
 export default {
   name: "upkeepChange",
   components: { popUp },
+  inject:['reload'],
+  directives: {
+        'el-select-loadmore': {
+            bind(el, binding) {
+                // 获取element-ui定义好的scroll盒子
+                const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap');
+                SELECTWRAP_DOM.addEventListener('scroll', function () {
+                    const condition = this.scrollHeight - this.scrollTop <= this.clientHeight;
+                    if (condition) {
+                        binding.value();
+                    }
+                });
+            }
+        }
+    },
   data() {
     return {
       placeholderTexe: "搜索报告编号、名称",
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: " 弄"
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上7 弄"
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上1519 弄"
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海 1516 弄"
-        }
-      ],
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕"
-        },
-        {
-          value: "选项2",
-          label: "双皮奶"
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎"
-        },
-        {
-          value: "选项4",
-          label: "龙须面"
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭"
-        }
-      ],
+      tableData: [],
+      options: [],
       value: "",
       popUptitle: "新增物料",
-      isUpslot: false
+      isUpslot: false,
+      isLoading:true,//加载动画
+      totalSum:0,//数据总数
+      currentPage: 1,//当前页
+      page_size : 9,//一页数据条数
+      CurrentChange:1,
+      isSearch: false,//是否为搜索
+      searchText:'',//搜索文字
+      isListloading: false,//检索列表加载样式
+      isDisabled_select: true,
+      upkeep_section:{
+        tool: '',//物料编号
+        service: this.$route.query.equipmentID,
+        material_Name: '',//物料名称
+        num: '',//物料数量
+      },
+      material_list:[],
+      materialListPage_number: 1,
+      materialListPage_Text: '',
+      materialList_loadmore: false,
     };
   },
   methods: {
@@ -143,9 +136,165 @@ export default {
         return "warning-row";
       }
     },
-    addMalfunction() {
+    addMalfunction(flag,data) {
       this.$refs.popUp.dialogVisible = true;
-    }
+      this.isDisabled_select = !flag;
+      this.popUptitle = flag ? '新增物料' : '修改物料';
+       flag ?  this.deleteSection(): this.getEquipment_upkeepDetailInfo(data);
+    },
+    deleteSection(){
+      this.upkeep_section = {
+        tool: '',//物料编号
+        service: this.$route.query.equipmentID,
+        material_Name: '',//物料名称
+        num: '',//物料数量
+      }
+    },
+     /**@name检索列表上拉加载 */
+    loadMore(data){
+        if(!this.materialList_loadmore) return;
+        this.materialListPage_number += 1;
+        this.search_materialList(this.materialListPage_Text)
+    },
+    /**@name 编号名称匹配 */
+    change_materialList(data){
+        this.material_list.forEach(Element =>{
+            if(Element.id == data){
+                this.upkeep_section.material_Name = Element.name;
+                this.upkeep_section.num = Element.inventory;
+            }
+        })
+    },
+    /**@name 物料名称、编号检索 */
+    search_materialList(data){
+        this.isListloading = true;
+        this.materialListPage_Text = data;
+        this.$http.get(this.materialListPage_number==1?this.$conf.env.search_materialList + data : this.$conf.env.search_materialList + data + '&p=' + this.materialListPage_number ).then(res =>{
+            console.log(res)
+            this.material_list = this.materialListPage_number==1 ?  res.data.results : this.material_list.concat(res.data.results);
+            this.materialList_loadmore = res.data.next ? true: false;
+            this.isListloading = false;
+        }).catch(err =>{
+            this.isListloading = false;
+            this.materialList_loadmore = false;
+            this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+        })
+    },
+    getEquipment_upkeepserviceList(pageNumber){
+      this.$http.get(this.$conf.env.getEquipment_upkeepserviceList+ this.$route.query.equipmentID).then( res =>{
+          this.isLoading = false;
+          this.tableData = res.data;
+      }).catch(err =>{
+          this.isLoading = false;
+          this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+      })
+    },
+     /**@name删除数据 */
+    deleteEquipment(ID){
+        this.$confirm('此操作将删除该物料, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+            this.$http.delete(this.$conf.env.deleteEquipmentUpkeep + ID + '/').then(res =>{
+                if(res.status == '204'){
+                    this.$message({ message: '删除成功', type: 'success'});
+                    this.reload();
+                }else{
+                    this.$message({ message: '删除失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data, type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
+        }).catch(() => {
+            this.$message({
+                type: 'warning',
+                message: '已取消删除'
+            });          
+        });
+        },
+        /**@name 维修物料详情 */
+        getEquipment_upkeepDetailInfo(data){
+            this.$http.get(this.$conf.env.getEquipment_upkeepDetailInfo  + data.row.id +'/').then(res =>{
+                this.search_materialList('')
+                res.data.tool =  res.data.id;
+                delete res.data.id;
+                res.data.material_Name = res.data.name;
+                delete res.data.name;
+                res.data.service = this.$route.query.equipmentID;
+                delete res.data.status;
+                this.upkeep_section = res.data;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        /**@name 新增物料 */
+        createdEquipment_upkeep(){
+            if(!VerificationData.VerificationData(this.upkeep_section)) return;
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.createdEquipment_upkeep, this.upkeep_section).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },100)
+                }else{
+                  this.isLoading = false;
+                  this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        /**@name 编辑物料 */
+        editEquipment_upkeep(){
+            if(!VerificationData.VerificationData(this.upkeep_section)) return;
+            this.$http.put(this.$conf.env.editEquipment_upkeep + this.upkeep_section.tool + '/',{num: this.upkeep_section.num} ).then(res =>{
+                if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },100)
+                }else{
+                    this.$message({ message: '修改失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        /**@name 提交 */
+        updataProject_upkeepFile(){
+          if(this.tableData.length > 0){
+                this.isLoading = true;
+                let params = {
+                    service: this.$route.query.equipmentID*1
+                };
+                this.$http.post(this.$conf.env.updataProject_upkeepFile, params).then( res =>{
+                    this.isLoading = false;
+                    if(res.status == '201'){
+                        this.$message({ message: '提交成功', type: 'success'});
+                        setTimeout(()=>{
+                            this.reload();
+                        },100)
+                    }else{
+                        this.$message({ message: '提交失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    this.isLoading = false;
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+                })
+            }else{
+                this.$message({ message:'暂时没有可提交的数据，快去添加吧' , type: 'warning'}); 
+            }
+        }
+  },
+  mounted(){
+    this.getEquipment_upkeepserviceList()
   }
 };
 </script>

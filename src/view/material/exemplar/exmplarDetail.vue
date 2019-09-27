@@ -1,62 +1,31 @@
 <template>
-    <div class="management_exmplarDetail body_main">
+    <div class="management_exmplarDetail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="testMethods_index_header">
             <h3>样件确认</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
 
         </header>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%;height: calc(100% - 3rem);"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date" min-width="15%"  label="样件名称"  header-align='center'  align='center'> </el-table-column>
-            <el-table-column prop="name"  label="样件数量" header-align='left' align='left'> </el-table-column>
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - .5rem)"  style="width: 100%;height: calc(100% - 3rem);"  :row-class-name="tabRowClassName">
+            <el-table-column prop="name" min-width="15%"  label="样件名称"  header-align='center'  align='center'>
+
+            </el-table-column>
+            <el-table-column prop="num"  label="样件数量" header-align='left' align='left'> </el-table-column>
         </el-table>
        <footer>
-           <el-button type="primary">缺少样件</el-button>
-           <el-button >确认</el-button>
+           <el-button type="primary" class="primary_err" @click="editVerifyInfo(0)">缺少样件</el-button>
+           <el-button type="primary" @click="editVerifyInfo(2)">确认</el-button>
        </footer>
     </div>
 </template>
 <script>
 export default {
     name:'exmplarDetail',
+    inject:['reload'],
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        popUptitle: '',
+        tableData: [],
         placeholderTexe:'上传试验编号、名称',
-        isUpslot:false
+        isLoading: true
       }
     },
     methods:{
@@ -83,40 +52,56 @@ export default {
             this.$router.push({name: 'frockProcess' })
         },
         /**@name功能按键 */
-        //弹框
-        editquipment(title, flag, data){
-            this.popUptitle = title;
-            this.isUpslot = flag;
-            this.$refs.popUp.dialogVisible = true;
-        },
-        //上传按钮
-        updataFileChange(){
-            this.$refs.file.click()
-        },
-        //搜索按钮
-        searchPersonnel(){
-
-        },
-        //上传按钮
-        updataFile(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
-        },
-        //文件删除
-        deleteFile(){
-            this.file = {};
-            this.fileName = '';
-        },
+       
         searchDetail(){
 
         },
+        getVerifyDetail(){
+            this.$http.get(this.$conf.env.getVerifyDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.isLoading = false;
+                var arr = [];
+                for(var i in res.data.sample_json){
+                    var obj={
+                        'name':i,
+                        "num":res.data.sample_json[i]
+                    }
+                    arr.push(obj)
+                }
+                this.tableData = arr
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        editVerifyInfo(number){
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.editVerifyInfo + this.$route.query.equipmentID + '/',{"status": number}).then(res=>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '确认成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },100)
+                }else{
+                    this.$message({ message: '确认失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getVerifyDetail()
     }
 }
 </script>
 <style lang="scss">
-@import '../../../style/LabManager/management/index.scss';
+
 .management_exmplarDetail{
+    @import '../../../style/LabManager/management/index.scss';
      padding-top: .42rem;
+     height: calc(100% - 3rem);
     .testMethods_index_header{
         padding-left: .41rem;
         height: .38rem;
@@ -198,6 +183,7 @@ export default {
             font-size: 0.32rem;
             float: right;
             margin-right: 1.66rem;
+            margin-top: .2rem;
             button:first-child{
                 background: #f30000;
             }

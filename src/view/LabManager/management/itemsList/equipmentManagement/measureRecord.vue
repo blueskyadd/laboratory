@@ -66,9 +66,6 @@ export default {
             }
         },
         /**@name 页面跳转 */
-        lookDetail(data){
-
-        },
         allocation(data){
             this.$router.push({path: '/measureProcess',query:{maintenanceProcessID:data.row.id} })
         },
@@ -80,7 +77,7 @@ export default {
             this.getmaintenanceRecordList(pageNumber);
         },
         getmaintenanceRecordList(pageNumber){
-            this.$http.get(pageNumber == 1 ? this.$conf.env.getmeasureRecordList + this.$route.query.EquipmentpurchaseID + '&page_size=' +this.page_size : this.$conf.env.getmeasureRecordList +this.$route.query.EquipmentpurchaseID + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getmeasureRecordList + this.$route.query.EquipmentpurchaseID + '&page_size=' +this.page_size : this.$conf.env.getmeasureRecordList +this.$route.query.EquipmentpurchaseID + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 res.data = {
                     "count": 1,
                     "next": null,
@@ -100,7 +97,7 @@ export default {
                 this.isLoading = false;
             }).catch(err =>{
                 this.isLoading = false;
-                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         }
     },

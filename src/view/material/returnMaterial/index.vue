@@ -10,7 +10,7 @@
             </div>
             <Search @searchDetail='searchDetail' class="returnMaterial_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-       <router-view></router-view> 
+       <router-view  ref='childer'></router-view> 
     </div>
 </template>
 <script>
@@ -21,12 +21,45 @@ export default {
     data(){
         return{
             placeholderTexe:'搜索报告编号、名称',
+            routerPath:''
         }
     },
     methods:{
         searchDetail(data){
-            console.log(data)
-        }
+            switch(this.$route.path){
+            case '/materialIndex/returnMaterial/returnTest':
+                this.$refs.childer.ruturnMaterialSearch(data,1)
+                break;
+            case '/materialIndex/returnMaterial/returnMaintain':
+                this.$refs.childer.MaintainMaterialSearch(data,1)
+                break;
+         }
+        },
+
+    },
+    mounted(){
+         this.routerPath = this.$route.path;
+         switch(this.$route.path){
+            case '/materialIndex/returnMaterial/returnTest':
+                this.placeholderTexe = '搜索试验编号、名称'
+                break;
+            case '/materialIndex/returnMaterial/returnMaintain':
+                this.placeholderTexe = '搜索设备编号、名称'
+                break;
+         }
+    },
+    watch:{
+         $route(to, from){
+            this.routerPath = to.path;
+            switch(to.path){
+                case '/materialIndex/returnMaterial/returnTest':
+                    this.placeholderTexe = '搜索试验编号、名称'
+                    break;
+                case '/materialIndex/returnMaterial/returnMaintain':
+                    this.placeholderTexe = '搜索设备编号、名称'
+                    break;
+            }
+         }
     }
 }
 </script>

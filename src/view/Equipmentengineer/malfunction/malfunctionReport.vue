@@ -1,5 +1,5 @@
 <template>
-    <div class="malfunctionReport_detail body_main">
+    <div class="malfunctionReport_detail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="malfunctionReport_index_header">
             <h3>上传维修报告</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -17,7 +17,7 @@
                 </div>
             </div>
             <footer>
-                <el-button type="primary" @click="$refs.popUp.dialogVisible = false">提交</el-button>
+                <el-button type="primary" @click="updataProject_file()">提交</el-button>
             </footer>
         </div>
         
@@ -28,9 +28,11 @@ export default {
     name:'malfunctionReport',
     data(){
         return{
-            fileName: '维修报告',
-            file:{},
+            fileName: '点击上传维修报告',
             isupload: false,
+            report:'',
+            isLoading: false,  
+            
         }
     },
     methods:{
@@ -39,13 +41,37 @@ export default {
 
         },
         malfunctionReport(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
+            let _this = this;
+             this.$updataFile.updataFile(e.target.files[0], res =>{
+                _this.report = res.data.file
+                this.fileName =  e.target.files[0].name;
+            },this)
+        },
+        updataProject_file(){
+            if(!this.report){
+                this.$message({ message: '请先上传文件', type: 'warning'});     
+            }else{
+                this.isLoading = true;
+                this.$http.put(this.$conf.env.updataProject_file + this.$route.query.equipmentID + '/', {"report": this.report}).then( res =>{
+                    this.isLoading = false;
+                    if(res.status == '200'){
+                        this.$message({ message: '提交成功', type: 'success'});
+                        setTimeout(()=>{
+                            this.$router.back(-1);
+                        },100)
+                    }else{
+                        this.$message({ message: '提交失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    this.isLoading = false;
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                })
+            }
         },
         deleteFile(){
-            this.file = {};
-            this.fileName = '';
-        }
+            this.report = '';
+            this.fileName = '点击上传维修报告';
+        },
     }
 }
 </script>

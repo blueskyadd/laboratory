@@ -9,15 +9,29 @@
             </div>
         </header>
         <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"   style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="试验方法名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="上传单位" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="上传时间" header-align='center'  align='center'> </el-table-column>
+            <el-table :data="tableData" :cell-style="changecolor" height="100%"   style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+                <el-table-column prop="num"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="试验方法名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="company"  label="上传单位" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="create_time"  label="上传时间" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="address"   label="试验结果" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline lookmanagement"  @click="allocation(scoped)">编辑</span><span class="underline"  @click="allocation(scoped)">查看</span> </template>
+                    <template slot-scope="scoped">
+                        <span class="underline lookmanagement" :style="{'color':scoped.row.update == 1?'':'#999!important','cursor':scoped.row.update == 1 ?'':'not-allowed'}"   @click="scoped.row.update == 1 && editDetail(scoped)">编辑</span>
+                        <a class="underline" download="w3logo" :href="scoped.row.file">查看</a> 
+                    </template>
                 </el-table-column>
             </el-table>
+        </div>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
     </div>
 </template>
@@ -27,24 +41,12 @@ export default {
     data(){
         return{
             placeholderTexe:'搜索报告编号、名称',
-             tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            currentPage: 1,//当前页
+            page_size : 9,//一页数据条数
+            CurrentChange:1,
         }
     },
     methods:{
@@ -64,13 +66,46 @@ export default {
                 return 'warning-row'
             }
         },
+        editDetail(data){
+            this.$router.push({path:'/Testengineer/updataFileTest', query: {equipmentID: data.row.id}})
+        },
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getTest_testwayList(pageNumber);
+        },
+        getTest_testwayList(pageNumber){
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getTest_testwayList + '?page_size=' +this.page_size : this.$conf.env.getTest_testwayList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getTest_testwayList(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.getTest_testwayList(this.CurrentChange);
+            }
+        },
     }
+    
 }
 </script>
 <style lang="scss">
 .testMethods_index{
     padding-top: .42rem;
-    
+    @import '../../../style/LabManager/management/index.scss';
     .testMethods_index_header{
         padding-left: .41rem;
         height: .38rem;
@@ -122,7 +157,7 @@ export default {
     }
     .taskAllocation_distributed{
         margin-top: .4rem;
-        height: calc(100% - 4.5rem);
+        height: calc(100% - 2.2rem);
         th{
             font-size: .2rem;
             line-height: .48rem;

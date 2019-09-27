@@ -1,5 +1,5 @@
 <template>
-    <div class="applicationInfrastructure body_main">
+    <div class="applicationInfrastructure body_main" v-loading.fullscreen.lock="isLoading">
         <header class="applicationInfrastructure_index_header">
             <h3>申请报修</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -9,26 +9,26 @@
             <div class="mian_text first_child">
                     <div>
                     <span>设施名称：</span>
-                    <p>烟雾烟雾试验箱烟雾试验箱试验箱</p>
+                    <p>{{infrastructureSection.name}}</p>
                 </div>
                 <div>
                     <span>所属实验室：</span>
-                    <p>NDOF923E2039</p>
+                    <p>{{infrastructureSection.room}}</p>
                 </div>
             </div>
             <div class="mian_text textarea">
                 <div>
                     <span>故障描述：</span>
-                    <div>
-                        <textarea name="" v-model="cause" maxlength="800" placeholder="故障描述原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                    <div class="disabled">
+                        <textarea name="" disabled v-model="infrastructureSection.info" maxlength="800" placeholder="故障描述原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{infrastructureSection.info.length}}/800</p>
                     </div>
                 </div>
             </div>
             <div class="mian_text first_child">
                 <div>
                     <span>上传故障照片：</span>
-                    <img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2174909441,2495215020&fm=26&gp=0.jpg" alt="">
+                    <img v-for="(item, index) in infrastructureSection.image_list" :key="index" :src="item" alt="">
                 </div>
             </div>
             </div>
@@ -40,7 +40,22 @@ export default {
     name:'applicationInfrastructure',
     data(){
         return{
-            cause: '',
+            infrastructureSection:{},
+            isLoading: true,
+        }
+    },
+    mounted(){
+        this.getinfrastructureDetail()
+    },
+    methods:{
+        getinfrastructureDetail(){
+            this.$http.get(this.$conf.env.getinfrastructureDetail + this.$route.query.infrastructureID + '/').then(res =>{
+                this.infrastructureSection = res.data
+                 this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     }
 }
@@ -149,7 +164,9 @@ export default {
                 }
                 img{
                     width: 1.92rem;
+                    border:1px dashed #eee;
                     height: 1.15rem;
+                    margin-right: .2rem;
                 }
             }
             .two_child{

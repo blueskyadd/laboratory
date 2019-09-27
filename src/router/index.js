@@ -281,6 +281,27 @@ export default new Router({
       path: '/informationPublish',
       name: 'informationPublish',
       component:() => import('@/view/LabManager/informationPublish/index'),
+      redirect: '/informationPublish/announcement',
+      children:[
+        //实验室公告
+        {
+          path: 'announcement',
+          name: 'announcement',
+          component:() => import('@/view/LabManager/informationPublish/itemList/announcement')
+        },
+        //实验室能力介绍
+        {
+          path: 'abilityIntroduce',
+          name: 'abilityIntroduce',
+          component:() => import('@/view/LabManager/informationPublish/itemList/abilityIntroduce')
+        },
+        //实验室设备图片
+        {
+          path: 'equipmentImg',
+          name: 'equipmentImg',
+          component:() => import('@/view/LabManager/informationPublish/itemList/equipmentImg')
+        }
+      ]
     },
 
     /**@name 试验工程师-------------------------------------(2)-------------------------*/
@@ -289,6 +310,7 @@ export default new Router({
       path: '/Testengineer/index',
       name: 'TestengineerIndex',
       component:() => import('@/view/Testengineer/index/index'),
+      
     },
     //完成任务mission
     {
@@ -357,6 +379,12 @@ export default new Router({
       name: 'upTestdata',
       component:() => import('@/view/Testengineer/missionUnaccomplish/view/test/process/upTestdata'),
     },
+    //试验结果分析
+    {
+      path: '/Testengineer/experimental_result',
+      name: 'experimental_result',
+      component:() => import('@/view/Testengineer/missionUnaccomplish/view/test/process/experimental_result'),
+    },
     /**@name 未完成任务 */
     {
       path: '/Testengineer/unMissionUnaccomplish',
@@ -400,6 +428,12 @@ export default new Router({
       path: '/Testengineer/cultivate',
       name: 'cultivate',
       component:() => import('@/view/Testengineer/cultivate/index'),
+    },
+    //合作的项目列表
+    {
+      path: '/Testengineer/cultivateDetailList',
+      name: 'cultivateDetailList',
+      component:() => import('@/view/Testengineer/cultivate/cultivateDetailList'),
     },
     /**@name 值班管理 */
     {
@@ -591,6 +625,18 @@ export default new Router({
       name: 'updatafrockReport',
       component:() => import('@/view/Equipmentengineer/frock/updatafrockReport'),
     },
+    /**@name 设备人员安全指导书 */
+    {
+      path: '/Equipmentengineer/ReWirePerson',
+      name: 'ReWirePerson',
+      component:() => import('@/view/Equipmentengineer/ReWirePerson/ReWire'),
+    },
+    //上传设备操作指导书
+    {
+      path: '/Equipmentengineer/updataReWirePerson',
+      name: 'updataReWirePerson',
+      component:() => import('@/view/Equipmentengineer/ReWirePerson/updataReWire'),
+    },
     /**@name 设备操作指导书 */
     {
       path: '/Equipmentengineer/ReWire',
@@ -603,6 +649,7 @@ export default new Router({
       name: 'updataReWire',
       component:() => import('@/view/Equipmentengineer/ReWire/updataReWire'),
     },
+    
     /**@name基础设施管理 */
     {
       path: '/Equipmentengineer/Infrastructure',

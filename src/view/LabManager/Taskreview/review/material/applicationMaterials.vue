@@ -1,5 +1,5 @@
 <template>
-    <div class="applicationMaterials body_main">
+    <div class="applicationMaterials body_main"  v-loading.fullscreen.lock="isLoading">
         <header class="applicationMaterials_index_header">
             <h3>申请物料</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,37 +8,78 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>物料名称：</span>
-                    <p>烟雾试验箱</p>
+                    <p>{{MaterialDetailSection.name}}</p>
                 </div>
                 <div class="mian_text first_child">
                     <span>物料数量：</span>
-                    <p>2012.02.12</p>
+                    <p>{{MaterialDetailSection.name}}</p>
                 </div>
                 <div class="mian_text two_child ">
                     <span>申请时间：</span>
-                    <p>2012.02.12</p>
+                    <p>{{MaterialDetailSection.create_time}}</p>
                 </div>
                 <div class="mian_text textarea">
                     <span>申请原因</span>
-                    <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="树脂试验急需！ " id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                    <div class="disabled" >
+                        <textarea name="" maxlength="800" disabled  v-model="MaterialDetailSection.cause" placeholder="输入申请原因 " id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{MaterialDetailSection.cause.length}}/800</p>
                     </div>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">不同意</el-button>
-                <el-button type="primary">审批</el-button>
+                <el-button type="primary" class="primary_err"  @click="applyMateraDetail(0)">不同意</el-button>
+                <el-button type="primary" @click="applyMateraDetail(2)">审批</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import { setTimeout } from 'timers';
 export default {
     name:'applicationMaterials',
+    inject:['reload'],
     data(){
         return{
-            cause: '',//申请原因
+            MaterialDetailSection:{
+                "cause":'',//原因
+                "create_time":'',
+                "num":'',
+                "name":'',
+            },
+            isLoading:true,
+        }
+    },
+    mounted(){
+        console.log(this.$route.query.MaterialsID)
+        this.getMaterialDetail()
+    },
+    methods:{
+        getMaterialDetail(){
+            this.$http.get(this.$conf.env.getMaterialDetail + this.$route.query.MaterialsID + '/').then( res =>{
+                this.isLoading = false;
+                this.MaterialDetailSection = res.data
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({message: '服务器错误',type: 'error'});
+            })
+        },
+        applyMateraDetail(number){
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.applyMateraDetail + this.$route.query.MaterialsID + '/',{"status":number}).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '审批成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back(-1);
+                    },100)
+                }else{
+                    this.$message({ message: '审批失败', type: 'warning'});              
+                }
+
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({message: '服务器错误',type: 'error'});
+            })
         }
     }
 }

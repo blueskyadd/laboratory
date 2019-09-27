@@ -1,5 +1,5 @@
 <template>
-    <div class="addWarning body_main">
+    <div class="addWarning body_main" v-loading.fullscreen.lock="isLoading">
         <header class="addWarning_index_header">
             <h3>新增警报</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,68 +8,133 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>设备名称：</span>
-                    <input class="inputText" type="text" placeholder="填写设备名称">
+                    <el-select
+                        v-model="upkeep_section.equipment"
+                        filterable
+                        remote
+                        reserve-keyword
+                        v-el-select-loadmore="loadMore"
+                        placeholder="请输入设备名称"
+                        :remote-method="search_materialList"
+                        @change='change_materialList'
+                        :loading="isListloading">
+                            <el-option
+                            v-for="item in material_list"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                            </el-option>
+                    </el-select>
                     <span>设备编号：</span>
-                    <input class="inputText" type="text" placeholder="填写设备编号">
+                    <p>{{equipmentNum}}</p>
                 </div>
                 <div class="mian_text first_child">
                     <span>实验室：</span>
-                    <el-select v-model="value" placeholder="请选择值班地点">
-                        <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                        </el-option>
-                    </el-select>
+                    <p>{{equipmentName}}</p>
                     <span>设备负责人：</span>
-                    <el-select v-model="value" placeholder="请选择值班地点">
-                        <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                        </el-option>
-                    </el-select>
+                    <p>{{equipmentUser}}</p>
                 </div>
                  <div class="mian_text textarea">
                     <span>报警原因</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="编辑报警原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="upkeep_section.cause" placeholder="编辑报警原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{upkeep_section.cause.length}}/800</p>
                     </div>
                 </div>
             </div>
             <footer>
-                <el-button type="primary">提交</el-button>
+                <el-button type="primary" @click="createdequipment_alarm()">提交</el-button>
             </footer>
         </div>
     </div>
 </template>
 <script>
+import VerificationData from '../../../components/VerificationData';
 export default {
     name:'addWarning',
+    directives: {
+        'el-select-loadmore': {
+            bind(el, binding) {
+                // 获取element-ui定义好的scroll盒子
+                const SELECTWRAP_DOM = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap');
+                SELECTWRAP_DOM.addEventListener('scroll', function () {
+                    const condition = this.scrollHeight - this.scrollTop <= this.clientHeight;
+                    if (condition) {
+                        binding.value();
+                    }
+                });
+            }
+        }
+    },
     data(){
         return{
-            cause: '',//申请原因
-            fileName: '指导书',
-            options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+            upkeep_section:{
+                "equipment":'',
+                "cause":''
+            },
+            equipmentNum:'',
+            equipmentName:'',
+            equipmentRoom:'',
+            equipmentUser: '',
+            material_list:[],
+            materialList_loadmore: false,
+            materialListPage_number: 1,
+            materialListPage_Text: '',
+            isListloading: false,
+            isLoading: false,
         }
+    },
+    methods:{
+        createdequipment_alarm(){
+            if(!VerificationData.VerificationData(this.upkeep_section)) return;
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.createdequipment_alarm, this.upkeep_section).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back();
+                    },100)
+                }else{
+                  this.isLoading = false;
+                  this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        /**@name 编号名称匹配 */
+        change_materialList(data){
+            this.material_list.forEach(Element =>{
+                if(Element.id == data){
+                    this.equipmentName = Element.name;
+                    this.equipmentRoom = Element.room;
+                    this.equipmentUser = Element.device_keeper;
+                    this.equipmentNum = Element.num;
+                }
+            })
+        },
+         /**@name检索列表上拉加载 */
+        loadMore(data){
+            if(!this.materialList_loadmore) return;
+            this.materialListPage_number += 1;
+            this.search_materialList(this.materialListPage_Text)
+        },
+        /**@name 设备名称、编号检索 */
+        search_materialList(data){
+            this.isListloading = true;
+            this.materialListPage_Text = data;
+            this.$http.get(this.materialListPage_number==1?this.$conf.env.getsearcheq_seqarch + data : this.$conf.env.getsearcheq_seqarch + data + '&p=' + this.materialListPage_number ).then(res =>{
+                console.log(res)
+                this.material_list = this.materialListPage_number==1 ?  res.data.results : this.material_list.concat(res.data.results);
+                this.materialList_loadmore = res.data.next ? true: false;
+                this.isListloading = false;
+            }).catch(err =>{
+                this.isListloading = false;
+                this.materialList_loadmore = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
     }
 }
 </script>
@@ -141,10 +206,20 @@ export default {
                 span{
                     font-size: .24rem;
                     color: #333333;
-                    width: 1.2rem;
+                    width: 1.5rem;
                 }
                 p{
                     font-size: .24rem;
+                    color: #444!important;
+                    margin-right: 1.4rem;
+                    max-width: 5rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                .number{
+                    color: #08a695!important;
+                    margin-right: 0;
                 }
                 textarea{
                     border:0;

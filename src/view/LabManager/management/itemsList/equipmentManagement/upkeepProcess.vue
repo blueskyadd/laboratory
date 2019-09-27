@@ -1,5 +1,5 @@
 <template>
-    <div class="upkeepProcess body_main">
+    <div class="upkeepProcess body_main" v-loading.fullscreen.lock="isLoading">
         <header class="upkeepProcess_index_header">
             <h3>保养流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -41,7 +41,8 @@ export default {
             ismalfunction: false,
             ismaintain:false,
             reportDownUrl:'',
-            islookReport: false
+            islookReport: false,
+            isLoading: true,
         }
     },
     methods:{
@@ -50,9 +51,11 @@ export default {
         },
         getmaintenanceRecordDetailInfo(){
             this.$http.get(this.$conf.env.getupkeeprecordInfo + this.$route.query.maintenanceProcessID + '/').then( res =>{
-                this.reportDownUrl = res.data.report
+                this.reportDownUrl = res.data.report;
+                this.isLoading = false;
             }).catch(err =>{
-                 this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         }
     },

@@ -15,7 +15,8 @@
                         <span :style="{color:isapplyEquipment?'#07A695': '#fff'}">申请设备</span>
                     </li>
                     <li>
-                        <img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
+                        <img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt="">
+                    </li>
                     <li @mouseover="iscontract= false" @mouseout="iscontract = true" :style="{background:iscontract? '#fff':'#07A695'}">
                         <a :href="EquipmentpurchaseContract" download="w3logo">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="iscontract">
@@ -68,7 +69,7 @@ export default {
                 this.isLoading = false;
             }).catch(err =>{
                 this.isLoading = false;
-                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         }
     },

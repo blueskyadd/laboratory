@@ -58,9 +58,6 @@ export default {
         },
 
         /**@name 页面跳转 */
-        lookDetail(data){
-
-        },
         allocation(data){
             this.$router.push({name: 'applicationmaterialManagement' })
         },
@@ -83,23 +80,19 @@ export default {
                 this.tableData = res.data.results;
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         /**@name数据请求 */
         getmaterialList(pageNumber){
             this.isSearch = false;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.getmaterialList + '?page_size=' +this.page_size : this.$conf.env.getmaterialList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getmaterialList + '?page_size=' +this.page_size : this.$conf.env.getmaterialList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         }
     },

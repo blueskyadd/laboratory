@@ -14,7 +14,11 @@
             <el-table-column prop="username"  label="手机号" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="status"  label="在职情况" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address" label="详情" header-align='center' align='center'>
-                <template slot-scope="scoped"><span class="underline lookmanagement"  @click="allocation(scoped)">查看</span><span class="underline lookmanagement"  @click="editPersonnel(scoped)">编辑</span><span class="underline deletemanagement"  @click="allocation(scoped)">删除</span> </template>
+                <template slot-scope="scoped">
+                    <span class="underline lookmanagement"  @click="allocation(scoped)">查看</span>
+                    <span class="underline lookmanagement"  @click="editPersonnel(scoped)">编辑</span>
+                    <span class="underline deletemanagement"  @click="allocation(scoped)">删除</span>
+                </template>
             </el-table-column>
         </el-table>
         <div class="pagination">
@@ -257,7 +261,7 @@ export default {
                 _this.isEmployeeResume = true;
                 _this.isPopLoading = false;
                 _this.fileName =  e.target.files[0].name;
-            })
+            },this)
         },
         //文件删除
         deleteFile(){
@@ -345,9 +349,7 @@ export default {
             console.log(res)
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         /**@name数据请求 */
@@ -359,9 +361,7 @@ export default {
                 this.tableData = res.data.results
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         //公司列表
@@ -369,9 +369,7 @@ export default {
             this.$http.get(this.$conf.env.getCompanyList).then( res =>{
                 this.CompanyList = res.data
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         //职位列表
@@ -379,9 +377,7 @@ export default {
             this.$http.get(this.$conf.env.getDepartmentList + labID).then( res =>{
                 this.DepartmentList = res.data
             }).catch(err =>{
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
     },

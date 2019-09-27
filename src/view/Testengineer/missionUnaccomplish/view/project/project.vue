@@ -1,6 +1,6 @@
 <template>
     <div class="projectengineer_project">
-        <div class="Search">
+        <!-- <div class="Search">
             <ul>
                 <li style="margin-bottom:.24rem">
                     <span class="equipmentName">试验类型</span>
@@ -28,6 +28,7 @@
                     <span class="equipmentName">试验开始时间</span>
                     <el-date-picker
                         v-model="statusTime"
+                        value-format="yyyy-MM-dd"
                         type="date"
                         placeholder="选择日期">
                     </el-date-picker>
@@ -37,6 +38,7 @@
                     <el-date-picker
                         v-model="statusTime"
                         type="date"
+                        value-format="yyyy-MM-dd"
                         placeholder="选择日期">
                     </el-date-picker>
                 </li>
@@ -45,19 +47,28 @@
                 <el-button type="primary">搜索</el-button>
                 <el-button type="primary">重置</el-button>
             </div>
-        </div>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
+        </div> -->
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table-column prop="number"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="项目名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目类型" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目开始时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目完成时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="试验结果" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="project_type"  label="项目类型" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="start_time"  label="项目开始时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="report_time"  label="项目完成时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address"  label="操作" header-align='center' align='center'>
-                 <template slot-scope="scoped"><span class="underline lookmanagement"  @click="allocation(scoped)">查看</span></template>
+                 <template slot-scope="scoped"><span class="underline lookmanagement" style="margin-right:0!important"  @click="allocation(scoped)">查看</span></template>
             </el-table-column>
         </el-table>
-        
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
     </div>
 </template>
 <script>
@@ -65,58 +76,14 @@ export default {
     name:'project',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        },{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        statusTime:'',
-        CurrentChange: 0,
+        tableData: [],
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        CurrentChange:1,
+        isSearch: false,//是否为搜索
+        searchText:'',//搜索文字
       }
     },
     methods:{
@@ -136,30 +103,62 @@ export default {
         },
 
         /**@name 页面跳转 */
-        historyEditDeteil(data){
-            this.$router.push({name: 'historyEditDeteil' })
-        },
         allocation(data){
-            this.$router.push({name: 'missionDetail' })
+            this.$router.push({path: '/Testengineer/missionDetail',query:{equipmentID:data.row.id} })
         },
-
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch?this.getProject_finishprojectList(pageNumber):this.searchProject_finishprojectList(this.searchText,pageNumber);
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        searchProject_finishprojectList(data,pageNumber){
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getProject_finishprojectList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.getProject_finishprojectList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getProject_finishprojectList(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getProject_finishprojectList + '?page_size=' +this.page_size : this.$conf.env.getProject_finishprojectList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getProject_finishprojectList(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch?this.getProject_finishprojectList(this.CurrentChange):this.searchProject_finishprojectList(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>
 <style lang="scss">
-@import '../../../../../style/LabManager/management/index.scss';
 .projectengineer_project{
+    @import '../../../../../style/LabManager/management/index.scss';
     position: relative;
-    height: 100%;
-    
+    height: calc(100% - 1.2rem);
+    padding-top: .42rem;
     .Search ul{
         margin-bottom: 0;
     }

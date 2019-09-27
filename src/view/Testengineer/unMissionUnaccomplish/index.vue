@@ -10,34 +10,26 @@
             </div>
             <Search @searchDetail='searchDetail' class="unMissionUnaccomplish_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-        <div class="Search">
+        <div class="Search" v-show="$route.path == '/Testengineer/unMissionUnaccomplish/unMissionUnaccomplishProject'">
             <ul>
                 <li style="margin-bottom:.24rem">
                     <span class="equipmentName">试验类型</span>
-                    <el-select v-model="value" placeholder="请选择项目类型">
+                    <el-select v-model="project_type" placeholder="请选择项目类型">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in project_typeList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
                 </li>
-                <li style="margin-bottom:.24rem">
-                    <span class="equipmentName">试验开始时间</span>
-                    <el-date-picker
-                        v-model="statusTime"
-                        type="date"
-                        placeholder="选择日期">
-                    </el-date-picker>
-                </li>
             </ul>
             <div class="editTableButton">
-                <el-button type="primary">搜索</el-button>
-                <el-button type="primary">重置</el-button>
+                <el-button type="primary" @click="searchList">搜索</el-button>
+                <el-button  @click="project_type = ''">重置</el-button>
             </div>
         </div>
-       <router-view></router-view> 
+       <router-view  ref='childer'></router-view> 
     </div>
 </template>
 <script>
@@ -47,33 +39,35 @@ export default {
     components:{Search},
     data(){
         return{
-            placeholderTexe:'搜索项目编号、名称',
-            options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        statusTime:'',
-        CurrentChange: 0,
+            placeholderTexe:'搜索试验编号、名称',
+            project_typeList:[
+                {
+                    name: 'DV试验',
+                    id: 1
+                },
+                {
+                    name: 'PV试验',
+                    id: 2
+                },
+            ],
+            project_type:''
         }
     },
     methods:{
         searchDetail(data){
-            console.log(data)
+            switch(this.$route.path){
+            case '/Testengineer/unMissionUnaccomplish/unMissionUnaccomplishTest':
+                this.$refs.childer.searchExperimental_myexperimentList(data,1)
+                break;
+            case '/Testengineer/unMissionUnaccomplish/unMissionUnaccomplishProject':
+                this.$refs.childer.searchEquipment_myprojectList(data,1)
+                break;
+            }
+        },
+        searchList(){
+            this.$refs.childer.searchTypeEquipment_myprojectList(this.project_type,1)
         }
-    }
+    },
 }
 </script>
 <style lang="scss" scoped> 

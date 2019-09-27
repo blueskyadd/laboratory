@@ -1,14 +1,25 @@
 <template>
     <div class="Taskreview_teskMethod">
         <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - 1.5rem)" style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
-            <el-table-column prop="date"  label="试验方法名称" header-align='center'  align='center'> </el-table-column>
-            <el-table-column prop="name"  label="申请人" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="申请时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address"   label="详情" header-align='center' align='center'>
+            <el-table-column prop="num"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
+            <el-table-column prop="name"  label="试验方法名称" header-align='center'  align='center'> </el-table-column>
+            <el-table-column prop="user"  label="申请人" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="create_time"  label="申请时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="id"   label="详情" header-align='center' align='center'>
                 <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
             </el-table-column>
         </el-table>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
     </div>
 </template>
 <script>
@@ -16,23 +27,15 @@ export default {
     name:'teskMethod',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }]
+        tableData: [],
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        CurrentChange:1,
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        equipmentID: 0,
+        isSearch: false,//是否为搜索
+        searchText:'',//搜索文字
       }
     },
     methods:{
@@ -56,13 +59,59 @@ export default {
 
         },
         allocation(data){
-            this.$router.push({name: 'applicationMethod' })
+            this.$router.push({path: '/applicationMethod',query:{"testMethodsID":data.row.id} })
+        },
+         /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch ?  this.getUnTestMethods(pageNumber):this.methodsSearch(this.searchText,pageNumber);
+        },
+        methodsSearch(data,pageNumber){
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getUnTestMethods + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.getUnTestMethods + '?search=' + data  + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getUnTestMethods(pageNumber){
+            this.isSearch = false;
+             this.$http.get(pageNumber == 1 ? this.$conf.env.getUnTestMethods + '?page_size=' +this.page_size : this.$conf.env.getUnTestMethods + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getUnTestMethods(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch ?  this.getUnTestMethods(this.CurrentChange):this.methodsSearch(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>
 <style lang="scss">
 .Taskreview_teskMethod{
+    @import '../../../../../style/LabManager/management/index.scss';
+    height:100%;
      th{
             font-size: .2rem;
             line-height: .48rem;

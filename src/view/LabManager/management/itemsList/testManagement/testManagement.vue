@@ -22,7 +22,7 @@
                         :label="item.label"
                         :value="item.value">
                         </el-option>
-                    </el-select>
+                    </egettestManagementListl-select>
                 </li>
             </ul>
             <div class="editTableButton">
@@ -33,7 +33,7 @@
                 <el-button  type="primary" @click="editquipment('新增试验标准', true)">新增</el-button>
             </div>
         </div>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%" v-loading='isLoading' :row-class-name="tabRowClassName">
             <el-table-column prop="num"  label="标准编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="标准名称" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="company"  label="上传单位" header-align='center' align='center'> </el-table-column>
@@ -72,7 +72,7 @@
                     </li>
                     <li class="upload">
                         <span><i class="importantData">*</i>上传图片：</span>
-                        <input type="file" ref="file"  @change='updataFile' style="display:none" >
+                        <input type="file" accept="image/*" ref="file"  @change='updataFile' style="display:none" >
                         <div v-if="isCreated">
                             <span @click="updataFileChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span>
                         </div>
@@ -141,10 +141,6 @@ export default {
         updataFileChange(){
             this.$refs.file.click()
         },
-        //搜索按钮
-        searchPersonnel(){
-
-        },
         //上传按钮
         updataFile(e){
             this.file =  e.target.files[0];
@@ -153,8 +149,7 @@ export default {
              this.$updataFile.updataFile(e.target.files[0], res =>{
                 _this.standard.file = res.data.file;
                 _this.isCreated = false;
-                console.log( _this.standard.file)
-            })
+            },this)
         },
         //文件删除
         deleteFile(){
@@ -183,49 +178,57 @@ export default {
             this.searchText = data;
             this.isSearch = true;
             this.currentPage = 1;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results
             console.log(res)
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name获取数据 */
         gettestManagementList(pageNumber){
             this.isSearch = false;
-            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?p=' +pageNumber +'&page_size=' + +this.page_size ).then( res =>{
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results
             console.log(res)
             }).catch(err =>{
                 this.isLoading = false;
-                if(err.response.status == '500'){
-                    this.$message({message: '服务器错误',type: 'error'});
-                }
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         },
         /**@name删除 */
-        deletegettestManagement(ID){
-            this.$http.delete(this.$conf.env.deletegettestManagement + ID + '/').then(res =>{
-                if(res.status == '204'){
-                    this.$message({ message: '删除成功', type: 'success'});
-                     this.reload();
-                }else{
-                    this.$message({ message: '删除失败', type: 'warning'});              
-                }
-            }).catch(err =>{
-                if(err.response.status == '400'){
-                    this.$message({ message:err.response.data, type: 'warning'});   
-                }else{
-                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
-                }
-            })
+        deletegettestManagement(ID){   
+            this.$confirm('此操作将删除该标准, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$http.delete(this.$conf.env.deletegettestManagement + ID + '/').then(res =>{
+                    if(res.status == '204'){
+                        this.$message({ message: '删除成功', type: 'success'});
+                        this.reload();
+                    }else{
+                        this.$message({ message: '删除失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    if(err.response.status == '400'){
+                        this.$message({ message:err.response.data, type: 'warning'});   
+                    }else{
+                        this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                    }
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            }); 
+            
         },
         /**@name创建 */
         createdtestStandard(){
@@ -241,7 +244,7 @@ export default {
                 if(err.response.status == '400'){
                     this.$message({ message:err.response.data , type: 'warning'});   
                 }else{
-                    this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
                 }
             })
         },
@@ -255,7 +258,7 @@ export default {
             return true;
         }
     },
-     mounted(){
+    mounted(){
         this.gettestManagementList(1);
     },
     watch:{

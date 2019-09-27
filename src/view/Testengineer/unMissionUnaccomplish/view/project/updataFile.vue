@@ -1,5 +1,5 @@
 <template>
-    <div class="updataFile_detail body_main">
+    <div class="updataFile_detail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="updataFile_index_header">
             <h3>上传项目文件</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -7,12 +7,23 @@
         <div class="main">
             <div class="taskName">
                 <span>项目名称：</span>
-                <p class="ProjectName">控福控福智能控福智能智能-硬件部</p>
-                <span >委托公司部门：</span>
-                <p class="companyName">控福控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能智能-硬件部</p>
+                <p class="ProjectName">{{$route.query.projectName}}</p>
+                <span >公司-部门：</span>
+                <p class="companyName">{{$route.query.equipmentLab}}-{{$route.query.equipmentDepartment}}</p>
+            </div>
+            <div class="first_child">
+                <span><i class="importantData">*</i>项目结果：</span>
+                <el-select v-model="fileSection.report_result" popper-class='principal_element' placeholder="选择项目结果">
+                    <el-option
+                    v-for="item in equipmentList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                    </el-option>
+                </el-select>
             </div>
             <div class="updata main_text">
-                <span class="projectupdataName">项目文件上传</span>
+                <span class="projectupdataName"><i class="importantData">*</i>项目文件上传</span>
                 <div class="file_box">
                     <input type="file" ref="file"  @change='updataFile' style="display:none" >
                     <div class="uploadFile">
@@ -23,13 +34,14 @@
                 </div>
             </div>
             <footer>
-                <el-button type="primary" @click="$refs.popUp.dialogVisible = false">提交</el-button>
+                <el-button type="primary" @click="updataProject_myTestFile()">提交</el-button>
             </footer>
         </div>
         
     </div>
 </template>
 <script>
+import VerificationData from '../../../../../components/VerificationData'
 export default {
     name:'updataFile',
     data(){
@@ -37,6 +49,21 @@ export default {
             fileName: '',
             file:{},
             isupload: false,
+            isLoading: false,
+            fileSection:{
+                "report":'',
+                "report_result":''
+            },
+            equipmentList:[
+                {
+                    'name':'不合格',
+                    'id':1
+                },
+                {
+                    'name':'合格',
+                    'id': 2
+                }
+            ]
         }
     },
     methods:{
@@ -45,12 +72,36 @@ export default {
 
         },
         updataFile(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
+            this.$updataFile.updataFile(e.target.files[0], res =>{
+                this.fileSection.report = res.data.file;
+                this.fileName = e.target.files[0].name;
+            },this)
         },
         deleteFile(){
-            this.file = {};
+            this.fileSection.report = '';
             this.fileName = '';
+        },
+        updataProject_myTestFile(){
+            if(!VerificationData.VerificationData(this.fileSection)) return;
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.updataProject_myTestFile + this.$route.query.equipmentID + '/',this.fileSection).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back();
+                    },200)
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                if(err.response.status == '400'){
+                    this.$message({ message:err.response.data , type: 'warning'});   
+                }else{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                }
+            })
         }
     }
 }
@@ -104,7 +155,7 @@ export default {
                 margin-top: .63rem;
             }
             .uploadFile{
-                margin-bottom: 4.3rem;
+                margin-bottom: 3.2rem;
                 display: flex;
                 align-items:  flex-start;
                 .accessory{
@@ -124,6 +175,14 @@ export default {
                 }
             }
 
+        }
+        .first_child{
+            p{
+                color:#333;
+            }
+            span{
+                font-size: .26rem;
+            }
         }
         footer{
             display: flex;

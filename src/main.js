@@ -12,14 +12,23 @@ import './style/resize.scss';//样式重定义
 import './style/common.scss';//公共样式
 import './style/element.scss';//element样式重定义
 
+/**@name ui组件*/
 //elementUI组件库
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 
+//数据动态显示ui
+import {CountUp} from 'vue-ydui/dist/lib.rem/countup';//动态数据
+Vue.component(CountUp.name, CountUp);
 //echarts
 import echarts from 'echarts'
 Vue.prototype.$echarts = echarts
+
+
+//自定义删除弹框
+import deleteBox from './components/common/deleteUpbox.js'
+Vue.prototype.$Delete  = deleteBox;
 
 /**@name接口请求 */
 import conf from "./config/index.js";

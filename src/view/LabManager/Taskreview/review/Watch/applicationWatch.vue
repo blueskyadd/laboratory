@@ -1,5 +1,5 @@
 <template>
-    <div class="applicationWatch body_main">
+    <div class="applicationWatch body_main"  v-loading.fullscreen.lock="isLoading">
         <header class="applicationWatch_index_header">
             <h3>申请值班</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -9,47 +9,41 @@
                 <div class="mian_text first_child">
                      <div>
                         <span>员工名称：</span>
-                        <p>烟雾试验箱</p>
+                        <p>{{watchSection.name}}</p>
                     </div>
                     <div>
                         <span>员工工号：</span>
-                        <p>NDOF923E2039</p>
+                        <p>{{watchSection.job_num}}</p>
                     </div>
                 </div>
             <div class="mian_text two_child">
                 <div>
                     <span>值班开始时间：</span>
-                    <p>2012.02.12</p>
+                    <p>{{watchSection.start_time}}</p>
                 </div>
                 <div>
                     <span>值班结束时间：</span>
-                    <p>2012.02.12</p>
+                    <p>{{watchSection.end_time}}</p>
                 </div>
                 <div>
                     <span>值班地点：</span>
-                    <p>2012.02.12</p>
-                </div>
-            </div>
-            <div class="mian_text two_child">
-                <div>
-                    <span>值班地点：</span>
-                    <p>2012.02.12</p>
+                    <p>{{watchSection.location}}</p>
                 </div>
             </div>
             <div class="mian_text textarea">
                 <div>
                     <span>申请原因</span>
-                    <div>
-                        <textarea name="" v-model="cause" maxlength="800" placeholder="今天任务有加多" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                    <div class="disabled">
+                        <textarea name="" disabled v-model="watchSection.cause" maxlength="800" placeholder="请输入申请原因"></textarea>
+                        <p class="number">{{watchSection.cause.length}}/800</p>
                     </div>
                 </div>
             </div>
                 
             </div>
             <footer>
-                <el-button type="primary">不同意</el-button>
-                <el-button type="primary">审批</el-button>
+                <el-button type="primary " class="primary_err"  @click="editApplyWatchDetail(2)">不同意</el-button>
+                <el-button type="primary" @click="editApplyWatchDetail(3)">审批</el-button>
             </footer>
         </div>
     </div>
@@ -59,8 +53,49 @@ export default {
     name:'applicationWatch',
     data(){
         return{
-            cause: '',
+            isLoading: true,
+            watchSection:{
+                "job_num":'',
+                "name":'',
+                "start_time":'',
+                "end_time":'',
+                "location":'',
+                "cause":''
+            }
         }
+    },
+    mounted(){
+        this.getApplyWatchDetail()
+    },
+    methods:{
+        getApplyWatchDetail(){
+            this.$http.get(this.$conf.env.getApplyWatchDetail + this.$route.query.watchRoomID + '/').then(res =>{
+                this.isLoading = false;
+                this.watchSection = res.data;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        editApplyWatchDetail(number){
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.editApplyWatchDetail + this.$route.query.watchRoomID + '/',{"status":number}).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '审批成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.$router.back(-1);
+                    },100)
+                }else{
+                    this.$message({ message: '审批失败', type: 'warning'});              
+                }
+
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+        
     }
 }
 </script>

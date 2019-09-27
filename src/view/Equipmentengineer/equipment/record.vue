@@ -1,16 +1,27 @@
 <template>
     <div class="record_index">
         <header class="record_index_header">
-            <h3>盐雾试验箱</h3>
+            <h3>{{this.$route.query.equipmentName}}</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="保养时间"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - .5rem)"  style="width: 100%"  :row-class-name="tabRowClassName"  v-loading='isLoading'>
+                <el-table-column prop="report_time" min-width="20%" label="保养时间"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="address" class-name="rightText_report"  label="操作" header-align='right' align='right'>
+                    <template slot-scope="scoped"><span class="underline"  @click="goUpkeep(scoped)">查看</span> </template>
                 </el-table-column>
             </el-table>
+        </div>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
     </div>
 </template>
@@ -19,37 +30,18 @@ export default {
     name: 'record',
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
-            popUptitle:'',
-            isUpslot:1,
-            placeholderTexe:'搜索试验编号、名称',
+            tableData: [],
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            currentPage: 1,//当前页
+            page_size : 9,//一页数据条数
+            CurrentChange:1,
         }
     },              
     methods:{
          /**@name 修改表格字体颜色 */
         changecolor(data){
-            if (data.columnIndex == 0 ) {
-                return "color:#07a695";
-            }else{
-                return "color:#444444";
-            }
+            return "color:#444444";
         },
         tabRowClassName({row,rowIndex}){
             let index = rowIndex + 2;
@@ -57,15 +49,39 @@ export default {
                 return 'warning-row'
             }
         },
-        allocation(){
-            this.$router.push({name:'upkeepFlow'})
+        goUpkeep(data){
+            this.$router.push({path:'/Equipmentengineer/upkeepFlow',query:{"equipmentID": data.row.id}})
+        },
+        getEquipment_upkeeprecord(pageNumber){
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipment_upkeeprecord + this.$route.query.equipmentID + '&page_size=' +this.page_size : this.$conf.env.getEquipment_upkeeprecord + this.$route.query.equipmentID + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getEquipment_upkeeprecord(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.getEquipment_upkeeprecord(this.CurrentChange);
+            }
         },
     }
 }
 </script>
 <style lang="scss">
 .record_index{
+    @import '../../../style/LabManager/management/index.scss';
     padding-top: .42rem;
+    height: calc(100% - 2.5rem);
     .record_index_header{
         padding-left: .41rem;
         height: .38rem;
@@ -99,7 +115,9 @@ export default {
     .warning-row{
         background:#f6f6f6;
     }
-    .taskAllocation_distributed{
+    .taskAllocation_distributed {
+        margin-top: .4rem;
+        height: calc(100% - 1rem);
         th{
             font-size: .2rem;
             line-height: .48rem;
@@ -121,68 +139,6 @@ export default {
             }
         }
     }
-    .popUp{
-        .el-dialog{
-            height: 59.4%;
-            overflow: hidden;
-        }
-        ul{
-            overflow-y: scroll;
-        }
-        ul::-webkit-scrollbar{
-            display: none;
-        }
-        ul>li{
-            display: flex;
-            p{
-                font-size: .2rem;
-            }
-        }
-        li>span{
-            font-size: .28rem;
-            color: #333333;
-        }
-        .taskDetail{
-            padding-top: .39rem;
-            li{
-                // line-height: .9rem;
-                height: .6rem;
-                padding: .15rem 0;
-            }
-            
-        }
-        .taskTest{
-            margin-top: .18rem;
-            li{
-                // height: .6rem;
-                line-height: .6rem;
-                padding: .05rem 0;
-                p{
-                   font-size: .28rem; 
-                    color: #333333;
-                    width: 60%;
-                }
-            }
-            .el-select{
-                width: 4rem;
-                height: .52rem;
-                .el-input__inner{
-                    height: .52rem; 
-                    font-size: .2rem;
-                    font-weight: 200;
-                }
-            }
-            button{
-                background: #08a795;
-                color: #fff;
-                height:.45rem;
-                width: 1.81rem;
-                font-size: .26rem;
-                margin-left: 30%;
-                margin-top: .54rem;
-                  
-            }
-        }
-    }
+    
 }
 </style>

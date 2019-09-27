@@ -5,30 +5,32 @@
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <span class="goBack underline" @click="goHome">首页</span>
             <div class="Taskreview_index_header_link">
-                <router-link replace  to="/Testengineer/environmentActive/material" tag="span">物料清单</router-link>
-                <router-link replace  to="/Testengineer/environmentActive/equipment" tag="span">设备清单</router-link>
-                <router-link replace  to="/Testengineer/environmentActive/methods" tag="span">试验操作</router-link>
+                <span :class="this.$route.path == '/Testengineer/environmentActive/material'?'router-link-active':'' "  @click="goMaterial()">物料清单</span>
+                <span :class="this.$route.path == '/Testengineer/environmentActive/equipment'?'router-link-active':'' " @click="goEquipment()">设备清单</span>
+                <span :class="this.$route.path == '/Testengineer/environmentActive/methods'?'router-link-active':'' "  @click="goMethods()">试验操作</span>
             </div>
         </header>
-        <div class="taskName">
+        <div class="taskName" >
             <span>项目名称：</span>
-            <p class="ProjectName" :style="{'width': $route.path == '/Testengineer/environmentActive/equipment' ? 'auto':'3rem'}">控福控福智能控福智能智能-硬件部</p>
+            <p class="ProjectName" :style="{'width': $route.path == '/Testengineer/environmentActive/equipment' ? 'auto':'3rem'}">{{$route.query.equipmentName}}</p>
             <span  v-if="$route.path != '/Testengineer/environmentActive/equipment'">公司-部门：</span>
-            <p class="companyName"  v-if="$route.path != '/Testengineer/environmentActive/equipment'">控福控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能智能-硬件部</p>
+            <p class="companyName"  v-if="$route.path != '/Testengineer/environmentActive/equipment'">{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
             <span @click="addmaterial" v-if="$route.path == '/Testengineer/environmentActive/material'" class="underline addmaterial">添加</span>
         </div>
          <router-view ref="methods"></router-view> 
     </div>
 </template>
 <script>
+import { nextTick } from 'q'
 export default {
     name: 'environmentActive',
     data(){
         return{
-           
             popUptitle:'',
             isUpslot:1,
             placeholderTexe:'搜索试验编号、名称',
+            labManagrInfo:{},
+           
         }
     },
     methods:{
@@ -36,11 +38,31 @@ export default {
             this.$router.push({name:'TestengineerIndex'})
         },
         searchDetail(){
-
+            
         },
         addmaterial(){
             this.$refs.methods.editquipment('添加物料', true)
-        }
+        },
+        goMaterial(){
+            this.$router.replace({path: '/Testengineer/environmentActive/material',query:{equipmentID: this.$route.query.equipmentID,equipmentName: this.$route.query.equipmentName}})
+        },
+        goEquipment(){
+            this.$router.replace({path: '/Testengineer/environmentActive/equipment',query:{equipmentID: this.$route.query.equipmentID,equipmentName: this.$route.query.equipmentName}})
+        },
+        goMethods(){
+            this.$router.replace({path: '/Testengineer/environmentActive/methods',query:{equipmentID: this.$route.query.equipmentID,equipmentName: this.$route.query.equipmentName}})
+        },
+        getEquipment_userinfoDetail(){
+            this.$http.get(this.$conf.env.getEquipment_userinfoDetail).then(res =>{
+                this.labManagrInfo = res.data;
+                
+            }).catch(err =>{
+                console.log(err)
+            })
+        },
+    },
+    mounted(){
+        this.getEquipment_userinfoDetail();
     }
 }
 </script>
@@ -66,12 +88,13 @@ export default {
                 color: #999999;
                 cursor: pointer;
             }
-            .router-link-exact-active{
+            .router-link-exact-active,.router-link-active{
                 color: #07a695;
                 text-decoration: underline;
             }
             
         }
+       
         h3{
             font-size: .36rem;
             color: #333333;
@@ -83,77 +106,26 @@ export default {
         .goBack{
             margin-left: .28rem;
             font-size: .23rem;
-            margin-right: 。32rem;
+            margin-right: .32rem;
         }
     }
-    
+     .taskName{
+        display: block;
+        overflow: hidden;
+        span{
+            float: left;
+        }
+        p{
+            float: left;
+        }
+        .addmaterial{
+            float: right;
+            margin-right: 1.55rem;
+        }
+    }
     //斑马线
     .warning-row{
         background:#f6f6f6;
-    }
-    
-    .popUp{
-        .el-dialog{
-            height: 59.4%;
-            overflow: hidden;
-        }
-        ul{
-            overflow-y: scroll;
-        }
-        ul::-webkit-scrollbar{
-            display: none;
-        }
-        ul>li{
-            display: flex;
-            p{
-                font-size: .2rem;
-            }
-        }
-        li>span{
-            font-size: .28rem;
-            color: #333333;
-        }
-        .taskDetail{
-            padding-top: .39rem;
-            li{
-                // line-height: .9rem;
-                height: .6rem;
-                padding: .15rem 0;
-            }
-            
-        }
-        .taskTest{
-            margin-top: .18rem;
-            li{
-                // height: .6rem;
-                line-height: .6rem;
-                padding: .05rem 0;
-                p{
-                   font-size: .28rem; 
-                    color: #333333;
-                    width: 60%;
-                }
-            }
-            .el-select{
-                width: 4rem;
-                height: .52rem;
-                .el-input__inner{
-                    height: .52rem; 
-                    font-size: .2rem;
-                    font-weight: 200;
-                }
-            }
-            button{
-                background: #08a795;
-                color: #fff;
-                height:.45rem;
-                width: 1.81rem;
-                font-size: .26rem;
-                margin-left: 30%;
-                margin-top: .54rem;
-                  
-            }
-        }
     }
 }
 </style>

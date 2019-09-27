@@ -2,33 +2,32 @@
     <div class="upkeepEqupment">
         <header class="upkeepEqupment_header">
             <h3>设备保养数</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <span class="goBack underline" @click="goBack">返回</span>
+            <Search @searchDetail='searchEquipment_upkeepList' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="设备编号"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="设备名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="实验室" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="保养创建时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="预计完成时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="状态"      header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">进行</span></template>
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
+                <el-table-column prop="num"  label="设备编号"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="设备名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="room"  label="实验室" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="start_time"  label="保养创建时间" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="end_time"  label="预计完成时间" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  label="状态"      header-align='center' align='center'>
+                    <template slot-scope="scoped"><span >{{scoped.row.status}}</span></template>
                 </el-table-column>
-                <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
+                <el-table-column  label="操作" header-align='center' align='center'>
+                    <template slot-scope="scoped"><span class="underline"  @click="goUpkeep(scoped)">查看</span> </template>
                 </el-table-column>
             </el-table>
         </div>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange" 
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -41,35 +40,42 @@ export default {
     components:{Search},
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                },{
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
-            popUptitle:'',
-            isUpslot:1,
+            tableData: [],
             placeholderTexe:'搜索试验编号、名称',
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            currentPage: 1,//当前页
+            page_size : 9,//一页数据条数
+            CurrentChange:1,
+            isSearch: false,//是否为搜索
+            searchText:'',//搜索文字
+            gobackChange: -1,
         }
     },
+    created() {
+        window.addEventListener('popstate', this.goBack(), false);
+    },
+    destroyed() {
+        window.removeEventListener('popstate', this.goBack(), false);
+    },
     methods:{
+        goBack(data){
+            // alert('asd')
+            console.log(data)
+            // this.$router.go(this.gobackChange)
+        },
          /**@name 修改表格字体颜色 */
         changecolor(data){
             if (data.columnIndex == 0 ) {
                 return "color:#07a695";
+            }else if(data.columnIndex == 5 ){
+                if(data.row.status == '未申请'){
+                    return "color:#f10956";
+                }else if(data.row.status == '已申请'){
+                    return "color:#00d683";
+                }
             }else{
+                
                 return "color:#444444";
             }
         },
@@ -79,23 +85,65 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
-        },
-        allocation(){
-            this.$router.push({name:'upkeepFlow'})
-        },
-        goUpdataFile(){
-            this.$router.push({name: 'updataFile'})
-        },
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch?this.getEquipment_maintain(pageNumber):this.searchEquipment_maintain(this.searchText,pageNumber);
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        goUpkeep(data){
+            this.$router.push({path:'/Equipmentengineer/upkeepFlow',query:{"equipmentID": data.row.id}})
+        },
+        /**@name 搜索*/
+        searchEquipment_upkeepList(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipment_upkeepList + '?search=' + data   + '&page_size=' +this.page_size : this.$conf.env.getEquipment_upkeepList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+               this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getEquipment_upkeepList(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipment_upkeepList + '?page_size=' +this.page_size : this.$conf.env.getEquipment_upkeepList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getEquipment_upkeepList(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch?this.getEquipment_upkeepList(this.CurrentChange):this.searchEquipment_upkeepList(this.searchText,this.CurrentChange);
+            }
+        },
+    },
+    beforeRouteEnter (to, from, next) {
+        console.log(from) 
+        next(vm =>{
+            if(from.name == 'upkeepUpdataFile'){
+                vm.gobackChange = -3;
+            } else{
+                vm.gobackChange = -1;
+            }
+        })
     }
 }
 </script>

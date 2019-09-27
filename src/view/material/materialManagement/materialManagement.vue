@@ -3,33 +3,37 @@
         <header class="materialManagementTable_header">
             <h3>物料管理</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.34rem;" @click="$router.push({name:'updataReWire'})">新增</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.34rem;" @click="$router.push({name:'addMaterial'})">新增</span>
+            <Search @searchDetail='searchMateria' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date"  label="物料编号" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="物料名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="位置" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="创建时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="物料种类" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="数量" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="安全库存数" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="采购周期" header-align='center'  align='center'> </el-table-column>
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
+                <el-table-column prop="nateriel_num"  label="物料编号" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="物料名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="inventory"  label="数量" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="unit"  label="单位" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="unit_price"  label="单价" header-align='center'  align='center'></el-table-column>
+                <el-table-column prop="device_type"  label="物料种类" header-align='center'  align='center'>
+                    <template slot-scope="scoped">
+                        <span>{{scoped.row.device_type  == 1 ? '易损件' : '原件'}}</span>
+                    </template>    
+                </el-table-column>
+                <el-table-column prop="safe_inventory"  label="安全库存数" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="purchase_cycle"  label="采购周期" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="location"  label="位置" header-al ign='center'  align='center'> </el-table-column>
                 <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline span_upload"  @click="allocation(scoped)">申请</span><span class="underline span_upload"  @click="allocation(scoped)">编辑</span></template>
+                    <template slot-scope="scoped"><span class="underline span_upload"  @click="goMateriaDetail(scoped)">申请</span><span class="underline span_upload"  @click="goUpdataFile(scoped)">编辑</span></template>
                 </el-table-column>
             </el-table>
         </div>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange" 
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -42,27 +46,17 @@ export default {
     components:{Search},
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                },{
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
             popUptitle:'',
             isUpslot:1,
             placeholderTexe:'搜索物料编号、名称',
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            currentPage: 1,//当前页
+            page_size : 9,//一页数据条数
+            CurrentChange:1,
+            isSearch: false,//是否为搜索
+            searchText:'',//搜索文字
         }
     },
     methods:{
@@ -70,8 +64,15 @@ export default {
         changecolor(data){
             if (data.columnIndex == 0 ) {
                 return "color:#07a695";
+            }else if(data.columnIndex == 2 ){
+                if(data.row.inventory < data.row.safe_inventory){
+                    return "color:#f10000"
+                }else{
+                    return "color:#444444";
+                }
             }else{
                 return "color:#444444";
+
             }
         },
         tabRowClassName({row,rowIndex}){
@@ -80,23 +81,61 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
+        
+        goMateriaDetail(data){
+            this.$router.push({path:'/materialIndex/ediitMaterial',query:{materialID: data.row.id,flag:true}})
         },
-        allocation(){
-            this.$router.push({name:'ediitMaterial'})
-        },
-        goUpdataFile(){
-            this.$router.push({name: 'updataFile'})
+        goUpdataFile(data){
+           this.$router.push({path: '/materialIndex/addMaterial',query:{materialID: data.row.id}})
         },
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch?this.getMateriaManaeList(pageNumber):this.searchMateria(this.searchText,pageNumber);
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        /**@name搜索 */
+        searchMateria(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
+            console.log(pageNumber)
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getMateriaManaeList + '?search=' + data   + '&page_size=' +this.page_size : this.$conf.env.getMateriaManaeList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+               this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        /**@name 数据请求 */
+        getMateriaManaeList(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getMateriaManaeList + '?page_size=' +this.page_size : this.$conf.env.getMateriaManaeList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getMateriaManaeList(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch?this.getMateriaManaeList(this.CurrentChange):this.searchMateria(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>

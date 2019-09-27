@@ -1,17 +1,24 @@
 <template>
-    <div class="measureFlow body_main">
+    <div class="measureFlow body_main" v-loading.fullscreen.lock="isLoading">
         <header class="measureFlow_index_header">
             <h3>计量流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <span class="goBack underline" @click="goHome">首页</span>
         </header>
         <div class="main">
-            <div class="titleEquipment"><span>设备名称：</span><p>老化试验箱</p></div>
+            <div class="titleEquipment"><span>设备名称：</span><p>{{meteringSection.name}}</p></div>
+            <div class="img_bg">
+                <img src="../../../assets/img/gauger/flow/overFlow.png" alt="">
+            </div>
             <div class="main_list">
                 <ul class="flow">
                     <li @click="goProposer()"><img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt=""><span>申请计量</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="godocumentEquipment()"><img src="../../../assets/img/Equipmentengineer/malfunction/contract.png" alt=""><span>合同签署</span></li>
+                    <li >
+                        <a download="w3logo" :href="meteringSection.compact">
+                            <img src="../../../assets/img/Equipmentengineer/malfunction/contract.png" alt=""><span>合同签署</span>
+                        </a>
+                    </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @click="goSchedule()"><img src="../../../assets/img/gauger/flow/schedule.png" alt=""><span>计量进度</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
@@ -26,25 +33,39 @@ export default {
     name:'measureFlow',
     data(){
         return{
-            cause: '',
+            meteringSection: {},
+            isLoading: true,
         }
     },
     methods:{
         goHome(){
-            this.$router.push({name:'gaugerIndex'})
+            this.$router.push({name:'gaugerIndex'});
         },
         goProposer(){
-            this.$router.push({name:'proposer'})
-        },
-        godocumentEquipment(){
-            this.$router.push({name:'documentEquipment'})
+            if(this.meteringSection.status == 0){
+                this.$router.push({path:'/gaugerIndex/proposer', query:{equipmentID: this.$route.query.equipmentID}});
+            }else{
+                this.$message({ message:'此设备已申请' , type: 'warning'}); 
+            }
         },
         goSchedule(){
-            this.$router.push({name:'schedule'})
+            this.$router.push({path:'/gaugerIndex/schedule', query:{equipmentID: this.$route.query.equipmentID}});
         },
         goReport(){
-            this.$router.push({name:'measureFlowReport'})
+            this.$router.push({path:'/gaugerIndex/measureFlowReport' , query:{equipmentID: this.$route.query.equipmentID}});
         },
+        getGauger_meteringFlow(){
+            this.$http.get(this.$conf.env.getGauger_meteringFlow + this.$route.query.equipmentID + '/').then( res =>{
+                this.meteringSection = res.data;
+                this.isLoading = false;
+            }).catch( err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        }
+    },
+    mounted(){
+        this.getGauger_meteringFlow()
     }
 }
 </script>
@@ -80,7 +101,6 @@ export default {
         padding: 0 .58rem;
         .titleEquipment{
             display: flex;
-            margin-bottom: 2.58rem;
             span{
                 font-size: .24rem;
                 color: #333333;
@@ -90,19 +110,23 @@ export default {
                 color: #07A695
             }
         }
+        .img_bg{
+            margin-bottom: 2.14rem;
+            overflow: hidden;
+            margin-top: -.76rem;
+            img{
+                float: right;
+            }
+        }
         .main_list{
             display: flex;
             // align-items: center;
-            padding-left: 2.26rem;
+            // padding-left: 2.26rem;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             ul{
                 display: flex;
-                // width: 100%;
-                // display: flex;
-                // height: 6.09rem;
-                // justify-content: space-around;
                 li{
                     background:#fff;
                     width: 2.4rem;

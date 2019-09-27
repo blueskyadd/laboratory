@@ -27,8 +27,8 @@ export default {
     name:'loging',
     data(){
         return{
-            userName: '',
-            passWord: ''
+            userName: '17630718222',
+            passWord: 'asd123456'
         }
     },
     methods:{

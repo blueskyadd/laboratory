@@ -7,29 +7,24 @@
 
         </header>
         <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="物料编号"  header-align='center'  align='center'> </el-table-column>
+            <el-table-column prop="nateriel_num"  label="物料编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="物料名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="物料数量" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="申请时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="申请人" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="状态" header-align='center' align='center'>
-                <template>
-                    <span>通过</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                 <template slot-scope="scoped"><span class="underline" style="margin-right:.48rem"  @click="allocation(scoped)">查看</span><span class="underline"  @click="allocation(scoped)">入库</span></template>
+            <el-table-column prop="num"  label="物料数量" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="create_time"  label="申请时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="user"  label="申请人" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="status"  label="状态" header-align='center' align='center'></el-table-column>
+            <el-table-column prop="id"   label="操作" header-align='center' align='center'>
+                 <template slot-scope="scoped"><span class="underline" style="margin-right:.48rem"  @click="goMateriaDetail(scoped)">查看</span><span class="underline"  @click="applyMaterial_application(scoped)">入库</span></template>
             </el-table-column>
         </el-table>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange" 
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -39,46 +34,19 @@
 import Search from "../../../components/common/search";
 export default {
     components:{Search},
+    inject:['reload'],
     name:'incoming',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        popUptitle: '',
-        placeholderTexe:'上传试验编号、名称',
-        isUpslot:false
+        tableData: [],
+        placeholderTexe:'输入物料编号、名称',
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        CurrentChange:1,
+        isSearch: false,//是否为搜索
+        searchText:'',//搜索文字
       }
     },
     methods:{
@@ -96,41 +64,76 @@ export default {
                 return "color:#444444";
             }
         },
-
-        /**@name 页面跳转 */
-        lookDetail(data){
-
+        goMateriaDetail(data){
+            this.$router.push({path:'/materialIndex/ediitMaterial',query:{materialID: data.row.id,flag:false}})
         },
         allocation(data){
             this.$router.push({name: 'frockProcess' })
         },
-        /**@name功能按键 */
-        //弹框
-        editquipment(title, flag, data){
-            this.popUptitle = title;
-            this.isUpslot = flag;
-            this.$refs.popUp.dialogVisible = true;
+        searchDetail(data){
+            this.searchgetMaterial_application(data,1)
         },
-        //上传按钮
-        updataFileChange(){
-            this.$refs.file.click()
+        /**@name入库 */
+        applyMaterial_application(data){
+            this.isLoading = true;
+            this.$http.put(this.$conf.env.applyMaterial_application + data.row.id + '/').then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                        this.$message({ message: '入库申请已提交', type: 'success'});
+                        this.reload();
+                    }else{
+                        this.$message({ message: '入库申请提交失败', type: 'warning'});              
+                    }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response.data[0]?err.response.data[0]:err.response.data?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
         },
-        //搜索按钮
-        searchPersonnel(){
-
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber;
+            this.CurrentChange = pageNumber;
+            this.isLoading = true;
+            !this.isSearch?this.getMaterial_application(pageNumber):this.searchgetMaterial_application(this.searchText,pageNumber);
         },
-        //上传按钮
-        updataFile(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
+        /**@name搜索 */
+        searchgetMaterial_application(data,pageNumber){
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getMaterial_application + '?search=' + data   + '&page_size=' +this.page_size : this.$conf.env.getMaterial_application + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
         },
-        //文件删除
-        deleteFile(){
-            this.file = {};
-            this.fileName = '';
-        },
-        searchDetail(){
-
+        /**@name加载数据 */
+        getMaterial_application(pageNumber){
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getMaterial_application + '?page_size=' +this.page_size : this.$conf.env.getMaterial_application + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        }
+    },
+    mounted(){
+        this.getMaterial_application(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                !this.isSearch?this.getMaterial_application(this.CurrentChange):this.searchgetMaterial_application(this.searchText,this.CurrentChange);
+            }
         },
     }
 }

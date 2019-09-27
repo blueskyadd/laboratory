@@ -9,18 +9,25 @@
             </div>
         </header>
         <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-                <el-table-column prop="date" label="序号"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date" label="试验名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date" label="负责人" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date" label="试验开始时间" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="试验数据"      header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">试验数据</span></template>
-                </el-table-column>
-                <el-table-column prop="address"   label="试验结果" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">合格</span> </template>
-                </el-table-column>
+            <el-table :data="tableData" :cell-style="changecolor" height="100%"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+                <el-table-column width="100%"  label="序号" type="index"   :index="getIndex"   header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="equipment.num" label="试验编号" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="equipment.name" label="试验名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="equipment.user" label="负责人" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="cause" label="报警原因"  header-align='center' align='center'></el-table-column>
+                <el-table-column prop="create_time" label="报警时间" header-align='center'  align='center'> </el-table-column>
             </el-table>
+        </div>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
     </div>
 </template>
@@ -30,24 +37,12 @@ export default {
     data(){
         return{
             placeholderTexe:'搜索报告编号、名称',
-             tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            currentPage: 1,//当前页
+            page_size : 9,//一页数据条数
+            CurrentChange:1,
         }
     },
     methods:{
@@ -57,8 +52,10 @@ export default {
          changecolor(data){
             if (data.columnIndex == 0 ) {
                 return "color:#07a695";
+            }else if(data.columnIndex == 4){
+                return "color:#f30000";
             }else{
-                return "color:#444444";
+                 return "color:#444444";
             }
         },
         tabRowClassName({row,rowIndex}){
@@ -67,11 +64,45 @@ export default {
                 return 'warning-row'
             }
         },
+        getIndex(index){
+            return (this.CurrentChange - 1) * this.page_size + index + 1
+        },
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getalarmList(pageNumber);
+        },
+        getalarmList(pageNumber){
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getalarmList + '?page_size=' +this.page_size : this.$conf.env.getalarmList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response.data?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getalarmList(1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.getalarmList(this.CurrentChange);
+            }
+        },
     }
+    
 }
 </script>
 <style lang="scss">
 .testWarning_index{
+    @import '../../../style/LabManager/management/index.scss';
     padding-top: .42rem;
     
     .testWarning_index_header{
@@ -122,7 +153,7 @@ export default {
     }
     .taskAllocation_distributed{
         margin-top: .4rem;
-        height: calc(100% - 4.5rem);
+        height: calc(100% - 2.2rem);
         th{
             font-size: .2rem;
             line-height: .48rem;
