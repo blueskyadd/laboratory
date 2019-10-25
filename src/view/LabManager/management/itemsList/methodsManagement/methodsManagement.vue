@@ -7,7 +7,7 @@
             <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address"  label="操作" header-align='center' align='center'>
                  <template slot-scope="scoped">
-                     <a :href="scoped.row.file" download="w3logo" class="underline lookmanagement deletemanagement">下载</a>
+                     <a :href="scoped.row.file" download="试验方法" class="underline lookmanagement">下载</a>
                      <span class="underline deletemanagement"  @click="deletetestMethods(scoped.row.id)">删除</span> </template>
             </el-table-column>
         </el-table>
@@ -33,7 +33,6 @@ export default {
         tableData: [],
         isLoading:true,//加载动画
         totalSum:0,//数据总数
-        currentPage: 1,//当前页
         page_size : 9,//一页数据条数
         CurrentChange:1,
         isSearch: false,//是否为搜索
@@ -57,17 +56,17 @@ export default {
         },
         /**@name 分页 */
         handleCurrentChange(pageNumber) {
-            this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
             this.isLoading = true;
             !this.isSearch?this.gettestMethodsList(pageNumber):this.testMethodsSearch(this.searchText,pageNumber);
         },
         /**@name搜索 */
         testMethodsSearch(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
             this.isLoading = true;
              this.searchText = data;
              this.isSearch = true;
-             this.currentPage = 1;
+             this.CurrentChange = pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.gettestMethodsList + '?search=' + data   + '&page_size=' +this.page_size : this.$conf.env.gettestMethodsList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -80,6 +79,7 @@ export default {
         /**@name数据获取 */
         gettestMethodsList(pageNumber){
             this.isSearch = false;
+             pageNumber = pageNumber ?  pageNumber : 1;
             this.$http.get(pageNumber == 1 ? this.$conf.env.gettestMethodsList + '?page_size=' +this.page_size : this.$conf.env.gettestMethodsList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -100,7 +100,11 @@ export default {
                 this.$http.delete(this.$conf.env.deletetestMethods + ID + '/').then(res =>{
                     if(res.status == '204'){
                         this.$message({ message: '删除成功', type: 'success'});
-                        this.reload();
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            !this.isSearch?this.gettestMethodsList(this.CurrentChange-1):this.testMethodsSearch(this.searchText,this.CurrentChange-1);
+                        }else{
+                            !this.isSearch?this.gettestMethodsList(this.CurrentChange):this.testMethodsSearch(this.searchText,this.CurrentChange);
+                        }
                     }else{
                         this.$message({ message: '删除失败', type: 'warning'});              
                     }
@@ -127,7 +131,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.gettestMethodsList(this.CurrentChange):this.testMethodsSearch(this.searchText,this.CurrentChange);
             }
         },

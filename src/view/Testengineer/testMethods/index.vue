@@ -17,7 +17,7 @@
                 <el-table-column prop="address"   label="试验结果" header-align='center' align='center'>
                     <template slot-scope="scoped">
                         <span class="underline lookmanagement" :style="{'color':scoped.row.update == 1?'':'#999!important','cursor':scoped.row.update == 1 ?'':'not-allowed'}"   @click="scoped.row.update == 1 && editDetail(scoped)">编辑</span>
-                        <a class="underline" download="w3logo" :href="scoped.row.file">查看</a> 
+                        <a class="underline" download="试验结果" :href="scoped.row.file">查看</a> 
                     </template>
                 </el-table-column>
             </el-table>
@@ -94,7 +94,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 this.getTest_testwayList(this.CurrentChange);
             }
         },

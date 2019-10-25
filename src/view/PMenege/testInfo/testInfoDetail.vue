@@ -1,5 +1,5 @@
 <template>
-    <div class="testInfoDetail body_main">
+    <div class="testInfoDetail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="testInfoDetail_index_header">
             <h3>试验详情</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,41 +8,40 @@
             <div class="measure_main">
                 <div class="mian_text two_child">
                     <span>产品编号：</span>
-                    <p class="testInfoDetail_name">烟雾试验箱</p>
+                    <p class="testInfoDetail_name">{{projectDetail.experiment_num}}</p>
                     <span>产品名称：</span>
-                    <p>2012.02.12</p>
+                    <p>{{projectDetail.name}}</p>
                 </div>
                 <div class="mian_text two_child ">
                     <span>项目编号：</span>
-                    <p class="testInfoDetail_name">2012.02.12</p>
+                    <p class="testInfoDetail_name">{{projectDetail.project_num}}</p>
                     <span>项目名称：</span>
-                    <p class="testInfoDetail_name">2012.02.12</p>
+                    <p class="testInfoDetail_name">{{projectDetail.project}}</p>
                     <span>负责人：</span>
-                    <p>张丹</p>
+                    <p>{{projectDetail.project_leader}}</p>
                 </div>
                 <div class="mian_text two_child ">
                     <span>试验编号：</span>
-                    <p class="testInfoDetail_name">2012.02.12</p>
+                    <p class="testInfoDetail_name">{{projectDetail.product_num}}</p>
                     <span>试验名称：</span>
-                    <p class="testInfoDetail_name">2012.02.12</p>
+                    <p class="testInfoDetail_name">{{projectDetail.product}}</p>
                     <span>负责人：</span>
-                    <p>张丹</p>
+                    <p>{{projectDetail.engineer}}</p>
                 </div>
                 <div class="information">
                     <div class="information_list ">
-                        <div class="mian_text two_child">
-                            <span>名字：</span>
-                            <p>信息</p>
+                        <div class="scroll_list">
+                            <div class="mian_text two_child" v-for="item in projectDetail.interflows" :key="item.id">
+                                <span>{{item.user}}：</span>
+                                <p>{{item.text}}</p>
+                            </div>
                         </div>
-                        <div class="mian_text two_child">
-                            <span>名字：</span>
-                            <p>信息</p>
-                        </div>
+                        
                     </div>
                    <footer>
                        <span>我：</span>
-                       <input type="text">
-                       <el-button type="primary">发送</el-button>
+                       <input type="text" v-model="intro">
+                       <el-button type="primary" @click="setDataPm_exfailDetail">发送</el-button>
                    </footer>
                 </div>
             </div>
@@ -54,8 +53,42 @@ export default {
     name:'testInfoDetail',
     data(){
         return{
-            cause: '',//申请原因
+            isLoading: true,
+            intro:'',
+            projectDetail:{}
         }
+    },
+    methods:{
+        getPm_project_exfailDetail(){
+            this.$http.get(this.$conf.env.getPm_project_exfailDetail  + this.$route.query.equipmentID +'/').then(res =>{
+                this.isLoading = false;
+                this.projectDetail = res.data;
+                this.$nextTick(() => {
+                    var container = document.getElementsByClassName('scroll_list')[0];
+                    container.scrollTop = container.scrollHeight;
+                })
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        setDataPm_exfailDetail(){
+            if(!this.intro){
+                 this.$message({ message:'写点内容在发送吧' , type: 'warning'});
+            }else{
+                this.isLoading = true;
+                this.$http.put(this.$conf.env.setDataPm_exfailDetail+ this.$route.query.equipmentID +'/',{'intro':this.intro}).then(res =>{
+                    this.intro = '';
+                    this.getPm_project_exfailDetail()
+                }).catch(err =>{
+                    this.isLoading = false;
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+                })
+            }
+        }
+    },
+    mounted(){
+        this.getPm_project_exfailDetail()
     }
 }
 </script>
@@ -112,7 +145,8 @@ export default {
                 display: flex;
                 justify-content: flex-start;
                 align-items: flex-start;
-                height: .5rem;
+                // height: .5rem;
+                padding: .2rem 0;
                 span{
                     font-size: .24rem;
                     color: #333333;
@@ -129,6 +163,7 @@ export default {
             .two_child{
                 p{
                     color: #07a695;
+                    flex: 1;
                 }
             }
             .information{
@@ -137,8 +172,13 @@ export default {
                 padding: 0.18rem .26rem 0;
                 .information_list{
                     height: 85%;
-                    .mian_text{
-                        list-style: .46rem;
+                    overflow: hidden;
+                    .scroll_list{
+                        height: 100%;
+                        overflow-y: scroll;
+                        .mian_text{
+                            list-style: .46rem;
+                        }
                     }
                 }
                 footer{
@@ -153,6 +193,8 @@ export default {
                         border: 1px solid #999;
                         margin-right: .64rem;
                         width: 13.86rem;
+                        font-size: .24rem;
+                        padding: 0 .05rem;
                     }
                     button{
                         font-size: .3rem;

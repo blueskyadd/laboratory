@@ -53,8 +53,8 @@
                             <div class="upload_BOX">
                                 <header>添加产品<span></span></header>
                                 <div class="from">
-                                    <div style="margin-bottom:.26rem;margin-top:.22rem;"><span><i class="importantData">*</i>产品编号</span><input v-model="produceInfo.name" type="text"></div>
-                                    <div style="margin-bottom:.14rem"><span><i class="importantData">*</i>产品名称</span><input type="text" v-model="produceInfo.number"></div>
+                                    <div style="margin-bottom:.26rem;margin-top:.22rem;"><span><i class="importantData">*</i>产品编号</span><input v-model="produceInfo.number" type="text"></div>
+                                    <div style="margin-bottom:.14rem"><span><i class="importantData">*</i>产品名称</span><input type="text" v-model="produceInfo.name"></div>
                                     <el-button type="primary" @click="created_produce()">确定</el-button>
                                 </div>
                             </div>
@@ -69,117 +69,30 @@
             <div class="my_apply">
                 <header class="show_background">我的应用</header>
                 <ul class="main_list">
-                    <li class="show_background" @click="$router.push({name:'calendar'})"><img src="../../../assets/img/project/flow/interior.png" alt=""><span>项目配置</span></li>
-                    <li class="show_background" @click="$router.push({name: 'testInfo'})"><img src="../../../assets/img/project/flow/interior.png" alt=""><span>试验信息</span></li>
-                    <li class="show_background" @click="$router.push({name: 'examine'})"><img src="../../../assets/img/project/flow/interior.png" alt=""><span>审批</span></li>
-                    <li class="show_background" @click="$router.push({name:'incurExpense'})"><img src="../../../assets/img/project/flow/interior.png" alt=""><span>支出费用</span></li>
+                    <li class="show_background" @click="$router.push({name:'calendar'})"><img src="../../../assets/img/PMenege/index/calendar.png" alt=""><span>项目配置</span></li>
+                    <li class="show_background" @click="$router.push({name: 'testInfo'})"><img src="../../../assets/img/PMenege/index/testInfo.png" alt=""><span>试验信息</span></li>
+                    <li class="show_background" @click="$router.push({name: 'examine'})"><img src="../../../assets/img/PMenege/index/examine.png" alt=""><span>审批</span></li>
+                    <li class="show_background" @click="$router.push({name:'incurExpense'})"><img src="../../../assets/img/PMenege/index/incurExpense.png" alt=""><span>支出费用</span></li>
                 </ul>
             </div>
             <div class="progress show_background">
                 <el-carousel trigger="click" height="100%"  arrow="always" indicator-position='none' :autoplay='true'>
-                    <el-carousel-item v-for="item in 4" :key="item">
+                    <el-carousel-item v-for="item in projectSchedule" :key="item.id">
                         <div class="project">
-                            <span class="project_name">产品A</span>
+                            <span class="project_name">{{item.name}}</span>
                             <div class="lengent">
                                 <div><span>待完成</span><span></span></div>
                                 <div><span>已完成</span><span></span></div>
-                                <div><span>状态</span><span>正常</span></div>
+                                <div><span>状态</span><span>{{item.status}}</span></div>
                             </div>
-                            <el-progress type="circle"  stroke-width='18' :percentage="percentage" :color="colors"></el-progress>
+                            <el-progress type="circle"  stroke-width='18' :percentage="toPoint(item.pct)" :color="colors"></el-progress>
                         </div>
                     </el-carousel-item>
                 </el-carousel>
             </div>
         </div>
         <div class="tableInfo listInfo ">
-            <div class="my_dynamic schedule show_background">
-                <header>
-                    <span>项目动态</span>
-                    <div style="display:flex;">
-                        <span class="name">优先级</span>
-                        <el-dropdown trigger="click" @command="handleCommand">
-                        
-                            <span class="el-dropdown-link">
-                                {{fileItemIndex.name}}<i class="el-icon-arrow-down el-icon--right"></i>
-                            </span>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item v-for="item in fileItem" :key="item.id" :command="item">{{item.name}}</el-dropdown-item>
-                            </el-dropdown-menu>
-                        </el-dropdown>
-                    </div>
-                </header>
-                <div class="main_box">
-                    <div class="header_list">
-                        <ul>
-                            <li>项目</li>
-                            <li>试验</li>
-                            <li>负责人</li>
-                            <li>进度</li>
-                            <li>状态</li>
-                        </ul>
-                    </div>
-                    <div class="main_element">
-                        <ul  :class="isHiddenBox?'hiddenHeight hidden_box': 'hidden_box'" :style="{'height': setHeight}">
-                            <li>
-                                <div class="title">
-                                    <span >红旗轿车</span>
-                                    <span class="border"></span>
-                                </div>
-                                <ul>
-                                    <li>
-                                        <div class="element_principal">
-                                            <i @click="setElementHidden"></i>
-                                            <span class="element_principal_border"></span>
-                                            <span class="element_principal_name">张张磊磊</span>
-                                        </div>
-                                       <div class="progress_bar">
-                                           <span></span>
-                                           <i>80%</i>
-                                       </div>
-                                       <div class="element_status">正常</div>
-                                    </li>
-                                    <li>
-                                        <div class="element_test">
-                                            <span></span>
-                                            <span>这栋实验</span>
-                                        </div>
-                                       <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"><span></span><i>80%</i></div>
-                                       <div class="element_status">正常</div>
-                                    </li>
-                                    <li>
-                                        <div class="element_test">
-                                            <span></span>
-                                            <span>这栋实验</span>
-                                        </div>
-                                       <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"><span></span><i>80%</i></div>
-                                       <div class="element_status">正常</div>
-                                    </li>
-                                    <li>
-                                        <div class="element_test">
-                                            <span></span>
-                                            <span>这栋实验</span>
-                                        </div>
-                                       <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"><span></span><i>80%</i></div>
-                                       <div class="element_status">正常</div>
-                                    </li>
-                                    <li>
-                                        <div class="element_test">
-                                            <span></span>
-                                            <span>这栋实验</span>
-                                        </div>
-                                       <div class="element_principal lastChild"><span>张磊</span></div>
-                                       <div class="progress_bar"><span></span><i>80%</i></div>
-                                       <div class="element_status">正常</div>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            <project-dynamic></project-dynamic>
             <div class="footer_table ">
                 <div class="bulletin_table show_background list">
                     <header>公告栏</header>
@@ -213,23 +126,20 @@
                     </div>
                 </div>
             </div>
-            
         </div>
         <imgInfo @listInfoDetail="listInfoDetail()"/>
     </div>
 </template>
 <script>
 import imgInfo from './timeTable';
-import VerificationData from '../../../components/VerificationData'
+import VerificationData from '../../../components/VerificationData';
+import projectDynamic from '../../../components/projectDynamic'
 export default {
     name:'PMenegeIndex',
-    components:{imgInfo},
+    components:{imgInfo, projectDynamic},
     data(){
         return{
-            fileItem:[{name:'高',id:1},{name:'中',id:2},{name:'低',id:3}],
-            fileItemIndex: {name:'高',id:1},
             percentage: 50,
-            isHiddenBox: false,
             isAddproject: false,
             isUserEdit: false,
             colors: [
@@ -243,23 +153,16 @@ export default {
             isNoticeListScroll: true,//公告栏上拉加载
             noticeList_pagenumber: 1,
             delayedList:[],//延时报警列表
-        }
-    },
-    computed:{
-        setHeight(){
-            return 5*0.63 + 'rem'
+            projectSchedule:[],//产品进度列表
         }
     },
     methods:{
-        setElementHidden(){
-            this.isHiddenBox = !this.isHiddenBox
-        },
+        toPoint(percent){
+   		 	var str=percent.replace("%","");
+   		 	return str == 0.0 ? 0 : parseInt(str);
+		},
         listInfoDetail(){
             this.$router.push({name:'listInfoDetail'})
-        },
-        handleCommand(command) {
-            console.log(command)
-            this.fileItemIndex = command;
         },
         /**@name 获取个人信息 */
         getUser_infoDetail(){
@@ -275,7 +178,7 @@ export default {
         getPm_noticeList(){
             this.$http.get(this.noticeList_pagenumber == 1 ? this.$conf.env.getPm_noticeList: this.$conf.env.getPm_noticeList + '?p=' + this.noticeList_pagenumber).then(res =>{
                 this.isNoticeListScroll = res.data.next? true:false;
-                this.noticeList = res.data.results;
+                this.noticeList = this.noticeList_pagenumber == 1 ? res.data.results:this.noticeList.concat(res.data.results);
             }).catch(err =>{
                 this.isNoticeListScroll = false;
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
@@ -338,13 +241,21 @@ export default {
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
-
-
+        //产品进度
+        getPm_priject_schedule(){
+            this.$http.get(this.$conf.env.getPm_priject_schedule).then(res =>{
+                console.log(res.data)
+                this.projectSchedule = res.data;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        }
     },
     mounted(){
         this.getUser_infoDetail();//获取个人信息
         this.getPm_noticeList();//公告栏
         this.getPm_delayedList();//延时报警
+        this.getPm_priject_schedule();//产品进度
     }
 }
 </script>
@@ -634,78 +545,4 @@ export default {
     }
     
 }
-.PMenegeIndex_upload{
-    padding: 0!important;
-    width: 3.26rem!important;
-    .upload_BOX{
-        header{
-        // padding: .12rem .14rem .14rem;
-        padding: 0 .14rem;
-        height: .4rem;
-        border-bottom: 1px solid #eee;
-        color: #333;
-        display: flex;
-        justify-content: space-between;
-        line-height: .4rem;
-        font-size: .14rem;
-        }
-        .from{
-            // height: 1.56rem;
-            padding: 0 .14rem;
-            // display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            font-size: .14rem;
-            .userImgurl{
-                display: flex;
-                align-items: center;
-                .userTitle{
-                    margin-right: .14rem;
-                }
-                div{
-                    display: flex;
-                    .addfile{
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        width: .4rem;
-                        height: .4rem;
-                        border:1px dashed #08a695;
-                        margin-left: .24rem;
-                        img{
-                            width: 70%;
-                        }
-                    }
-                    .fileImg{
-                        width: .4rem;
-                        height: .4rem;
-                        border-radius: 50%;
-                        overflow: hidden;
-                        display: flex;
-                        
-                        img{
-                            width: 100%;
-                        }
-                    }
-                }
-            }
-            input{
-                width: 2rem;
-                height: .26rem;
-                border: 1px solid #08a695;
-                margin-left: .08rem;
-                padding: 0 .08rem;
-            }
-            button{
-                padding: .1rem .22rem;
-                width: fit-content;
-                display: table-cell;
-                float: right;
-                background: #08a695;
-                margin-bottom: .1rem;
-            }
-        }
-    }
-}
-
 </style>

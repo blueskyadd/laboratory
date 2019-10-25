@@ -4,7 +4,12 @@
                 <p>{{setHeaderTitle}}</p>
             </div>
             <div class="right_trake">
-                <div @click="goNotification()"><img src="../assets/img/commont/header/inform.png" alt=""><span>通知</span></div>
+                <div @click="goNotification()">
+                    <el-badge :value="systemNumber" :max="99" class="item">
+                        <img src="../assets/img/commont/header/inform.png" alt="">
+                    </el-badge>
+                    <span>通知</span>
+                </div>
                 <div><img src="../assets/img/commont/header/user.png" alt=""><span>{{userName}}</span></div>
                 <div @click="goOutSystem()"><img src="../assets/img/commont/header/userOut.png" alt=""><span>退出</span></div>
             </div>
@@ -19,6 +24,7 @@ export default {
     data(){
         return{
             userName: localStorage.getItem('userName'),
+            systemNumber:0
         }
     },
     methods:{
@@ -27,9 +33,20 @@ export default {
         },
         goNotification(){
             this.$router.push({name:'notification'})
+        },
+        getSystem_number(){
+            this.$http.get(this.$conf.env.getSystem_number).then(res =>{
+                console.log(res)
+                this.systemNumber = res.data.num;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
     },
     mounted(){
+        if(this.$route.path != '/'){
+           this.getSystem_number(); 
+        }
     }
 }
 </script>
@@ -52,9 +69,14 @@ header{
     }
     .right_trake{
         display: flex;
-        width: 3.71rem;
+        width: 3.95rem;
         justify-content: space-between;
         align-items: center;
+        cursor: pointer;
+        .is-fixed{
+            top: -.05rem;
+            right: 0.2rem; 
+        }
         div{
             display: flex;
             align-items: center;
@@ -67,7 +89,7 @@ header{
                 font-weight:400;
                 color:#333333;
                 font-size: .22rem;
-                max-width: .9rem;
+                max-width: 1.2rem;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;

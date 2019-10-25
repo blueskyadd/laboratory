@@ -9,22 +9,23 @@
             alt
           />
         </div>
-        <span>{{(operating*100).toFixed(1)}}%</span>
+        <span>{{operatingNum}}</span>
       </div>
     </div>
 </template>
 <script>
 export default {
-    props:[
-        'titleName'
-    ],
+    props:{
+      titleName: String,
+      operatingNum: String
+    },
     data(){
         return{
             operating: 1 ,
         }
     },
     computed:{
-        changeRotate(){
+        changeRotate(operating){
             if(this.operating == 0){
                 return 'rotate(-140deg)'
             }else if(this.operating == 1 ){
@@ -33,10 +34,22 @@ export default {
                 return 'rotate('+ (1-this.operating-0.1 ) * -120 + 'deg)'
             }
         },
+    },
+    methods:{
+      toPoint(){
+          if(this.operatingNum){
+             this.operating = this.operatingNum.replace("%", "")/100;
+          }else{
+             this.operating = 0
+          }
+        },
         goDetailBat(){
           this.$emit('goDetail')
-        }
+        },
     },
+    mounted(){
+      this.toPoint();
+    }
 };
 </script>
 <style lang="scss" scoped>
@@ -49,6 +62,7 @@ export default {
     width: 50%;
     background: #fff;
     padding-top: 0.01rem;
+    cursor: pointer;
     h3 {
       font-size: 0.24rem;
       color: #333333;

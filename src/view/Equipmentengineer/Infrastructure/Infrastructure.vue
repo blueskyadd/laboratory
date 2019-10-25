@@ -83,7 +83,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 this.getEquipment_servicerecord(this.CurrentChange);
             }
         },

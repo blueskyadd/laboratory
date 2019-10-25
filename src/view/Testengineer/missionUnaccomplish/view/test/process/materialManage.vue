@@ -1,12 +1,16 @@
 <template>
     <div class="taskAllocation_distributed_measure ">
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 3.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
             <el-table-column prop="name"  label="物料名称" header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="device_type"  label="物料种类" header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="num" label="物料数量"      header-align='center' align='center'></el-table-column>
             <el-table-column prop="status" label="备注"      header-align='center' align='center'></el-table-column>
             <el-table-column prop="id"   label="编辑" header-align='center' align='center'>
-                <template slot-scope="scoped"><span class="underline edit"  :style="{'color':scoped.row.status < 3 ?'':'#999!important','cursor':scoped.row.status < 3?'':'not-allowed'}"   @click="scoped.row.status < 3 && deleteEquipment_exbomInfo(scoped.row.id)">删除</span><span class="underline"  @click="editquipment('编辑物料', false,scoped)">编辑</span> </template>            </el-table-column>
+                <template slot-scope="scoped">
+                    <span class="underline"   :style="{'color':scoped.row.status < 3 ?'':'#999!important','cursor':scoped.row.status < 3?'':'not-allowed'}"   @click="scoped.row.status < 3 && deleteEquipment_exbomInfo(scoped.row.id)">删除</span>
+                    <!-- <span class="underline"  @click="editquipment('编辑物料', false,scoped)">编辑</span> -->
+                </template>            
+            </el-table-column>
         </el-table>
         <div class="pagination">
             <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
@@ -19,6 +23,9 @@
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
+        <footer>
+            <el-button type="primary" @click="setEquipment_testers()">提交</el-button>
+        </footer>
         <popUp ref="popUp" setWidth='45%' :popUptitle='popUptitle' class="popUp">
             <template>
                 <ul>
@@ -53,7 +60,6 @@
                     </li>
                     <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button type="primary" @click="isDisabled_select?createdEquipment_exbomInfo():editEquipment_exbomInfo()">完成</el-button></li>
                 </ul>
-                
             </template>
         </popUp>
     </div>
@@ -171,7 +177,11 @@ export default {
                 this.$http.delete(this.$conf.env.deleteEquipment_exbomInfo + ID + '/').then(res =>{
                     if(res.status == '204'){
                         this.$message({ message: '删除成功', type: 'success'});
-                        this.reload();
+                       if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            this.getEquipemnt_experimentList(this.CurrentChange - 1);
+                        }else{
+                            this.getEquipemnt_experimentList(this.CurrentChange);
+                        }
                     }else{
                         this.$message({ message: '删除失败', type: 'warning'});              
                     }
@@ -257,10 +267,28 @@ export default {
         },
         /**@name 数据渲染 */
         getEquipemnt_experimentList(pageNumber){
+            pageNumber = pageNumber ?  pageNumber : 1;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getEquipemnt_experimentList+ this.$route.query.equipmentID + '&page_size=' +this.page_size : this.$conf.env.getEquipemnt_experimentList + this.$route.query.equipmentID +'&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        setEquipment_testers(){
+            this.isLoading = true;
+            this.$http.post(this.$conf.env.setEquipment_testers,{experiment:this.$route.query.equipmentID} ).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '提交成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },100)
+                }else{
+                    this.$message({ message: '提交失败', type: 'warning'});              
+                }
             }).catch(err =>{
                 this.isLoading = false;
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
@@ -274,7 +302,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 this.getEquipemnt_experimentList(this.CurrentChange);
             }
         },
@@ -311,6 +339,16 @@ export default {
         }
         .popUp{
             height: 72%!important;
+        }
+        footer{
+            display: flex;
+            justify-content: flex-end;
+            margin-right: 10%;
+            button{
+                font-size: .3rem;
+                padding: .12rem .24rem;
+                background: #08a695;
+            }
         }
     }
 </style>

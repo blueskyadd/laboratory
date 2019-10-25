@@ -1,21 +1,34 @@
 <template>
-    <div class="projectFlow body_main">
-        <header class="proposer_index_header">
-            <h3>项目流程</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" @click="goHome">首页</span>
+    <div class="projectFlow body_main"  v-loading.fullscreen.lock="isloading">
+        <header class="proposer_index_header" style="justify-content:flex-start">
+            <div>
+                <h3>项目流程</h3>
+                <div>
+                    <span class="goBack underline" @click="$router.back(-1)">返回</span>
+                    <span class="goBack underline" @click="goHome">首页</span>
+                </div>
+            </div>
+            
         </header>
         <div class="main">
-            <div class="titleEquipment"><span>设备名称：</span><p>老化试验箱</p></div>
+            <div class="titleEquipment"><span>设备名称：</span><p>{{projectDetail.name}}</p></div>
+            <div class="projectOk">
+                <img v-show="projectDetail.status == 8" src="../../../assets/img/projectManage/flow/projectOk.png" alt="">
+            </div>
             <div class="main_list">
                 <ul class="flow">
-                    <li @click="goProjectManageTest()"><img src="../../../assets/img/project/flow/projectManage.png" alt=""><span>试验管理</span></li>
+                    <li @click="goprojectmanage()"><img src="../../../assets/img/project/flow/projectManage.png" alt=""><span>试验管理</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @click="goInternalAppointment()"><img src="../../../assets/img/project/flow/interior.png" alt=""><span>预约内部试验</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @click="goScheduleTest()"><img src="../../../assets/img/gauger/flow/schedule.png" alt=""><span>试验进度</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @click="goProjectPaper()"><img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt=""><span>项目报告</span></li>
+                    <li @click="goProjectPaper()">
+                        <img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt="">
+                        <span>项目报告</span>
+                        <img class="result" v-if="projectDetail.result == 2" src="../../../assets/img/projectManage/flow/unqualified.png" alt="">
+                        <img class="result" v-if="projectDetail.result == 3" src="../../../assets/img/projectManage/flow/qualified.png" alt="">
+                    </li>
                 </ul>
             </div>
         </div>
@@ -26,25 +39,38 @@ export default {
     name:'projectFlow',
     data(){
         return{
-            cause: '',
+            isloading: true,
+            projectDetail:{}
         }
     },
     methods:{
         goHome(){
             this.$router.push({name:'gaugerIndex'})
         },
-        goInternalAppointment(){
-            this.$router.push({name:'InternalAppointment'})
+        goprojectmanage(){
+            this.$router.push({path:'/ProjectManager/projectManageTest',query:{equipmentID:this.$route.query.equipmentID,equipmentName: this.projectDetail.name}})
         },
-        godocumentEquipment(){
-            this.$router.push({name:'documentEquipment'})
+        goInternalAppointment(){
+            this.$router.push({path:'/ProjectManager/InternalAppointment',query:{equipmentID:this.$route.query.equipmentID,equipmentName: this.projectDetail.name}})
         },
         goScheduleTest(){
-            this.$router.push({name:'scheduleTest'})
+            this.$router.push({path:'/ProjectManager/scheduleTest',query:{equipmentID:this.$route.query.equipmentID,equipmentName: this.projectDetail.name}})
         },
         goProjectPaper(){
-            this.$router.push({name:'projectPaper'})
+            this.$router.push({path:'/ProjectManager/projectPaper',query:{equipmentID:this.$route.query.equipmentID,equipmentName: this.projectDetail.name,equipmentreport_result: this.projectDetail.report_result,equipmentreport:this.projectDetail.report}})
         },
+        getProject_appointinfoFlow(){
+            this.$http.get(this.$conf.env.getProject_appointinfoFlow + this.$route.query.equipmentID + '/').then(res =>{
+                this.projectDetail = res.data;
+                this.isloading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getProject_appointinfoFlow()
     }
 }
 </script>
@@ -56,7 +82,7 @@ export default {
         padding: 0 .58rem;
         .titleEquipment{
             display: flex;
-            margin-bottom: 2.58rem;
+            // margin-bottom: 2.58rem;
             span{
                 font-size: .24rem;
                 color: #333333;
@@ -64,6 +90,16 @@ export default {
             p{
                 font-size: .24rem;
                 color: #07A695
+            }
+        }
+        .projectOk{
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: .58rem;
+            height: 2rem;
+            img{
+                // width: 2rem;
+                height: 2rem;
             }
         }
         .main_list{
@@ -137,6 +173,16 @@ export default {
                     height: 1.23rem;
                 }
             }
+             .flow li:last-child{
+                position: relative;
+                .result{
+                    position: absolute;
+                    top: .2rem;
+                    left: .2rem;
+                    width: 1rem;
+                    height: auto;
+                }
+             }
             p{
                 font-family:MicrosoftYaHei;
                 font-weight:400;

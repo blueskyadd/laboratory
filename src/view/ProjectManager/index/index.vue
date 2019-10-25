@@ -5,20 +5,20 @@
                  <swiper-slide>
                     <div class="show_background divNumber toplist" @click="goProjectStandard()">
                         <div><img src="../../../assets/img/Testengineer/index/yesOrder.png" alt=""><span>试验标准</span></div>
-                        <div class="number"><span>09</span><span>个</span></div>
+                        <div class="number"><yd-countup :endnum="Project_topNumber_standard" :duration="1" >{{Project_topNumber_standard}}</yd-countup><span>个</span></div>
                     </div>
                 </swiper-slide>
                 <swiper-slide>
                     <div class="show_background toplist divNumber bottom_text" @click="goProjectAppointment()">
                         <div><img src="../../../assets/img/Testengineer/index/unOrder.png" alt=""><span>预约项目</span></div>
-                        <div class="number"><span>09</span><span>个</span></div>
-                        <div><p>进行<i>5</i></p><p>等待<i>5</i></p><p>完成<i>5</i></p></div>
+                        <div class="number"><yd-countup :endnum="Project_topNumber_appointment" :duration="1" >{{Project_topNumber_appointment}}</yd-countup><span>个</span></div>
+                        <!-- <div><p>进行<i>5</i></p><p>等待<i>5</i></p><p>完成<i>5</i></p></div> -->
                     </div>
                 </swiper-slide>
                 <swiper-slide>
                     <div class="show_background toplist divNumber" @click="goProjectHistory()">
                         <div><img src="../../../assets/img/project/index/history.png" alt=""><span>历史项目</span></div>
-                        <div class="number"><span>09</span><span>个</span></div>
+                        <div class="number"><yd-countup :endnum="Project_topNumber_history" :duration="1" >{{Project_topNumber_history}}</yd-countup><span>个</span></div>
                     </div>
                 </swiper-slide>
                 <swiper-slide>
@@ -37,8 +37,11 @@ export default {
     components:{swiper, swiperSlide, indexHome},
     data() {
       return {
+          Project_topNumber_standard:'',
+          Project_topNumber_appointment:'',
+          Project_topNumber_history:'',
           swiperOption: {
-            slidesPerView: '4',
+            slidesPerView: 'auto',
             // spaceBetween: 22,
             freeMode: true,
             pagination: {
@@ -46,10 +49,12 @@ export default {
                 clickable: true,
             },
         },
+        
       }
     },  
     mounted(){
-        this.$emit('headerTitle','实验室信息化管理系统-客户经理')
+        this.$emit('headerTitle','实验室信息化管理系统-客户经理');
+        this.getProject_topNumber();
     },
     destroyed(){
         this.$emit('headerTitle','实验室信息化管理系统')
@@ -74,6 +79,15 @@ export default {
         goAddProjectAppoinment(){
             this.$router.push({path:'/ProjectManager/addProjectAppoinment?flag=1'})
         },
+        getProject_topNumber(){
+            this.$http.get(this.$conf.env.getProject_topNumber).then(res =>{
+                this.Project_topNumber_standard = res.data.num1;
+                this.Project_topNumber_appointment = res.data.num2;
+                this.Project_topNumber_history = res.data.num3;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
     }
 }
 </script>

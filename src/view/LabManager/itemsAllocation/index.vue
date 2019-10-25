@@ -8,9 +8,9 @@
                 <router-link replace  to="/itemsAllocation/unAllocation" tag="span">未分配项目</router-link>
                 <router-link replace  to="/itemsAllocation/distributed" tag="span">已分配项目</router-link>
             </div>
-            <Search @searchDetail='searchDetail' class="itemsAllocation_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <Search @searchDetail='searchDetail'  class="itemsAllocation_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-       <router-view></router-view> 
+       <router-view ref='childer'></router-view> 
     </div>
 </template>
 <script>
@@ -21,17 +21,30 @@ export default {
     data(){
         return{
             placeholderTexe:'搜索项目编号、名称',
+            routerPath:''
         }
     },
     methods:{
         searchDetail(data){
-            console.log(data)
+            switch(this.routerPath){
+                case '/itemsAllocation/unAllocation':
+                    this.$refs.childer.searchItemsAllocation(data,1);//物料管理
+                    break;
+                case '/itemsAllocation/distributed':
+                    this.$refs.childer.searchmeasure_projectallot(data,1);//物料管理
+                    break;
+            }
         },
         
     },
     mounted(){
-        
+         this.routerPath = this.$route.path;
     },
+    watch:{
+        $route(to, from){
+            this.routerPath = to.path;
+        }
+    }
     
 }
 </script>

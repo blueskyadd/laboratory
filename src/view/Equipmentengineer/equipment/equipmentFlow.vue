@@ -16,7 +16,7 @@
                     </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @mouseover="iscontract= false" @mouseout="iscontract = true" :style="{background:iscontract? '#fff':'#07A695'}">
-                        <a :href="equipmentSection.contract" download="w3logo">
+                        <a :href="equipmentSection.contract" download="合同">
                             <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="iscontract">
                             <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
                             <span :style="{color:iscontract?'#07A695': '#fff'}">合同</span>
@@ -24,7 +24,7 @@
                     </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @mouseover="isUplaod= false" @mouseout="isUplaod = true" :style="{background:isUplaod? '#fff':'#07A695'}">
-                        <a :href="equipmentSection.equipment_debug" download="w3logo">
+                        <a :href="equipmentSection.equipment_debug" download="调试报告">
                             <img src="../../../assets/img/LabManager/management/equipment/frockProcess/updataFile.png" alt="" v-if="isUplaod">
                             <img src="../../../assets/img/LabManager/management/equipment/frockProcess/updataFile_actively.png" alt="" v-else>
                             <span :style="{color:isUplaod?'#07A695': '#fff'}">上传调试报告</span>

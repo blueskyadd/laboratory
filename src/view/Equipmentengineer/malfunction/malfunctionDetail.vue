@@ -60,6 +60,7 @@ export default {
 .malfunctionDetail{
      padding-top: .42rem;
      overflow-y: scroll;
+     height: 100% ;
     .malfunctionDetail_index_header{
         padding-left: .41rem;
         height: .38rem;
@@ -86,7 +87,7 @@ export default {
     }
     .main{
         display: flex;
-        height: calc(100% - 2.05rem);
+        // height: 100%;
         flex-direction: column;
         align-items: flex-end;
         justify-content: space-between;
@@ -154,24 +155,11 @@ export default {
                         margin-right: 0.27rem;
                         align-items: flex-end;
                         display: flex;
-                        div{
-                        width: .8rem;
-                        height: .8rem;
-                        border:1px dashed #08a695;
-                        display:flex;
-                        justify-content: center;
-                        align-items: center;
-                        span{
-                            width: 50%;
-                            height: 50%;
-                            cursor: pointer;
-                            display: block;
-                            display: flex;
-                            img{
-                                width: 100%;
-                                height: 100%;
-                            }
-                        }
+                        width: 3rem;
+                        height: 1.87rem;
+                        img{
+                            width: 100%;
+                            height: 100%;
                         }
                     }
                     .accessory{
@@ -217,6 +205,7 @@ export default {
                 font-weight:400;
                 color:rgba(51,51,51,1);
                 font-size: .24rem;
+                padding-bottom: .5rem;
             }
             
         }

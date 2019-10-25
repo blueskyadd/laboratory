@@ -1,5 +1,5 @@
 <template>
-    <div class="LaboratoryUpkeepProcess body_main">
+    <div class="LaboratoryUpkeepProcess body_main" v-loading.fullscreen.lock="isLoading">
         <header class="LaboratoryUpkeepProcess_index_header">
             <h3>保养流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,13 +8,27 @@
         <div class="main">
             <div class="main_list">
                 <ul>
-                    <li><img src="../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>申请保养设备</span></li>
-                    <li><img src="../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li><img src="../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>维修工具、材料</span></li>
-                    <li><img src="../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li><img src="../../../../assets/img/LabManager/management/equipment/purchase.gif" alt=""><span>上传保养报告</span></li>
+                    <li  @click="goupkeepProposer()" @mouseover="ismalfunction = true" @mouseout="ismalfunction = false" :style="{background:ismalfunction? '#07A695':'#fff'}">
+                        <img src="../../../../assets/img/LabManager/management/equipment/maintenanceProcess/malfunction.png"  v-if="!ismalfunction">
+                        <img src="../../../../assets/img/LabManager/management/equipment/maintenanceProcess/malfunction_actively.png" alt="" v-else>
+                        <span :style="{color:ismalfunction? '#fff':'#07A695'}">申请保养设备</span>
+                    </li>
+                    <li><img src="../../.../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
+                    <li @click="goupkeepChange()" @mouseover="ismaintain = true" @mouseout="ismaintain = false" :style="{background:ismaintain? '#07A695':'#fff'}">
+                        <img src="../../../../assets/img/LabManager/management/equipment/maintenanceProcess/maintain.png" alt="" v-if="!ismaintain">
+                        <img src="../../../../assets/img/LabManager/management/equipment/maintenanceProcess/maintain_actively.png" alt="" v-else>
+                        <span>维修工具、材料</span>
+                    </li>
+                    <li><img src="../../.../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
+                    <li @mouseover="islookReport = true" @mouseout="islookReport = false" :style="{background:islookReport? '#07A695':'#fff'}">
+                        <a :href="reportDownUrl" download="保养报告">
+                            <img src="../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport.png" alt="" v-if="!islookReport">
+                            <img src="../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport_actively.png" alt="" v-else>
+                            <span>上传保养报告</span>
+                         </a>
+                    </li>
                 </ul>
-            </div>
+            </div>  
         </div>
     </div>
 </template>
@@ -24,13 +38,35 @@ export default {
     data(){
         return{
             cause: '',
+            ismalfunction: false,
+            ismaintain:false,
+            reportDownUrl:'',
+            islookReport: false,
+            isLoading: true,
         }
     },
     methods:{
         goHome(){
             this.$router.push({name:'LabManagerIndex'})
         },
-        
+        getmaintenanceRecordDetailInfo(){
+            this.$http.get(this.$conf.env.getupkeeprecordInfo + this.$route.query.maintenanceProcessID + '/').then( res =>{
+                this.reportDownUrl = res.data.report;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        goupkeepProposer(){
+            this.$router.push({path:'/Equipmentengineer/upkeepProposer', query:{equipmentID: this.$route.query.maintenanceProcessID,flag:1}})
+        },
+        goupkeepChange(){
+            this.$router.push({path:'/Equipmentengineer/upkeepChange', query:{equipmentID: this.$route.query.maintenanceProcessID}})
+        }
+    },
+    mounted(){
+        this.getmaintenanceRecordDetailInfo()
     }
 }
 </script>
@@ -71,11 +107,11 @@ export default {
                 display: flex;
                 display: flex;
                 // justify-content: ;
-                padding: 0 4.82rem;
+                padding: 0 22%;
                 li{
                     position: relative;
                     background:#fff;
-                    width: 2.4rem;
+                    width: 33%;
                     height: 2.28rem;
                     box-shadow:0px .05rem .05rem 0px rgba(12,3,6,0.3);
                     border-radius: .05rem;
@@ -84,6 +120,11 @@ export default {
                     align-items: center;
                     padding-top: .22rem;
                     border: 1px solid #07A695;
+                    a{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
                     img{
                         width: 1.25rem;
                         height: 1.25rem;
@@ -102,7 +143,7 @@ export default {
                 }
                 li:nth-child(2), li:nth-child(4){
                     position: inherit;
-                    width: 1.18rem;
+                    width: 21%;
                     display: flex;
                     align-items: center;
                     background: #fff;
@@ -110,7 +151,7 @@ export default {
                     box-shadow: none;
                     overflow: hidden;
                     img{
-                        width: 1.18rem;
+                        width: 100%;
                         height: auto;
                         display: block;
                         margin: auto;

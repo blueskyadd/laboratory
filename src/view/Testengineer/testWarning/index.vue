@@ -11,8 +11,8 @@
         <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor" height="100%"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
                 <el-table-column width="100%"  label="序号" type="index"   :index="getIndex"   header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="equipment.num" label="试验编号" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="equipment.name" label="试验名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="equipment.num" label="设备编号" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="equipment.name" label="设备名称" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="equipment.user" label="负责人" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="cause" label="报警原因"  header-align='center' align='center'></el-table-column>
                 <el-table-column prop="create_time" label="报警时间" header-align='center'  align='center'> </el-table-column>
@@ -92,7 +92,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 this.getalarmList(this.CurrentChange);
             }
         },

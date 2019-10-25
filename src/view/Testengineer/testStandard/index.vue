@@ -39,7 +39,7 @@
             <el-table-column prop="company"  label="上传单位" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address"   label="下载" header-align='center' align='center'>
-                 <template slot-scope="scoped"><a style="margin-right:0!important;" class="underline lookmanagement deletemanagement" :href="scoped.row.file" download="w3logo">下载</a></template>
+                 <template slot-scope="scoped"><a style="margin-right:0!important;" class="underline lookmanagement deletemanagement" :href="scoped.row.file" download="试验方法">下载</a></template>
             </el-table-column>
         </el-table>
         <div class="pagination">
@@ -134,7 +134,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?  this.gettestManagementList(this.CurrentChange):this.testManageSearch(this.searchText,this.CurrentChange);
             }
         },

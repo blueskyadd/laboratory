@@ -5,9 +5,9 @@
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
         <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 2.5rem)"  style="width: 100%;" v-loading="isLoading"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date" min-width="20%"  label="计量时间"  header-align='center'  align='center'> </el-table-column>
-            <el-table-column prop="name"  min-width="20%" label="委托公司" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address" class-name="rightText"  label="操作" header-align='right' align='right'>
+            <el-table-column prop="metering_time" min-width="20%"  label="计量时间"  header-align='center'  align='center'> </el-table-column>
+            <el-table-column prop="nominee_company"  min-width="20%" label="委托公司" header-align='center' align='center'> </el-table-column>
+            <el-table-column  class-name="rightText"  label="操作" header-align='right' align='right'>
                  <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span></template>
             </el-table-column>
         </el-table>
@@ -80,7 +80,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 this.getGauger_meteringhistoryList(this.CurrentChange);
             }
         },

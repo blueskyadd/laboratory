@@ -36,17 +36,27 @@
             font-weight: normal;
             text-align: center;
             line-height: .2rem;
+            max-width: 2.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+            margin: 0 auto;
         }
         .edit_userinfo{
             font-size: .14rem;
             line-height: 0.14rem;
-            padding: 0.5rem .26rem 0.07rem .34rem;
+            padding: 0.25rem .26rem 0.07rem .34rem;
+            display: flex;
+            justify-content: space-between;
+            
         }
         p{
             font-size: .12rem;
             line-height: 0.22rem;
             text-align: center;
-            padding: 0 .51rem 0.07rem .36rem;
+            padding: 0 .51rem 0 .36rem;
+            margin-bottom: .05rem;
             display: -webkit-box;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 3;
@@ -90,7 +100,7 @@
         flex-wrap: wrap;
         justify-content: space-between;
         overflow-y: scroll;
-        height: 100%;
+        // height: 100%;
         li{
             width: 48%;
             height: 1.44rem;
@@ -116,7 +126,11 @@
         display: none;
     }
 }
-
+.noDatalist{
+    justify-content: center;
+    padding: .2rem 0;
+    font-size: .24rem;
+}
 
 .my_dynamic{
     border-radius: .06rem;
@@ -186,6 +200,11 @@
             background: #fff;
             padding: 0 .39rem 0 .29rem;
             height: calc(100% - .7rem);
+            .main_element_ul{
+                overflow-y: scroll;
+                height: 100%;
+                
+            }
             .hidden_box{
                 overflow: hidden;
                 padding-top: .09rem;
@@ -194,6 +213,7 @@
             .hiddenHeight{
                 height:.5rem!important;
                 ul{
+                    
                     li{
                         border-color:#fff;
                     }
@@ -221,10 +241,14 @@
                                 height: .16rem;
                                 display: block;
                                 border-radius: 50%;
-                                border: 1px solid #08a795;
                                 margin-top: -.09rem;
                                 margin-left: -.09rem;
                                 background: #fff;
+                                cursor:pointer;
+                                img{
+                                    width: 100%;
+                                    display: block;
+                                }
                             }
                             .element_principal_border{
                                 flex: 1;
@@ -252,7 +276,7 @@
                             display: flex;
                             flex-direction: column;
                             span{
-                                background:linear-gradient(to bottom, #5ebdb5 0%, #15a697 50% ,#087464 100%);;
+                                background:linear-gradient(to bottom, #5ebdb5 0%, #15a697 50% ,#087464 100%);
                                 height: 60%;
                                 width: 80%;
                                 border-radius: 2rem;
@@ -260,7 +284,7 @@
                             i{
                                 font-size: .12rem;
                                 align-self: flex-end;
-                                margin-right: 13%;
+                                margin-right: 11%;
                             }
                         }
                         .element_status{

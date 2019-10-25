@@ -15,7 +15,7 @@
             <el-table-column prop="device_keeper"  label="负责人" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="status"   label="计量状态" header-align='center' align='center'></el-table-column>
             <el-table-column prop="address" label="合同" header-align='center' align='center'>
-                 <template slot-scope="scoped"><a class="underline" download="w3logo" :href="scoped.row.compact">详情</a></template>
+                 <template slot-scope="scoped"><a class="underline" download="合同" :href="scoped.row.compact">详情</a></template>
             </el-table-column>
             <el-table-column prop="address"  label="操作" header-align='center' align='center'>
                  <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span></template>
@@ -123,7 +123,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getGauger_meteringList(this.CurrentChange):this.searchGauger_meteringList(this.searchText,this.CurrentChange);
             }
         },

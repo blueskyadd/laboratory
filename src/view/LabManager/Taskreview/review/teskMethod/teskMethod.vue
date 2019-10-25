@@ -1,6 +1,6 @@
 <template>
-    <div class="Taskreview_teskMethod">
-        <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - 1.5rem)" style="width: 100%"  :row-class-name="tabRowClassName">
+    <div class="Taskreview_teskMethod scrollTable">
+        <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - 2.3rem)" style="width: 100%"  :row-class-name="tabRowClassName">
             <el-table-column prop="num"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="试验方法名称" header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="user"  label="申请人" header-align='center' align='center'> </el-table-column>
@@ -101,7 +101,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?  this.getUnTestMethods(this.CurrentChange):this.methodsSearch(this.searchText,this.CurrentChange);
             }
         },

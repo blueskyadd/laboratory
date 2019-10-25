@@ -898,6 +898,12 @@ export default new Router({
       name: 'projectPaper',
       component:() => import('@/view/ProjectManager/projectAppointment/flow/projectPaper'),
     },
+    //试验详情
+    {
+      path: '/ProjectManager/reportDetail',
+      name: 'reportDetail',
+      component:() => import('@/view/ProjectManager/projectAppointment/flow/reportDetail'),
+    },
     //创建/编辑项目
     { 
       path: '/ProjectManager/addProjectAppoinment',
@@ -970,18 +976,18 @@ export default new Router({
       name: 'LaboratoryUpkeepProcess',
       component:() => import('@/view/LaboratoryManager/myApply/flow/upkeepProcess'),
     },
-    //我的应用--设备查看流程--设备计量记录列表
-    { 
-      path: '/LaboratoryManager/LaboratoryMeasureRecord',
-      name: 'LaboratoryMeasureRecord',
-      component:() => import('@/view/LaboratoryManager/myApply/flow/measureRecord'),
-    },
-    //我的应用--设备查看流程--设备计量记录流程
-    { 
-      path: '/LaboratoryManager/LaboratoryMeasureProcess',
-      name: 'LaboratoryMeasureProcess',
-      component:() => import('@/view/LaboratoryManager/myApply/flow/measureProcess'),
-    },
+    // //我的应用--设备查看流程--设备计量记录列表
+    // { 
+    //   path: '/LaboratoryManager/LaboratoryMeasureRecord',
+    //   name: 'LaboratoryMeasureRecord',
+    //   component:() => import('@/view/LaboratoryManager/myApply/flow/measureRecord'),
+    // },
+    // //我的应用--设备查看流程--设备计量记录流程
+    // { 
+    //   path: '/LaboratoryManager/LaboratoryMeasureProcess',
+    //   name: 'LaboratoryMeasureProcess',
+    //   component:() => import('@/view/LaboratoryManager/myApply/flow/measureProcess'),
+    // },
     //我的应用--项目总数
     { 
       path: '/LaboratoryManager/projectSum',

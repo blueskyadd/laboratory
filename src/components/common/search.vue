@@ -11,6 +11,7 @@ export default {
     name: 'search',
     props:{
         placeholderTexe:String,//搜索框提示文字
+        searchText:String
     },
     data(){
         return{
@@ -20,13 +21,17 @@ export default {
     methods:{
         searchDetail(){
             this.$emit('searchDetail', this.search_value)
+        },
+        result(){
+            this.search_value = ''
         }
     },
     watch:{
         $route(to,from){
             this.search_value = ''
-        }
-    }
+        },
+        
+    },
 }
 </script>
 

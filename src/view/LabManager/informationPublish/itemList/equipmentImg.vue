@@ -42,6 +42,7 @@
                         <input type="file" ref="file" accept="image/*"  @change='updataFile' style="display:none" >
                         <div v-if="!equipmentStection.image">
                             <span @click="updataFileChange"><img src="../../../../assets/img/commont/file/addfile.png" alt=""></span>
+                            
                         </div>
                         <img v-else  @click="updataFileChange" :src="equipmentStection.image" class="upload_img" alt="">
                     </li>
@@ -161,6 +162,7 @@ export default {
         },
         /**@name获取数据 */
         getequipmentImgList(pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentImgList + '?page_size=' +this.page_size : this.$conf.env.getequipmentImgList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -186,7 +188,11 @@ export default {
                 this.$http.delete(this.$conf.env.deleteEquipmentImg + ID + '/').then(res =>{
                     if(res.status == '204'){
                         this.$message({ message: '删除成功', type: 'success'});
-                        this.reload();
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            this.getequipmentImgList(this.CurrentChange - 1)
+                        }else{
+                            this.getequipmentImgList(this.CurrentChange)
+                        }
                     }else{
                         this.$message({ message: '删除失败', type: 'warning'});              
                     }
@@ -249,7 +255,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 1 ? 1 :  newData*1;
                 this.getequipmentImgList(this.CurrentChange)
             }
         },

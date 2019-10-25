@@ -80,7 +80,7 @@ export default {
                 if(res.status == '200'){
                     this.$message({ message: '确认成功', type: 'success'});
                     setTimeout(()=>{
-                        this.reload();
+                        this.$$router.back();
                     },100)
                 }else{
                     this.$message({ message: '确认失败', type: 'warning'});              

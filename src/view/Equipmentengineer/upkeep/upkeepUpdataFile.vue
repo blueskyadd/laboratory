@@ -43,8 +43,6 @@
                 </div>
             </div>
             <footer>
-                <el-button type="primary" @click="fanhui()">fanhu </el-button>
-
                 <el-button type="primary" @click="updataUpkeep_report()">提交</el-button>
             </footer>
         </div>

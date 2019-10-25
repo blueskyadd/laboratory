@@ -18,12 +18,13 @@
                     <span >试验开始时间：</span>
                     <p class="companyName">{{testeresString.start_time}}</p>
                     <span >预计试验结束时间：</span>
-                    <el-date-picker
+                    <p class="companyName">{{testeresString.end_time}}</p>
+                    <!-- <el-date-picker
                         v-model="testeresString.end_time"
                         type="datetime"
                         value-format="yyyy-MM-ddTHH:mm:ss"
                         placeholder="选择日期">
-                    </el-date-picker>
+                    </el-date-picker> -->
                 </div>
                 <div class="table_box">
                     <span class="underline" @click="addTesteres()">新增</span>
@@ -113,7 +114,7 @@ export default {
         getEquipment_testersDetail(){
             this.$http.get(this.$conf.env.getEquipment_testersDetail + this.$route.query.equipmentID + '/').then(res =>{
                 this.isLoading = false;
-                res.data.end_time = res.data.end_time.split(' ')[0]+'T'+res.data.end_time.split(' ')[1]
+                // res.data.end_time = res.data.end_time.split(' ')[0]+'T'+res.data.end_time.split(' ')[1]
                 this.testeresString = res.data;
             }).catch( err =>{
                 this.isLoading = false;

@@ -78,9 +78,9 @@
                         <el-select v-model="equipmentEngineer.name" :disabled='!isUpslot'   placeholder="请选择设备名称">
                             <el-option
                             v-for="item in unEquipmentList"
-                            :key="item.id"
+                            :key="item.name"
                             :label="item.name"
-                            :value="item.id">
+                            :value="item.name">
                             </el-option>
                         </el-select>
                     </li>
@@ -140,7 +140,7 @@
                     <li class="upload">
                         <span><i class="importantData">*</i>上传文件：</span>
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
-                        <div v-if="isUpslot">
+                        <div v-if="isUpslotFile">
                             <span @click="updataFileChangeFile"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span>
                         </div>
                         <span v-else class="accessory"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""><span class="underline deleteFile" @click="deleteFile()">删除</span></span>
@@ -154,12 +154,12 @@
                     <el-table-column prop="user"  label="申请人" header-align='center' align='center'> </el-table-column>
                     <el-table-column prop="contract"  label="合同" header-align='center' align='center'>
                         <template slot-scope="scope">
-                            <a class="underline" :href="scope.row.contract" download="w3logo">查看</a>
+                            <a class="underline" :href="scope.row.contract" download="合同">查看</a>
                         </template>
                     </el-table-column>
                     <el-table-column prop="equipment_debug"  label="调试报告" header-align='center' align='center'>
                         <template  slot-scope="scope">
-                            <a class="underline" :href="scope.row.equipment_debug" download="w3logo">查看</a>
+                            <a class="underline" :href="scope.row.equipment_debug" download="调试报告">查看</a>
                         </template>
                     </el-table-column>
                     <el-table-column prop="address"  label="操作" header-align='center' align='center'>
@@ -186,7 +186,7 @@ export default {
         value: '',
         popUptitle: '',
         isUpslot: false,
-        qrCodeImg:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3160924040,3588865717&fm=26&gp=0.jpg',
+        qrCodeImg:'',
         flag:false,
         isEquipmentList: false,//设备列表
         setWidth: '45%',
@@ -211,9 +211,10 @@ export default {
             "money":'',//金额
         },//设备信息
         equipmentID:'',//设备ID
-        instructionsName:'使用手册',//使用手册名称
+        instructionsName:'',//使用手册名称
         isSearch: false,//是否为搜索
-        searchText:'',//搜索文字
+        searchText:'',//搜索文字,
+        isUpslotFile: false
       }
     },
     methods:{
@@ -225,8 +226,15 @@ export default {
         },
          /**@name 修改表格字体颜色 */
         changecolor(data){
-            if (data.columnIndex == 0 ||data.columnIndex == 3) {
+            if (data.columnIndex == 0 ) {
                 return "color:#07a695";
+            }else if(data.columnIndex == 4){
+                if(data.row.status == '维修中'){
+                    return "color:#f10000";
+                }else{
+                    return "color:#07a695"; 
+                }
+            
             }else{
                 return "color:#444444";
             }
@@ -245,6 +253,7 @@ export default {
         },
         //弹框
         editquipment(title, flag, data){
+            console.log(data.row.id)
             this.getlaboratoryList();//实验室列表
             this.getequipmentEngineerList();//设备工程师
             this.getmeasurementEnginerrList();//计量员
@@ -252,6 +261,7 @@ export default {
             this.setWidth = '45%';
             this.popUptitle = title;
             this.isUpslot = flag;
+            this.isUpslotFile = flag;
             this.equipmentID = data.row.id;
             this.equipmentEngineer.apply_for = data.row.id;
             this.$refs.popUp.dialogVisible = true;
@@ -265,16 +275,12 @@ export default {
         updataFileChangeFile(){
             this.$refs.file.click()
         },
-        //搜索按钮
-        searchPersonnel(){
-
-        },
         //取消-数据重置
         DeleteSection(){
             this.equipmentEngineer  = {
                 "name":'',//设备名称
                 "num":'',//设备编号
-                "apply_for":'',//设备所属申请 id
+                "apply_for": this.equipmentEngineer.apply_for,//设备所属申请 id
                 "room":'',//实验室ID
                 "device_keeper":'',//设备管理员id
                 "gauger":'',//计量员id
@@ -283,6 +289,7 @@ export default {
                 "year":'',//使用年限
                 "money":'',//金额
             }
+             this.instructionsName = '';
         },
         //上传按钮
         updataFileImg(e){
@@ -298,17 +305,17 @@ export default {
             this.$updataFile.updataFile(e.target.files[0], res =>{
                 _this.equipmentEngineer.instructions = res.data.file
                 _this.instructionsName = e.target.files[0].name;
-                _this.isUpslot = false;
+                _this.isUpslotFile = false;
             },this)
         },
         //文件删除
         deleteFile(){
             this.equipmentEngineer.instructions = '';
             this.instructionsName = '';
-            this.isUpslot = true;
+            this.isUpslotFile = true;
         },
         open(row) {
-            // this.qrCodeImg = row.qrcode;
+            this.qrCodeImg = row.qrcode;
             this.flag = true;
         },
         change(data) {
@@ -323,11 +330,11 @@ export default {
         },
         /**@name搜索 */
         equipmentSearch(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
             this.isLoading = true;
             this.searchText = data;
             this.isSearch = true;
-            this.CurrentChange = 1;
-            console.log(this.CurrentChange)
+            this.CurrentChange = pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentManagementList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.getequipmentManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -340,6 +347,7 @@ export default {
         /**@name获取设备数据 */
         getequipmentManagementList(pageNumber){
             this.isSearch = false;
+            pageNumber = pageNumber ? pageNumber : 1;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentManagementList + '?page_size=' +this.page_size : this.$conf.env.getequipmentManagementList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -389,6 +397,7 @@ export default {
                 res.data.gauger = res.data.gauger.id;
                 res.data.room = res.data.room.id;
                 this.equipmentEngineer = res.data;
+                this.instructionsName = res.data.instructions;
             }).catch(err =>{
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })  
@@ -416,7 +425,12 @@ export default {
                 this.$http.delete(this.$conf.env.deleteEquipment + ID +'/').then( res =>{
                     if(res.status == '204'){
                         this.$message({ message: '删除成功', type: 'success'});
-                        this.reload();
+                         if(this.tableData.length == 1 && this.CurrentChange != 1){
+                             !this.isSearch?this.getequipmentManagementList(this.CurrentChange - 1):this.equipmentSearch(this.searchText,this.CurrentChange - 1);
+                         }else{
+                             !this.isSearch?this.getequipmentManagementList(this.CurrentChange):this.equipmentSearch(this.searchText,this.CurrentChange);
+                         }
+                        
                     }else{
                         this.$message({ message: '删除失败', type: 'warning'});              
                     }
@@ -433,11 +447,14 @@ export default {
                     message: '已取消删除'
                 });          
             });
-            
         },
         /**@name 新增设备 */
         createdEquipment(){
             if(!this.VerificationData()) return;
+            if(this.equipmentEngineer.year > 65535){
+                 this.$message.error('使用年限不能超过65535年哦'); 
+                 return 
+            }
             this.$http.post(this.$conf.env.createdEquipment, this.equipmentEngineer).then( res =>{
                 if(res.status == '201'){
                     this.$message({ message: '创建成功', type: 'success'});
@@ -462,6 +479,10 @@ export default {
         /**@name 设备信息修改 */
         editEquipmentInfo(){
             if(!this.VerificationData()) return;
+            if(this.equipmentEngineer.year > 65535){
+                 this.$message.error('使用年限不能超过65535年哦'); 
+                 return  false
+            }
             this.$http.put(this.$conf.env.editEquipmentInfo + this.equipmentID + '/', this.equipmentEngineer).then( res =>{
                 if(res.status == '200'){
                     this.$message({ message: '修改成功', type: 'success'});
@@ -484,6 +505,7 @@ export default {
             })
         },
         VerificationData(){
+            console.log(this.equipmentEngineer)
             for(var i in this.equipmentEngineer){
                 if(!this.equipmentEngineer[i]){
                     this.$message({message: '*为必填项哦',type: 'warning'});
@@ -500,7 +522,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getequipmentManagementList(this.CurrentChange):this.equipmentSearch(this.searchText,this.CurrentChange);
             }
         },
@@ -514,7 +536,7 @@ export default {
         height: calc(100% - .9rem)!important;
     }
     .addequipment{
-        margin-top: .43rem;
+        margin-top: 0rem;
     }
      th{
             font-size: .2rem;

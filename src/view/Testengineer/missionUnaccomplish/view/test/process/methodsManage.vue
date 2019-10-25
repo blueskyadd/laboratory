@@ -16,7 +16,7 @@
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div class="uploadFile">
                             <div ><span @click="updataFileChange"><img src="../../../../../../assets/img/commont/file/addfile.png" alt=""></span></div>
-                            <span  class="accessory"><img src="../../../../../../assets/img/commont/file/accessory.png" alt=""><span class="underline deleteFile">删除</span></span>
+                            <span  class="accessory"><img src="../../../../../../assets/img/commont/file/accessory.png" alt=""></span>
                             <p>{{fileName}}</p>
                         </div>
                     </div>
@@ -69,7 +69,7 @@ export default {
                 this.$message({ message: '请先上传文件', type: 'warning'});     
             }else{
                 this.isLoading = true;
-                this.$http.put(this.$conf.env.editEquipment_exbomInfoDetail + this.$route.query.equipmentID + '/').then( res =>{
+                this.$http.put(this.$conf.env.editEquipment_exbomInfoDetail + this.$route.query.equipmentID + '/',{'operation':  this.report}).then( res =>{
                     this.isLoading = false;
                     if(res.status == '200'){
                         this.$message({ message: '提交成功', type: 'success'});

@@ -12,7 +12,7 @@
                         <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div>
                             <span class="accessory" @click="updataFileChange"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""></span>
-                            <a class="underline" :href="fileUrl" download="w3logo">下载</a>
+                            <a class="underline" :href="fileUrl" download="工装文件">下载</a>
                         </div>
                     </div>
                 </div>
@@ -46,7 +46,10 @@ export default {
         this.$http.put(this.$conf.env.editReportInfo+this.$route.query.reportID + '/',{'result':num }).then(res =>{
             if(res.status == '200'){
                 this.$message({ message: '审核成功', type: 'success'});
-                    this.reload();
+                    var _this = this;
+                    setTimeout(()=>{
+                        _this.$router.back();
+                    },1000)
             }else{
                 this.$message({ message: '审核失败', type: 'warning'});              
             }

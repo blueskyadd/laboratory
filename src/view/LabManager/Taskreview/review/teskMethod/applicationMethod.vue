@@ -17,7 +17,7 @@
                 <div class="mian_text two_child">
                     <span>试验方法：</span>
                      <p class="underline">
-                        <a :href="testMethodsSection.file" download="w3logo">点击查看</a></p>
+                        <a :href="testMethodsSection.file" download="试验方法">点击查看</a></p>
                 </div>
             </div>
             <footer>
@@ -60,9 +60,10 @@ export default {
                 this.isLoading = false;
                 if(res.status == '200'){
                     this.$message({ message: '审批成功', type: 'success'});
-                    setTimeout(()=>{
-                        this.$router.back(-1);
-                    },100)
+                    var _this = this;
+                        setTimeout(()=>{
+                            _this.$router.back();
+                        },1000)
                 }else{
                     this.$message({ message: '审批失败', type: 'warning'});              
                 }

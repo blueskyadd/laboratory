@@ -29,7 +29,7 @@
                     </el-date-picker>
                 </div>
             </div>
-            <footer>
+            <footer v-if="$route.query.flag != 1">
                 <el-button type="primary" @click="editEquipment_upkeepDetail">保存</el-button>
             </footer>
         </div>

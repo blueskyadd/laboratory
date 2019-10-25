@@ -1,8 +1,10 @@
 <template>
     <div class="proposer body_main"  v-loading.fullscreen.lock="isLoading">
         <header class="proposer_index_header">
-            <h3>申请计量</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            <div>
+                <h3>申请计量</h3>
+                <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            </div>
         </header>
         <div class="main">
             <div class="measure_main">
@@ -94,7 +96,6 @@ export default {
                 this.isLoading = false;
             }).catch(err =>{
                 this.isLoading = false;
-                console.log(err)
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
         }

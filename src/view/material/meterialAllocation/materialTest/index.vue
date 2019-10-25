@@ -82,86 +82,6 @@ export default {
         getmaterialTestList(pageNumber){
             this.isSearch = false;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getmaterialTestList + '?page_size=' +this.page_size : this.$conf.env.getmaterialTestList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
-                res.data={
-                    "count": 2,
-                    "next": null,
-                    "previous": null,
-                    "results": [
-                        {
-                            "id": 9,
-                            "experiment_num": "48548756",
-                            "name": "项目4 试验02",
-                            "project_type": "PV试验",
-                            "room": "实验室1",
-                            "engineer": "试验工程师6"
-                        },
-                        {
-                            "id": 4,
-                            "experiment_num": "4878945",
-                            "name": "盐雾试验03",
-                            "project_type": "PV试验",
-                            "room": "实验室4",
-                            "engineer": "试验工程师6"
-                        },
-                        {
-                            "id": 9,
-                            "experiment_num": "48548756",
-                            "name": "项目4 试验02",
-                            "project_type": "PV试验",
-                            "room": "实验室1",
-                            "engineer": "试验试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6试验工程师6工程师6"
-                        },
-                        {
-                            "id": 4,
-                            "experiment_num": "4878945",
-                            "name": "盐雾试验03",
-                            "project_type": "PV试验",
-                            "room": "实验室4",
-                            "engineer": "试验工程师6"
-                        },
-                        {
-                            "id": 9,
-                            "experiment_num": "48548756",
-                            "name": "项目4 试验02",
-                            "project_type": "PV试验",
-                            "room": "实验室1",
-                            "engineer": "试验工程师6"
-                        },
-                        {
-                            "id": 4,
-                            "experiment_num": "4878945",
-                            "name": "盐雾试验03",
-                            "project_type": "PV试验",
-                            "room": "实验室4",
-                            "engineer": "试验工程师6"
-                        },
-                        {
-                            "id": 9,
-                            "experiment_num": "48548756",
-                            "name": "项目4 试验02",
-                            "project_type": "PV试验",
-                            "room": "实验室1",
-                            "engineer": "试验工程师6"
-                        },
-                        {
-                            "id": 4,
-                            "experiment_num": "4878945",
-                            "name": "盐雾试验03",
-                            "project_type": "PV试验",
-                            "room": "实验室4",
-                            "engineer": "试验工程师6"
-                        },
-                        {
-                            "id": 9,
-                            "experiment_num": "48548756",
-                            "name": "项目4 试验02",
-                            "project_type": "PV试验",
-                            "room": "实验室1",
-                            "engineer": "试验工程师6"
-                        },
-                    ]
-                }
-                res.data.count = 12;
                 this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
@@ -179,7 +99,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getmaterialTestList(this.CurrentChange):this.materialTestSearch(this.searchText,this.CurrentChange);
             }
         },

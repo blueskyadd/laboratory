@@ -8,20 +8,20 @@
         <div class="main">
             <div class="main_list">
                 <ul>
-                    <li  @mouseover="ismalfunction = true" @mouseout="ismalfunction = false" :style="{background:ismalfunction? '#07A695':'#fff'}">
+                    <li @click="goapplicationMeasure" @mouseover="ismalfunction = true" @mouseout="ismalfunction = false" :style="{background:ismalfunction? '#07A695':'#fff'}">
                         <img src="../../../../../assets/img/LabManager/management/equipment/measureRecord/applyFor.png"  v-if="!ismalfunction">
                         <img src="../../../../../assets/img/LabManager/management/equipment/measureRecord/applyFor_actively.png" alt="" v-else>
-                        <span :style="{color:ismalfunction? '#fff':'#07A695'}">申请设备</span>
+                        <span :style="{color:ismalfunction? '#fff':'#07A695'}">申请计量</span>
                     </li>
                     <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
-                    <li @mouseover="ismaintain = true" @mouseout="ismaintain = false" :style="{background:ismaintain? '#07A695':'#fff'}">
+                    <li @click="goschedule()" @mouseover="ismaintain = true" @mouseout="ismaintain = false" :style="{background:ismaintain? '#07A695':'#fff'}">
                         <img src="../../../../../assets/img/LabManager/management/equipment/measureRecord/schedule.png" alt="" v-if="!ismaintain">
                         <img src="../../../../../assets/img/LabManager/management/equipment/measureRecord/schedule_actively.png" alt="" v-else>
                         <span>计量进度</span>
                     </li>
                     <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @mouseover="islookReport = true" @mouseout="islookReport = false" :style="{background:islookReport? '#07A695':'#fff'}">
-                        <a :href="reportDownUrl" download="w3logo">
+                        <a :href="reportDownUrl" download="计量报告">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport.png" alt="" v-if="!islookReport">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport_actively.png" alt="" v-else>
                             <span>查看计量报告</span>
@@ -53,6 +53,12 @@ export default {
             }).catch(err =>{
                  this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
+        },
+        goapplicationMeasure(){
+            this.$router.push({path:'/gaugerIndex/proposer', query:{equipmentID: this.$route.query.maintenanceProcessID}})
+        },
+        goschedule(){
+            this.$router.push({path:'/gaugerIndex/schedule', query:{equipmentID: this.$route.query.maintenanceProcessID}})
         }
     },
     mounted(){

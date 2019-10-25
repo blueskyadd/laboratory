@@ -3,7 +3,7 @@
         <header class="addEquipment_header">
             <h3>设备负责数</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="allocation">申请设备</span>
+            <span class="goBack underline" style="margin-left:.3rem;margin-right: 9.88rem;" @click="allocation()">申请设备</span>
             <Search @searchDetail='searchMyequipment_applyNumber' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
@@ -69,7 +69,11 @@ export default {
             }
         },
         allocation(data){
-            this.$router.push({path:'/Equipmentengineer/NewEquipmentFlow',query:{"equipmentID": data.row.id}})
+            if(data){
+                this.$router.push({path:'/Equipmentengineer/NewEquipmentFlow',query:{"equipmentID": data.row.id}})
+            }else{
+                this.$router.push({name:'proposerEquipment'})
+            }
         },
         /**@name 分页 */
         handleCurrentChange(pageNumber) {
@@ -112,7 +116,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getMyequipment_applyNumber(this.CurrentChange):this.searchMyequipment_applyNumber(this.searchText,this.CurrentChange);
             }
         },

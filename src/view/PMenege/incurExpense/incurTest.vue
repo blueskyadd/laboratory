@@ -3,16 +3,27 @@
         <header class="testMethods_index_header">
             <h3>试验费用</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <Search @searchDetail='searchPm_project_exfailLis' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date" label="产品编号"  header-align='center'  align='center'> </el-table-column>
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 2.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table-column prop="experiment_num" label="产品编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name" label="产品名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name" label="费用" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name" label="明细" header-align='center' align='center'>
-                <template><span class="underline" @click="goEquipmentDetail()">详edf情</span></template>
+            <el-table-column prop="expense" label="费用" header-align='center' align='center'> </el-table-column>
+            <el-table-column label="明细" header-align='center' align='center'>
+                <template slot-scope="scoped"><span class="underline" @click="goEquipmentDetail(scoped)">详情</span></template>
             </el-table-column>
         </el-table>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
     </div>
 </template>
 <script>
@@ -22,45 +33,15 @@ export default {
     name:'incurTest',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        popUptitle: '',
+        tableData: [],
         placeholderTexe:'上传试验编号、名称',
-        isUpslot:false,
-        pageNumber: 1,
-        perPage: 10
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        CurrentChange:1,
+        isSearch: false,//是否为搜索
+        searchText:'',//搜索文字
       }
     },
     methods:{
@@ -78,16 +59,57 @@ export default {
                 return "color:#444444";
             }
         },
-        searchDetail(){
-
+        searchPm_project_exfailLis(data,pageNumber){
+            pageNumber = pageNumber ?pageNumber:1
+            this.isLoading = true;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = 1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getPm_project_exexpend + this.$route.query.equipmentID + '&search=' + data + '&page_size=' +this.page_size : this.$conf.env.getPm_project_exexpend + this.$route.query.equipmentID + '&search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         },
         getIndex(index){
             return (this.pageNumber - 1) * this.perPage + index + 1
         },
-        goEquipmentDetail(){
-             alert('a')
-           this.$router.push({name:'projectInccur'})
+        goEquipmentDetail(data){
+           this.$router.push({path:'/LaboratoryManager/projectInccur',query:{"equipmentID": data.row.id}})
+        },
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            !this.isSearch?this.getPm_project_exexpend(pageNumber):this.searchPm_project_exfailLis(this.searchText,pageNumber);
+        },
+        getPm_project_exexpend(pageNumber){
+             this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getPm_project_exexpend + this.$route.query.equipmentID + '&page_size=' +this.page_size : this.$conf.env.getPm_project_exexpend + this.$route.query.equipmentID + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getPm_project_exexpend(1);
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                !this.isSearch?this.getPm_project_exexpend(this.CurrentChange):this.searchPm_project_exfailLis(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>

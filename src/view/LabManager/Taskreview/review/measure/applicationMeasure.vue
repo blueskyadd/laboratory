@@ -43,7 +43,7 @@
             </footer>
         </div>
     </div>
-</template>
+</template>     
 <script>
 import { setTimeout } from 'timers';
 export default {
@@ -81,7 +81,7 @@ export default {
                         this.$message({ message: '审核成功', type: 'success'});
                         var _this = this;
                         setTimeout(()=>{
-                            _this.reload();
+                            _this.$router.back();
                         },1000)
                     }else{
                         this.$message({ message: '审核失败', type: 'warning'});              
@@ -102,8 +102,9 @@ export default {
 }
 </script>
 <style lang="scss" >
-@import '../../../../../style/LabManager/main.scss';
+
 .applicationMeasure{
+    @import '../../../../../style/LabManager/main.scss';
      padding-top: .42rem;
      overflow-y: scroll;
     .applicationMeasure_index_header{

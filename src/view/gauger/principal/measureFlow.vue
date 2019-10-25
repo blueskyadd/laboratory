@@ -15,7 +15,7 @@
                     <li @click="goProposer()"><img src="../../../assets/img/Equipmentengineer/malfunction/equipment.png" alt=""><span>申请计量</span></li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li >
-                        <a download="w3logo" :href="meteringSection.compact">
+                        <a download="合同签署" :href="meteringSection.compact">
                             <img src="../../../assets/img/Equipmentengineer/malfunction/contract.png" alt=""><span>合同签署</span>
                         </a>
                     </li>

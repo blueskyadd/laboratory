@@ -11,65 +11,34 @@
                         </swiper-slide>
                     </swiper>
                 </div>
-                <div class="equipment_data">
-                    <div class="equipment_data_list">
-                        <h3>设备运行率</h3>
-                        <div class="efficient_data">
-                            <div class="circle">
-                                <img :style="{'transform': changeRotate}" src="../assets/img/LabManager/index/pointer.png" alt="">
-                            </div>
-                             <span>{{(operating*100).toFixed(1)}}%</span>
-                        </div>
-                    </div>
+                <div class="equipment_data" v-if="isEquipment_data">
+                    <equipmentData titleName="设备运行率"  :operatingNum='Laboratory_topNumber.num1' />
                     <div class="equipment_data_list">
                         <h3>设备档案</h3>
                         <div class="efficient_data">
                             <div class="text_number">
-                                <yd-countup :endnum="12" :duration="1" >{{allocation}}</yd-countup>
+                                <yd-countup :endnum="Laboratory_topNumber.num2" :duration="1" >{{Laboratory_topNumber.num2}}</yd-countup>
                                 <span>份</span>
                             </div>
                         </div>
                     </div>
-                    <div class="equipment_data_list">
-                        <h3>设备维修率</h3>
-                        <div class="efficient_data">
-                            <div class="circle">
-                                 <img :style="{'transform': changeRotate}" src="../assets/img/LabManager/index/pointer.png" alt="">
-                            </div>
-                            <span>{{(operating*100).toFixed(1)}}%</span>
-                        </div>
-                    </div>
-                    <div class="equipment_data_list">
-                        <h3>物料安全率</h3> 
-                        <div class="efficient_data">
-                            <div class="circle">
-                                 <img :style="{'transform': changeRotate}" src="../assets/img/LabManager/index/pointer.png" alt="">
-                            </div>
-                            <span>{{(operating*100).toFixed(1)}}%</span>
-                        </div>
-                    </div>
+                    <equipmentData titleName="设备维修率" :operatingNum='Laboratory_topNumber.num3' />
+                    <equipmentData titleName="设备安全率" :operatingNum='Laboratory_topNumber.num4'/>
                 </div>
             </div>
-            <div class="index_footerBanner main_body_html ">
+            <div class="index_footerBanner main_body_html " ref="swiperOption">
                 <swiper :options="swiperOption" v-if="swiperOption" >
-                    <swiper-slide v-for="(slide, index) in swiperSlides" :key="index">
-                        <img src="../assets/img/LabManager/index/dev.png" alt="">
+                    <swiper-slide v-for="(slide, index) in EquipmentImgList" :key="index">
+                        <img :src="slide.image" alt="">
                         <div class="masking">
-                            <h3>高低温试验箱</h3>
+                            <h3>{{slide.name}}</h3>
                             <swiper :options="swiperOption_text" v-if="swiperOption_text">
-                                <swiper-slide>
-                                <ul>
-                                    <li><span>工作原理：</span><p>制冷循环采用你卡制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环制冷循环采用你卡若循环若循环</p></li>
-                                    <li><span>适用特点：</span><p>制冷循环采用你卡若循环</p></li>
-                                    <li><span>产品符合：</span><p>制冷循环采用你卡若循环</p></li>
-                                    <li><span>温度范围：</span><p>制冷循环采用你卡若循环</p></li>
-                                    <li><span>工作原理：</span><p>制冷循环采用你卡若循环</p></li>
-                                    <li><span>适用特点：</span><p>制冷循环采用你卡若循环</p></li>
-                                    <li><span>产品符合：</span><p>制冷循环采用你卡若循环</p></li>
-                                    <li><span>温度范围：</span><p>制冷循环采用你卡若循环</p></li>
-                                </ul>
-                            </swiper-slide>
-                        </swiper>
+                                <swiper-slide >
+                                    <ul>
+                                        <li><p>{{slide.text}}</p></li>
+                                    </ul>
+                                </swiper-slide>
+                            </swiper>
                         </div>
                     </swiper-slide>
                 </swiper>
@@ -78,9 +47,11 @@
         <div class="right_main">
             <div class="bulletin_board main_body_html show_background">
                 <h3>实验室公告栏</h3>
-                <ul ref="bulletin_board_scrollbar">
-                    <li v-for="item in Bulletin_board" :key="item.id"><img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>{{item.content}}</p> </li>
-                </ul>
+                 <swiper :options="swiperOption_Bulletin_board" v-if="swiperOption_Bulletin_board" >
+                    <swiper-slide v-for="(item, index) in Bulletin_board" :key="index">
+                        <img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>{{item.content}}</p>
+                    </swiper-slide>
+                </swiper>
             </div>
             <div class="calendar_board main_body_html show_background">
                 <Calendar :sundayStart='false' ></Calendar>
@@ -89,53 +60,77 @@
     </div>
 </template>
 <script>
-
+import equipmentData from '../components/common/equipment_data';
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
 import Calendar from "vue-calendar-component";
 import { setTimeout } from 'timers';
 export default {
     name:'index',
-    components: {swiper, swiperSlide, Calendar},
+    components: {swiper, swiperSlide, Calendar, equipmentData},
     data() {
       return {
         Ability_introduce:'',//实验室能力介绍
         Bulletin_board: [],//实验室公告栏列表
+
         swiperOption: {
             slidesPerView: 'auto',
+            grabCursor: true,
             freeMode: true,
+            mousewheelControl: true,
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
             },
+            on:{
+                transitionEnd: () =>{
+                    this.getequipmentImgListMove()
+                }
+            }
         },
         swiperOption_text:{
             direction: 'vertical',
             slidesPerView: 'auto',
             freeMode: true,
+            grabCursor: true,
             scrollbar: {
                 el: '.swiper-scrollbar',
             },
             mousewheel: true,
-
+        },
+        swiperOption_Bulletin_board:{
+            direction: 'vertical',
+            slidesPerView: 'auto',
+            freeMode: true,
+            grabCursor: true,
+            scrollbar: {
+                el: '.swiper-scrollbar',
+            },
+            mousewheel: true,
+            on:{
+                transitionEnd: () =>{
+                    this.getScrollBulletin_board()
+                }
+            }
         },
         swiperSlides: [1, 2, 3, 4,5,6,7,8,9,10],
         operating: 1 ,
-        allocation:12
+        allocation:12,
+        Laboratory_topNumber:{},
+        isEquipment_data:false,
+        EquipmentImgList:[],
+        EquipmentImgList_pagenumber:1,
+        isEquipmentImgList: true,
+        board_pagenumber: 1,
+        isboard_pagenumber: false,
       }
     },  
     mounted() {
         this.$message.closeAll()
         /**@name 接口请求 */
         this.getAbilityintroduce();//获取实验室信息
-        this.getBulletinBoard();//获取公告栏列表数据
-        
-        /**@name 函数处理 */
-        this.$refs.bulletin_board_scrollbar.addEventListener('scroll',()=>{
-            console.log('加载')
-        })
-    },
-    destroyed(){
-        
+        this.getBulletinBoard(1);//获取公告栏列表数据
+        this.getLaboratory_topNumber();//获取右侧设备运行率
+        this.getequipmentImgList(1);//获取底部图片列表
     },
     computed:{
         changeRotate(){
@@ -174,7 +169,7 @@ export default {
                     this.Ability_introduce = res.data.text;
                 }
             }).catch(err =>{
-                console.log(err.response)
+                console.log(err)
                 if(err.response.status == '401'){
                     if(err.response.data.detail == 'Signature has expired.'){
                         this.$message({message: '签名已过期,请重新登录',type: 'error',duration:0});
@@ -184,17 +179,50 @@ export default {
                 }
             })
         },
-        //获取公告栏列表数据
-        getBulletinBoard(){
-            this.$http.get(this.$conf.env.getBulletinBoard).then( res =>{
-                this.Bulletin_board = res.data.results;
+        /**@name 获取公告栏列表数据*/
+        getScrollBulletin_board(){
+             if(!this.isboard_pagenumber) return;
+            this.board_pagenumber += 1;
+            this.getBulletinBoard(this.board_pagenumber)
+        },
+        getBulletinBoard(pageNumber){
+            this.$http.get(pageNumber == 1? this.$conf.env.getBulletinBoard +'?page_size=' + 16 :  this.$conf.env.getBulletinBoard + '?p=' +pageNumber + '&page_size=16').then( res =>{
+                this.isboard_pagenumber = res.data.next? true:false;
+                this.Bulletin_board = this.Bulletin_board == 1 ? res.data.results:this.Bulletin_board.concat(res.data.results);
             }).catch(err =>{
-
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
+        },
+        /**@name获取设备运行率 */
+        getLaboratory_topNumber(){
+            this.$http.get(this.$conf.env.getLaboratory_topNumber).then( res =>{
+                this.Laboratory_topNumber = res.data;
+                this.isEquipment_data = true;
+            }).catch(err =>{
+                this.isEquipment_data = true;
+                this.Laboratory_topNumber = {'num1':'0%','num2':'0%','num3':'0%','num4':'0%'};
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        /**@name获取图片列表数据 */
+        getequipmentImgList(pageNumber){
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getequipmentImgList : this.$conf.env.getequipmentImgList + '?p=' +pageNumber ).then( res =>{
+                this.isLoading = false;
+                this.EquipmentImgList = this.Bulletin_board == 1 ? res.data.results:this.EquipmentImgList.concat(res.data.results);
+                this.isEquipmentImgList = res.data.next ? true : false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        getequipmentImgListMove(){
+            if(!this.isEquipmentImgList) return;
+            this.EquipmentImgList_pagenumber += 1;
+            this.getequipmentImgList(this.EquipmentImgList_pagenumber)
         }
     }
 }
-</script>
+</script>   
 <style lang="scss">
 @import '../../static/font/font.css';
 $setColor:#7f0dde;
@@ -487,17 +515,18 @@ $setColor:#7f0dde;
                 text-align: center;
                 color: #333333;
             }
-            ul{
+            .swiper-container{
                 padding: 0 .18rem;
                 height: calc(100% - .72rem);
-                overflow-y: scroll;
-                li{
+                // overflow-y: scroll;
+                .swiper-slide{
                     font-size: .2rem;
                     line-height: .3rem;
                     color: #555555;
                     margin-bottom: .16rem;
                     padding-left: .21rem;
                     display: flex;
+                    height: auto!important;
                     img{
                         width: .22rem;
                         height: .22rem;

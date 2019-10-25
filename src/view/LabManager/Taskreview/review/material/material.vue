@@ -1,6 +1,6 @@
 <template>
-    <div class="Taskreview_measure">
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+    <div class="Taskreview_measure scrollTable">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 2.3rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
             <el-table-column prop="nateriel_num"  label="物料编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="物料名称"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="num"  label="物料数量" header-align='center'  align='center'> </el-table-column>
@@ -30,7 +30,6 @@ export default {
       return {
         tableData: [],
         totalSum:0,//数据总数
-        currentPage: 1,//当前页
         page_size : 9,//一页数据条数
         CurrentChange:1,
         isSearch: false,//是否为搜索
@@ -59,7 +58,6 @@ export default {
         },
          /**@name 分页 */
         handleCurrentChange(pageNumber) {
-            this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
             this.isLoading = true;
             !this.isSearch ?this.getMaterialList(pageNumber):this.MaterialSearch(this.searchText,pageNumber);
@@ -67,9 +65,9 @@ export default {
         },
         MaterialSearch(data,pageNumber){
             this.isLoading = true;
-             this.searchText = data;
-             this.isSearch = true;
-             this.currentPage = 1;
+            this.searchText = data;
+            this.isSearch = true;
+            this.CurrentChange =  pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getMaterialList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.getMaterialList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -98,7 +96,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?this.getMaterialList(this.CurrentChange):this.MaterialSearch(this.searchText,this.CurrentChange);
             }
         },

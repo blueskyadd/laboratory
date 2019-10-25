@@ -76,7 +76,7 @@ export default {
                 if(res.status == '200'){
                     this.$message({ message: '审批成功', type: 'success'});
                     setTimeout(()=>{
-                        this.$router.back(-1);
+                        this.$router.back();
                     },100)
                 }else{
                     this.$message({ message: '审批失败', type: 'warning'});              

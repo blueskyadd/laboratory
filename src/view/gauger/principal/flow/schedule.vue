@@ -1,15 +1,17 @@
 <template>
     <div class="schedule body_main" v-loading.fullscreen.lock="isLoading">
         <header class="proposer_index_header">
-            <h3>计量进度</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            <div>
+                <h3>计量进度</h3>
+                <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            </div>
         </header>
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text first_child">
-                    <span>物料名称：</span>
+                    <span>设备名称：</span>
                     <p class="scheduleName">{{meteringDetail.name}}</p>
-                    <span>物料编号：</span>
+                    <span>设备编号：</span>
                     <p style="color:#999999">{{meteringDetail.num}}</p>
                 </div>
                 <div class="mian_text first_child">
@@ -39,6 +41,7 @@ export default {
             fileName: '指导书',
             options: [],
             isLoading: true,
+            meteringDetail:{}
         }
     },
     methods:{

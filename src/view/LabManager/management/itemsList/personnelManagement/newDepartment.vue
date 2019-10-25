@@ -1,36 +1,48 @@
 <template>
     <div class="newDepartment_index table_box">
         <header class="newDepartment_index_header">
-            <h3>新增部门</h3>
+            <h3>部门列表</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <!-- <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/> -->
         </header>
          <div class="taskAllocation_distributed ">
               <div class="editTableButton">
                 <el-button type="primary" @click="addDepartment">新增</el-button>
             </div>
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.3rem)"  style="width: 100%"  :row-class-name="tabRowClassName"  v-loading="isLoading">
                 <el-table-column prop="id"  type="index"   width = '100%' :index="getIndex"  align='center' label="序号"></el-table-column>
-                <el-table-column prop="date"  label="部门名称"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="创建日期" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline lookmanagement"  @click="editDepartment(scoped)">编辑</span><span class="underline deletemanagement"  @click="allocation(scoped)">删除</span> </template>
+                <el-table-column prop="lab"  label="公司名称"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="部门名称"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="create_time"  label="创建日期" header-align='center'  align='center'> </el-table-column>
+                <el-table-column  label="操作" header-align='center' align='center'>
+                    <template slot-scope="scoped"><span class="underline lookmanagement"  @click="editDepartment(scoped)">编辑</span><span class="underline deletemanagement"  @click="deletedDpartment(scoped.row.id)">删除</span> </template>
                 </el-table-column>
             </el-table>
+            <div class="pagination">
+                <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+                <el-pagination
+                @current-change="handleCurrentChange"
+                :current-page.sync="CurrentChange"
+                :page-size="page_size"
+                layout="prev, pager, next"
+                :total="totalSum">
+                </el-pagination>
+                <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+            </div>
         </div>
         <popUp ref="popUp" setWidth='45%' :popUptitle='popUptitle' class="popUp">
             <template>
                 <div>
                     <ul>
-                        <li><span>部门名称：</span><input type="text" placeholder="填写姓名"></li>
-                        <li><span>创建时间：</span>
+                        <li><span>部门名称：</span><input type="text" v-model="departmentName" placeholder="填写部门名称"></li>
+                        <!-- <li><span>创建时间：</span>
                             <el-date-picker
                                 v-model="statusTime"
                                 type="date"
-                                placeholder="离职时间">
+                                placeholder="创建时间">
                             </el-date-picker>
-                        </li>
-                        <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button type="primary">完成</el-button></li>
+                        </li> -->
+                        <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button type="primary" @click="!companyID?createdDepartment():editDepartmentInfo()">完成</el-button></li>
                     </ul>
                 </div>
             </template>
@@ -43,31 +55,18 @@ import popUp from '../../../../../components/common/popUp'
 export default {
     name: 'newDepartment',
     components:{Search,popUp},
+    inject:['reload'],
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
             popUptitle:'',
-            isUpslot:1,
-            placeholderTexe:'搜索试验编号、名称',
-            pageNumber: 1,
-            perPage: 10
+            isLoading: true,
+            totalSum:0,//数据总数
+            page_size : 9,//一页数据条数
+            CurrentChange:1,//输入框绑定数据
+            departmentID: '',
+            departmentName: '',
+            companyID: ''
         }
     },
     methods:{
@@ -85,27 +84,127 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
-        },
         getIndex(index){
-            return (this.pageNumber - 1) * this.perPage + index + 1
+            return (this.CurrentChange - 1) * this.page_size + index + 1
         },
         addDepartment(){
             this.setdialogVisible('新增部门')
         },
-        editDepartment(){
-            this.setdialogVisible('编辑部门')
+        editDepartment(data){
+            this.setdialogVisible('编辑部门',data);
         },
-        setdialogVisible(title){
+        setdialogVisible(title,data){
             this.popUptitle = title;
+            if(data){
+                this.departmentName = data.row.name;
+                this.companyID = data.row.lab_id;
+                this.departmentID = data.row.id;
+            }
             this.$refs.popUp.dialogVisible = true;
         },
-    }
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getcompany_labList(this.searchText,  this.CurrentChange);
+        },
+        department_info(pageNumber){
+            pageNumber = pageNumber ?  pageNumber : 1;
+            this.CurrentChange = pageNumber;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.department_info + '?lab='+this.$route.query.companyID + '&page_size='+ this.page_size : this.$conf.env.department_info +  '?lab=' + '?lab='+this.$route.query.companyID+'&p=' +pageNumber + '&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        createdDepartment(){
+            if(!this.departmentName){
+                this.$message({ message: '请填写部门名称', type: 'warning'});
+                return false;
+            };
+            this.$http.post(this.$conf.env.department_info,{"name": this.departmentName,"lab": this.$route.query.companyID}).then(res =>{
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    this.reload();
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        editDepartmentInfo(){
+            if(!this.departmentName){
+                this.$message({ message: '请填写部门名称', type: 'warning'});
+                return false;
+            };
+             this.$http.put(this.$conf.env.department_info + this.departmentID + '/',{"name": this.departmentName }).then(res =>{
+                if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                    this.$refs.popUp.dialogVisible = false;
+                    if(this.tableData.length == 1 && this.CurrentChange != 1){
+                        this.department_info(this.CurrentChange - 1);
+                    }else{
+                        this.department_info(this.CurrentChange);
+                    }
+                }else{
+                    this.$message({ message: '修改失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        //删除
+        deletedDpartment(ID){
+            this.$confirm('此操作将删除该部门, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$http.delete(this.$conf.env.department_info + ID + '/').then(res =>{
+                    if(res.status == '204'){
+                        this.$message({ message: '删除成功', type: 'success'});
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            this.department_info(this.CurrentChange - 1);
+                        }else{
+                            this.department_info(this.CurrentChange);
+                        }
+                    }else{
+                        this.$message({ message: '删除失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+        },
+    },
+    mounted(){
+        this.department_info(1)
+    },
+     watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                this.department_info(this.CurrentChange);
+            }
+        },
+     }
 }
 </script>
 <style lang="scss">
 .newDepartment_index{
+     @import '../../../../../style/LabManager/management/index.scss';
     padding-top: .42rem;
     .newDepartment_index_header{
         padding-left: .41rem;
@@ -161,6 +260,7 @@ export default {
         }
     }
     .taskAllocation_distributed{
+        height: 100%;
         th{
             font-size: .2rem;
             line-height: .48rem;
@@ -184,11 +284,12 @@ export default {
     }
     .popUp{
         .el-dialog{
-            height: 35%;
+            height: 25%;
             overflow: hidden;
         }
         ul{
             overflow-y: scroll;
+            height: auto;
         }
         ul::-webkit-scrollbar{
             display: none;

@@ -42,7 +42,7 @@
                  <template slot-scope="scoped">
                      <span class="underline lookmanagement"  @click="allocation(scoped)">查看</span>
                      <span class="underline lookmanagement"  @click="editquipment('编辑工装', false,scoped)">编辑</span>
-                     <span class="underline deletemanagement" :style="{color:scoped.row.inventory == '正常' ? '#a6a6a6' : '#f32c2c'}" @click="deletefrock(scoped)">删除</span> </template>
+                     <span class="underline deletemanagement" :style="{color:scoped.row.inventory == '正常' ? '#a6a6a6' : '#f32c2c'}" @click="deletefrock(scoped.row.id)">删除</span> </template>
             </el-table-column>
         </el-table>
         <div class="pagination">
@@ -73,7 +73,7 @@
                         </li>
                         <li>
                             <span><i class="importantData">*</i>使用年限：</span>
-                            <input   type="number" v-model="frockSectionInfo.year" placeholder="填写使用年限">
+                            <input   type="number"  v-model="frockSectionInfo.year" placeholder="填写使用年限">
                         </li>
                         <li >
                             <span><i class="importantData">*</i>工装负责人：</span>
@@ -111,12 +111,12 @@
                     <el-table-column prop="user" min-width="40%" label="申请人" header-align='center' align='center'> </el-table-column>
                     <el-table-column prop="name" min-width="40%" label="合同" header-align='center' align='center'>
                         <template slot-scope="scoped">
-                            <a class="underline" :href="scoped.row.contract" download="w3logo">下载</a>
+                            <a class="underline" :href="scoped.row.contract" download="合同">下载</a>
                         </template>
                     </el-table-column>
                     <el-table-column prop="name" min-width="40%" label="调试报告" header-align='center' align='center'>
                         <template slot-scope="scoped">
-                            <a :href="scoped.row.report" download="w3logo" class="underline">查看</a>
+                            <a :href="scoped.row.report" download="调试报告" class="underline">查看</a>
                         </template>
                     </el-table-column>
                     <el-table-column prop="address"   label="操作" header-align='center' align='center'>
@@ -182,8 +182,10 @@ export default {
             }else if(data.columnIndex == 3){
                 if(data.row.inventory == '报废'){
                     return "color:#f32c2c";
-                }else{
+                }else if(data.row.inventory == '正常'){
                     return "color:#1cd88d";
+                }else{
+                    return "color:#07a695";
                 }
             }else{
                 return "color:#444444";
@@ -201,6 +203,37 @@ export default {
             this.setWidth = '70%';
             this.$refs.popUp.dialogVisible = true;
             this.getNoentryFrockList();//获取数据
+        },
+        deletefrock(ID){
+            this.$confirm('此操作将删除该工装, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$http.delete(this.$conf.env.deletefrock + ID +'/').then( res =>{
+                    if(res.status == '204'){
+                        this.$message({ message: '删除成功', type: 'success'});
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            !this.isSearch ? this.getfrockManageList(this.CurrentChange - 1):this.frockSearch(this.searchText,this.CurrentChange - 1);
+                        }else{
+                            !this.isSearch ? this.getfrockManageList(this.CurrentChange):this.frockSearch(this.searchText,this.CurrentChange);
+                        }
+                    }else{
+                        this.$message({ message: '删除失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    if(err.response.status == '400'){
+                        this.$message({ message:err.response.data, type: 'warning'});   
+                    }else{
+                        this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                    }
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
         },
         //弹框
         editquipment(title, flag, data){
@@ -265,10 +298,11 @@ export default {
         },
         /**@name 搜索 */
         frockSearch(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
              this.isLoading = true;
              this.searchText = data;
              this.isSearch = true;
-             this.currentPage = 1;
+             this.currentPage = pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getfrockManageList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.getfrockManageList + '?search=' + data +  + '&p=' +pageNumber +'&page_size='  +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -281,6 +315,7 @@ export default {
         /**@name获取数据 */
         getfrockManageList(pageNumber){
           this.isSearch = false;
+          pageNumber = pageNumber ? pageNumber : 1;
           this.$http.get(pageNumber == 1 ? this.$conf.env.getfrockManageList + '?page_size=' +this.page_size : this.$conf.env.getfrockManageList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -322,6 +357,10 @@ export default {
         /**@name 创建工装 */
         createdFrock(){
             if(!VerificationData.VerificationData(this.frockSectionInfo)) return 
+            if(this.frockSectionInfo.year > 65535){
+                 this.$message.error('使用年限不能超过65535年哦'); 
+                 return  false
+            }
             this.$http.post(this.$conf.env.createdFrock,this.frockSectionInfo).then(res =>{
                 if(res.status == '201'){
                     this.$message({ message: '创建成功', type: 'success'});
@@ -336,6 +375,10 @@ export default {
         /**@name编辑工装 */
         editFrock(){
             if(!VerificationData.VerificationData(this.frockSectionInfo)) return 
+            if(this.frockSectionInfo.year > 65535){
+                 this.$message.error('使用年限不能超过65535年哦'); 
+                 return  false
+            }
             this.$http.put(this.$conf.env.editFrock + this.frockID + '/', this.frockSectionInfo).then( res =>{
                 if(res.status == '200'){
                     this.$message({ message: '修改成功', type: 'success'});
@@ -355,8 +398,8 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
-                !this.isSearch ? this.getpersonnelManagementList(this.CurrentChange):this.frockSearch(this.searchText,this.CurrentChange);
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                !this.isSearch ? this.getfrockManageList(this.CurrentChange):this.frockSearch(this.searchText,this.CurrentChange);
             }
         },
     }
@@ -365,7 +408,6 @@ export default {
 <style lang="scss">
 @import '../../../../../style/LabManager/management/index.scss';
 .management_frockManagement{
-    padding-top: .248rem;
     .Search .editTableButton{
         padding-top: .68rem!important;
     }

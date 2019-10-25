@@ -1,8 +1,10 @@
 <template>
-    <div class="measureFlowReport body_main">
+    <div class="measureFlowReport body_main" v-loading.fullscreen.lock="isLoading">
         <header class="proposer_index_header">
-            <h3>计量报告</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            <div>
+                <h3>计量报告</h3>
+                <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            </div>
         </header>
         <div class="main">
             <div class="measure_main">
@@ -61,7 +63,8 @@ export default {
                 disabledDate(time) {
                     return time.getTime() < Date.now();
                 },
-            }
+            },
+            isLoading: false
         }
     },
     methods:{
@@ -83,7 +86,7 @@ export default {
             this.isLoading = true;
             this.$http.put(this.$conf.env.createdGuager_metering  +this.$route.query.equipmentID +'/', this.meteringDetail).then(res =>{
                 this.isLoading = false;
-                if(res.status == '201'){
+                if(res.status == '200'){
                     this.$message({ message: '创建成功', type: 'success'});
                     this.$router.back();
                 }else{

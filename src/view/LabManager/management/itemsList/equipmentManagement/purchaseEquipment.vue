@@ -9,7 +9,7 @@
             <div class="titleEquipment"><span>设备名称：</span><p>{{EquipmentpurchaseName}}</p></div>
             <div class="main_list">
                 <ul>
-                    <li @click="goapplicationEquipment" @mouseover="isapplyEquipment = false" @mouseout="isapplyEquipment = true" :style="{background:isapplyEquipment? '#fff':'#07A695'}">
+                    <li :style="{background:isapplyEquipment? '#fff':'#07A695'}">
                         <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment.png" alt="" v-if="isapplyEquipment">
                         <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment_actively.png" alt="" v-else>
                         <span :style="{color:isapplyEquipment?'#07A695': '#fff'}">申请设备</span>
@@ -17,8 +17,8 @@
                     <li>
                         <img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt="">
                     </li>
-                    <li @mouseover="iscontract= false" @mouseout="iscontract = true" :style="{background:iscontract? '#fff':'#07A695'}">
-                        <a :href="EquipmentpurchaseContract" download="w3logo">
+                    <li  :style="{background:iscontract? '#fff':'#07A695'}">
+                        <a :href="EquipmentpurchaseContract" download="合同">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="iscontract">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
                             <span :style="{color:iscontract?'#07A695': '#fff'}">合同</span>
@@ -27,8 +27,8 @@
                     <li>
                         <img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt="">
                     </li>
-                    <li @mouseover="islookReport = false" @mouseout="islookReport = true" :style="{background:islookReport? '#fff':'#07A695'}">
-                        <a :href="EquipmentpurchaseLookReport" download="w3logo">
+                    <li   :style="{background:islookReport? '#fff':'#07A695'}">
+                        <a :href="EquipmentpurchaseLookReport" download="试验报告">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport.png" alt="" v-if="islookReport">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport_actively.png" alt="" v-else>
                             <span :style="{color:islookReport?'#07A695': '#fff'}">试验报告</span>
@@ -46,7 +46,7 @@ export default {
         return{
             cause: '',
             isLoading: true,
-            isapplyEquipment: true,
+            isapplyEquipment: false,
             iscontract: true,
             islookReport:true,
             EquipmentpurchaseName:'',
@@ -64,8 +64,10 @@ export default {
         getEquipmentpurchaseInfo(){
             this.$http.get(this.$conf.env.getEquipmentpurchaseInfo + this.$route.query.EquipmentpurchaseID +  '/').then( res =>{
                 this.EquipmentpurchaseName = res.data.name;
-                this.EquipmentpurchaseContract = res.data.contract;
-                this.EquipmentpurchaseLookReport = res.data.equipment_debug;
+                this.EquipmentpurchaseContract = res.data.contract ? res.data.contract : '';
+                this.iscontract = res.data.contract ? false:true;
+                this.EquipmentpurchaseLookReport = res.data.equipment_debug?res.data.equipment_debug:'';
+                this.islookReport = res.data.equipment_debug ? false : true;
                 this.isLoading = false;
             }).catch(err =>{
                 this.isLoading = false;
@@ -129,7 +131,7 @@ export default {
                 li{
                     position: relative;
                     background:#fff;
-                    width: 31%;
+                    width: 32%;
                     height: 2.28rem;
                     box-shadow:0px .05rem .05rem 0px rgba(12,3,6,0.3);
                     border-radius: .05rem;
@@ -169,7 +171,7 @@ export default {
                     box-shadow: none;
                     overflow: hidden;
                     img{
-                        width: 1.18rem;
+                        width: 100%;
                         height: auto;
                         display: block;
                         margin: auto;

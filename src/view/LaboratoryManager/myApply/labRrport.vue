@@ -1,17 +1,18 @@
 <template>
     <div class="management_labRrport body_main">
         <header class="proposer_index_header">
-            <h3>试验标准</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <div>
+                <h3>测试报告</h3>
+                <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            </div>
         </header>
         <div class="taskName">
             <span>项目名称：</span>
-            <p class="ProjectName">控福控福智能控福智能智能-硬件部</p>
-            <span >委托公司部门：</span>
-            <p class="companyName">控福控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能控福智能智能-硬件部</p>
+            <p class="ProjectName">{{tableData.name}}</p>
+            <span >公司-部门：</span>
+            <p class="companyName">{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
         </div>
-        <div class="Search">
+        <!-- <div class="Search">
             <ul>
                 <li>
                     <span class="equipmentName">标准来源</span>
@@ -29,16 +30,16 @@
                 <el-button type="primary" @click="searchPersonnel">搜索</el-button>
                 <el-button type="primary">重置</el-button>
             </div>
-        </div>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="编号"  header-align='center'  align='center'> </el-table-column>
+        </div> -->
+        <el-table :data="tableData.experiments" :cell-style="changecolor" height="calc(100%  - 3.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table-column prop="experiment_num"  label="编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="实验结果" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="负责人" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="result"  label="实验结果" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="engineer"  label="负责人" header-align='center' align='center'> </el-table-column>
         </el-table>
         <footer>
-                <div><span>东分六期项目：</span>不合格</div>
-                <span class="underline">点击查看报告</span>
+                <div><span>{{tableData.name}}项目：</span>{{tableData.report_result}}</div>
+                <a :href="tableData.report" download="报告" class="underline">点击查看报告</a>
         </footer>
     </div>
 </template>
@@ -49,45 +50,10 @@ export default {
     components:{Search},
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        popUptitle: '',
-        isUpslot: false,
-        statusTime: '',
+        tableData: [],
         placeholderTexe: '搜索项目编号、名称',
-        CurrentChange:7,
+        isLoading:true,//加载动画
+        labManagrInfo:{}
       }
     },
     methods:{
@@ -105,22 +71,33 @@ export default {
                 return "color:#444444";
             }
         },
-        /**@name功能按键 */
-        //搜索按钮
-        searchPersonnel(){
-
+        getLaboratory_finishproject3Detail(){
+            this.$http.get(this.$conf.env.getLaboratory_finishproject3Detail + this.$route.query.equipmentID + '/').then( res =>{
+                this.isLoading = false;
+                this.tableData = res.data;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            }) 
         },
-        searchDetail(){
-
+        getEquipment_userinfoDetail(){
+            this.$http.get(this.$conf.env.getEquipment_userinfoDetail).then(res =>{
+                this.labManagrInfo = res.data;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         },
-        
+    },
+    mounted(){
+        this.getLaboratory_finishproject3Detail();
+        this.getEquipment_userinfoDetail();
     }
 }
 </script>
 <style lang="scss">
-@import '../../../style/LabManager/management/index.scss';
-@import '../../../style/Testengineer/teskName.scss';
 .management_labRrport{
+    @import '../../../style/LabManager/management/index.scss';
+    @import '../../../style/Testengineer/teskName.scss';
     padding-top: .46rem;
     .goBack{
         margin-right: 10.4rem;

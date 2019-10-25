@@ -34,23 +34,27 @@
    height : 100% ;
    overflow : hidden;
  }
-//  body::-webkit-scrollbar{
-// 	 width: auto;
-// 	 height: auto;
-//  }
-//  #app{
-// 	min-width:1920px;
-// 	min-height:1080px;
+ body::-webkit-scrollbar{
+	 width: .15rem;
+	 height: .15rem;
+ }
+ #app{
+	min-width:1600px;
+	min-height:900px;
 	
-//  }
- @media screen and (max-width: 1920px){ 
+ }
+ @media screen and (max-width: 1600px){ 
     body { 
-        // overflow-x: scroll!important;
-    } 
+		overflow-x: scroll!important;
+		// width: 16rem!important;
+		// height: 9rem!important;
+    }
 }
-@media screen and (max-height:1080px){ 
+@media screen and (max-height:900px){ 
     body { 
-        // overflow-y: scroll!important;
+		overflow-y: scroll!important;
+		// width: 1600px!important;
+		// height: 9rem!important;
     } 
 }
  body, #app{

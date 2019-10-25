@@ -1,40 +1,51 @@
 <template>
     <div class="addCompany_index table_box">
         <header class="addCompany_index_header">
-            <h3>新增公司</h3>`
+            <h3>公司列表</h3>`
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <!-- <Search @searchDetail='getcompany_labList' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/> -->
         </header>
-         <div class="taskAllocation_distributed ">
+         <div class="taskAllocation_distributed">
               <div class="editTableButton">
                 <el-button type="primary" @click="addCompany">新增</el-button>
             </div>
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.3rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
                 <el-table-column prop="id"  type="index"   width = '100%' :index="getIndex"  align='center' label="序号"></el-table-column>
-                <el-table-column prop="date"  label="公司名称"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="创建日期" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="创建人" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="name" label="部门"      header-align='center' align='center'>
+                <el-table-column prop="num"  label="公司编号"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name"  label="公司名称"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="create_time"  label="创建日期" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="name" label="部门"  header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline" @click="lookDetail(scoped)">管理</span></template>
                 </el-table-column>
                 <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                    <template slot-scope="scoped"><span class="underline lookmanagement"  @click="editCompany(scoped)">编辑</span><span class="underline deletemanagement"  @click="allocation(scoped)">删除</span> </template>
+                    <template slot-scope="scoped"><span class="underline lookmanagement"  @click="editCompany(scoped)">编辑</span><span class="underline deletemanagement"  @click="deleteCompany_lab(scoped.row.id)">删除</span> </template>
                 </el-table-column>
             </el-table>
+            <div class="pagination">
+                <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+                <el-pagination
+                @current-change="handleCurrentChange"
+                :current-page.sync="CurrentChange"
+                :page-size="page_size"
+                layout="prev, pager, next"
+                :total="totalSum">
+                </el-pagination>
+                <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+            </div>
         </div>
         <popUp ref="popUp" setWidth='45%' :popUptitle='popUptitle' class="popUp">
             <template>
                 <div>
                     <ul>
-                        <li><span>部门名称：</span><input type="text" placeholder="填写姓名"></li>
-                        <li><span>创建时间：</span>
+                        <li><span>部门名称：</span><input type="text" v-model="name" placeholder="填写公司名称"></li>
+                        <!-- <li><span>创建时间：</span>
                             <el-date-picker
                                 v-model="statusTime"
                                 type="date"
-                                placeholder="离职时间">
+                                placeholder="创建时间">
                             </el-date-picker>
-                        </li>
-                        <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button type="primary">完成</el-button></li>
+                        </li> -->
+                        <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button @click="companyID ?editCompany_lab(): createdCompany_lab()" type="primary">完成</el-button></li>
                     </ul>
                 </div>
             </template>
@@ -48,31 +59,19 @@ import popUp from '../../../../../components/common/popUp'
 export default {
     name: 'addCompany',
     components:{Search,popUp},
+    inject:['reload'],
     data(){
         return{
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
-            ],
+            tableData: [],
             popUptitle:'',
             isUpslot:1,
             placeholderTexe:'搜索试验编号、名称',
-            pageNumber: 1,
-            perPage: 10
+            isLoading:true,//加载动画
+            totalSum:0,//数据总数
+            page_size : 9,//一页数据条数
+            CurrentChange:1,//输入框绑定数据
+            name:'',//公司名称
+            companyID:'',
         }
     },
     methods:{
@@ -90,30 +89,134 @@ export default {
                 return 'warning-row'
             }
         },
-        searchDetail(){
-
-        },
-        lookDetail(){
-            this.$router.push({name:'newDepartment'})
+        lookDetail(data){
+            this.$router.push({path:'/newDepartment',query:{companyID:data.row.id}})
         },
         getIndex(index){
-            return (this.pageNumber - 1) * this.perPage + index + 1
+            return (this.CurrentChange - 1) * this.page_size + index + 1
         },
         addCompany(){
-            this.setdialogVisible('新增公司')
+            this.setdialogVisible('新增公司');
+            this.name ='';
+            this.companyID = '';
         },
-        editCompany(){
-            this.setdialogVisible('编辑公司')
+        editCompany(data){
+            this.setdialogVisible('编辑公司',data)
         },
-        setdialogVisible(title){
+        setdialogVisible(title,data){
             this.popUptitle = title;
+            if(data){
+                this.name = data.row.name;
+                this.companyID = data.row.id;
+            }
             this.$refs.popUp.dialogVisible = true;
         },
-    }
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getcompany_labList(this.searchText,  this.CurrentChange);
+        },
+        getcompany_labList(search, pageNumber){
+            pageNumber = pageNumber ?  pageNumber : 1;
+            this.searchText = search;
+            this.CurrentChange = pageNumber;
+            this.isSearch = false;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getcompany_labList + '?page_size='+ this.page_size + '&search=' +search  : this.$conf.env.getcompany_labList + '?p=' +pageNumber + '&search=' +search+ '&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        editCompany_lab(){
+            if(!this.name){
+                this.$message({ message: '请填写公司名称', type: 'warning'});
+                return false;
+            };
+            this.$http.put(this.$conf.env.editCompany_lab + this.companyID + '/',{"name": this.name }).then(res =>{
+                if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                    this.$refs.popUp.dialogVisible = false;
+                    if(this.tableData.length == 1 && this.CurrentChange != 1){
+                        this.getcompany_labList(this.searchText,  this.CurrentChange - 1);
+                    }else{
+                        this.getcompany_labList(this.searchText,  this.CurrentChange);
+                    }
+                }else{
+                    this.$message({ message: '修改失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        //删除
+        deleteCompany_lab(ID){
+            this.$confirm('此操作将删除该公司, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$http.delete(this.$conf.env.deleteCompany_lab + ID + '/').then(res =>{
+                    if(res.status == '204'){
+                        this.$message({ message: '删除成功', type: 'success'});
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            this.getcompany_labList(this.searchText,  this.CurrentChange - 1);
+                        }else{
+                            this.getcompany_labList(this.searchText,  this.CurrentChange);
+                        }
+                    }else{
+                        this.$message({ message: '删除失败', type: 'warning'});              
+                    }
+                }).catch(err =>{
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+            });
+        },
+        //创建公司
+        createdCompany_lab(){
+            if(!this.name){
+                this.$message({ message: '请填写公司名称', type: 'warning'});
+                return false;
+            };
+            this.$http.post(this.$conf.env.createdCompany_lab,{"name": this.name }).then(res =>{
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    this.reload();
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getcompany_labList('',1)
+    },
+     watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                this.getcompany_labList(this.searchText,  this.CurrentChange);
+            }
+        },
+     }
 }
 </script>
 <style lang="scss">
 .addCompany_index{
+    @import '../../../../../style/LabManager/management/index.scss';
     padding-top: .42rem;
     .addCompany_index_header{
         padding-left: .41rem;
@@ -169,6 +272,7 @@ export default {
         }
     }
     .taskAllocation_distributed{
+        height: 100%;
         th{
             font-size: .2rem;
             line-height: .48rem;
@@ -192,11 +296,12 @@ export default {
     }
     .popUp{
         .el-dialog{
-            height: 35%;
+            height: 25%;
             overflow: hidden;
         }
         ul{
             overflow-y: scroll;
+            height: auto;
         }
         ul::-webkit-scrollbar{
             display: none;

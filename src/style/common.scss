@@ -31,7 +31,7 @@
 }
 //滚动条样式重定义
 ::-webkit-scrollbar{
-    width: .1rem;
+    width: .05rem;
     height: .1rem;
     background-color: #F5F5F5;
 }
@@ -46,8 +46,8 @@
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb{
     border-radius: .1rem;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #ccc;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.2);
+    background-color: #ddd;
 }
 //弹框
 .popUp{
@@ -217,6 +217,12 @@
     margin-left: .19rem;
     align-items: flex-end;
     padding-bottom: .38rem;
+    margin-right: 10%;
+    justify-content: space-between;
+    div{
+        display: flex;
+        align-items: flex-end;
+    }
     h3{
         font-size: .36rem;
         color: #333333;
@@ -232,6 +238,7 @@
     //返回按钮
     .goBack{
         margin-left: .28rem;
+        margin-right: 0!important;
     }
 }
 .taskName{
@@ -395,6 +402,93 @@ li>a{
     //返回按钮
     .goBack{
         margin-left: .28rem;
-        margin-right: 9.32rem;
+        // margin-right: 9.32rem;
+    }
+}
+//下拉菜单
+.el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
+    background-color: #08a795!important;
+    color: #fff!important;
+}
+
+//修改个人信息弹框
+.PMenegeIndex_upload{
+    padding: 0!important;
+    width: 3.5rem!important;
+    .upload_BOX{
+        header{
+            // padding: .12rem .14rem .14rem;
+            padding: 0 .14rem;
+            height: .4rem;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            line-height: .4rem;
+            font-size: .14rem;
+        }
+        .from{
+            // height: 1.56rem;
+            padding: 0 .14rem;
+            // display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            font-size: .14rem;
+            span{
+                display: flex;
+                align-items: center;
+            }
+            div{
+                display: flex;
+            }
+            .userImgurl{
+                display: flex;
+                align-items: center;
+                .userTitle{
+                    margin-right: .14rem;
+                }
+                div{
+                    display: flex;
+                    .addfile{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: .4rem;
+                        height: .4rem;
+                        border:1px dashed #08a695;
+                        margin-left: .24rem;
+                        img{
+                            width: 70%;
+                        }
+                    }
+                    .fileImg{
+                        width: .4rem;
+                        height: .4rem;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        display: flex;
+                        img{
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
+                }
+            }
+            input{
+                width: 2rem;
+                height: .26rem;
+                border: 1px solid #08a695;
+                margin-left: .08rem;
+                padding: 0 .08rem;
+            }
+            button{
+                padding: .1rem .22rem;
+                width: fit-content;
+                display: table-cell;
+                float: right;
+                background: #08a695;
+                margin-bottom: .1rem;
+            }
+        }
     }
 }

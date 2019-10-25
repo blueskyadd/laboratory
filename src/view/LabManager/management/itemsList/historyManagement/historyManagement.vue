@@ -4,52 +4,30 @@
             <ul>
                 <li style="margin-bottom:.24rem">
                     <span class="equipmentName">项目类型</span>
-                    <el-select v-model="value" placeholder="请选择项目类型">
+                    <el-select v-model="project_type" placeholder="请选择项目类型">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in project_typeList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
                 </li>
                 <li style="margin-bottom:.24rem">
                     <span class="equipmentName">项目结果</span>
-                    <el-select v-model="value" placeholder="请选择项目结果">
+                    <el-select v-model="report_result" placeholder="请选择项目结果">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in report_resultList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
                 </li>
-                <!-- <li style="margin-bottom:.24rem">
-                    <span class="equipmentName">项目创建时间</span>
-                    <el-select v-model="value" placeholder="请选择项目创建时间">
-                        <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                        </el-option>
-                    </el-select>
-                </li>
-                <li>
-                    <span class="equipmentName">项目完成时间</span>
-                    <el-select v-model="value" placeholder="请选择项目完成时间">
-                        <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                        </el-option>
-                    </el-select>
-                </li> -->
             </ul>
             <div class="editTableButton">
-                <el-button type="primary">搜索</el-button>
-                <el-button type="primary">重置</el-button>
+                <el-button type="primary" @click="searchPersonnel">搜索</el-button>
+                <el-button  @click="result()">重置</el-button>
             </div>
         </div>
         <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
@@ -77,7 +55,6 @@
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
-        
     </div>
 </template>
 <script>
@@ -86,14 +63,16 @@ export default {
     data() {
       return {
         tableData: [],
-        options: [],
-        value: '',
         isLoading: true,
         totalSum:1,
         CurrentChange:1,
         page_size: 9,
         isSearch: false,//是否为搜索
         searchText:'',//搜索文字
+        project_type:'',
+        report_result:'',
+        project_typeList:[{'name':'DV试验','id':1},{'name':'PV试验','id':2}],
+        report_resultList:[{'name':'不合格','id':1},{'name':'合格','id':2}],
       }
     },
     methods:{
@@ -120,25 +99,36 @@ export default {
 
         /**@name 页面跳转 */
         historyEditDeteil(data){
-            this.$router.push({name: 'historyEditDeteil' })
+            this.$router.push({path: '/historyEditDeteil',query:{equipmentID: data.row.id} })
         },
         allocation(data){
-            this.$router.push({name: 'histoyDetail' })
+            this.$router.push({path: '/Testengineer/unMissionDetail',query:{equipmentID: data.row.id,flag:1 }})
         },
         /**@name 分页 */
         handleCurrentChange(pageNumber) {
             this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
             this.isLoading = true;
-            !this.isSearch ?this.getmaintenanceRecordList(pageNumber):this.historySearch(this.searchText,pageNumber);
-            
+            !this.isSearch ?this.getmaintenanceRecordList(pageNumber):this.historySearch(this.searchText,pageNumber);    
+        },
+        /**@name 搜索按钮 */
+        searchPersonnel(){
+             this.getProject_history_finishproject(this.searchText,this.currentPage);
+        },
+        /**@name 重置 */
+        result(){
+            this.searchText = '';
+            this.project_type = '';
+            this.report_result = '';
+            this.$emit('searchresolt')
+             this.getProject_history_finishproject(this.searchText,this.currentPage);
         },
         /**@name搜索 */
         historySearch(data,pageNumber){
             this.isLoading = true;
-             this.searchText = data;
-             this.isSearch = true;
-             this.currentPage = 1;
+            this.searchText = data;
+            this.isSearch = true;
+            this.currentPage = pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?search=' + data + '&page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -159,6 +149,19 @@ export default {
                 this.isLoading = false;
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
+        },
+        getProject_history_finishproject(search,pageNumber){
+            this.searchText = search;
+             this.CurrentChange = pageNumber ?this.CurrentChange: 1; 
+            pageNumber= pageNumber?pageNumber:1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.gethistoryProjectList + '?project_type=' + this.project_type  + '&search='+search + '&report_result=' + this.report_result + '&page_size=' +this.page_size : this.$conf.env.gethistoryProjectList + '?project_type='+ this.project_type + '&search='+search +  '&report_result=' + this.report_result +'&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            }) 
         }
     },
     mounted(){
@@ -168,7 +171,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?this.getmaintenanceRecordList(this.CurrentChange):this.historySearch(this.searchText,this.CurrentChange);
             }
         },

@@ -6,7 +6,7 @@
         </header>
         <div class="taskName">
             <span>公司-部门：</span>
-            <p>{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
+            <p class="itemName">{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
         </div>
          <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor" height="100%"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
@@ -15,12 +15,13 @@
                 <el-table-column prop="engineer"  label="负责人" header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="start_time"  label="试验开始时间" header-align='center'  align='center'> </el-table-column>
                 <el-table-column  label="试验数据"  header-align='center' align='center'>
-                    <template slot-scope="scoped"><a class="underline" download="w3logo" :href="scoped.row.result">试验数据</a></template>
+                    <template slot-scope="scoped"><a class="underline" download="试验数据" :href="scoped.row.result">试验数据</a></template>
                 </el-table-column>
                 <el-table-column prop="result"   label="试验结果" header-align='center' align='center'> </el-table-column>
             </el-table>
         </div>
-        <footer class="underline" @click="goUpdataFile">上传项目文件</footer>
+        <footer class="underline" v-if="!$route.query.flag" @click="goUpdataFile">上传项目文件</footer>
+        <footer v-else><a :href="report" class="underline" download="项目文件" >查看项目文件</a></footer>
     </div>
 </template>
 <script>
@@ -33,6 +34,7 @@ export default {
             isUpslot:1,
             isLoading:true,//加载动画
             projectName:'',
+            report:'',
             labManagrInfo:{}
         }
     },
@@ -58,7 +60,11 @@ export default {
             }
         },
         goUpdataFile(){
-            this.$router.push({path: '/Testengineer/updataFile',query:{equipmentName:this.projectName,equipmentLab:this.labManagrInfo.lab,equipmentDepartment:this.labManagrInfo.department,equipmentID: this.$route.query.equipmentID}})
+            if(this.$route.query.flag){
+                this.$router.push({path: '/Testengineer/updataFile',query:{flag:1,equipmentName:this.projectName,equipmentLab:this.labManagrInfo.lab,equipmentDepartment:this.labManagrInfo.department,equipmentID: this.$route.query.equipmentID}})
+            }else{
+                this.$router.push({path: '/Testengineer/updataFile',query:{flag:2,equipmentName:this.projectName,equipmentLab:this.labManagrInfo.lab,equipmentDepartment:this.labManagrInfo.department,equipmentID: this.$route.query.equipmentID}})
+            }
         },
         getEquipment_myTextprojectList(data){
             var url= data ? this.$conf.env.getEquipment_myTextprojectList+ this.$route.query.equipmentID + '/' + '?search=' + data : this.$conf.env.getEquipment_myTextprojectList+ this.$route.query.equipmentID + '/'
@@ -66,6 +72,7 @@ export default {
                 this.isLoading = false;
                 this.tableData = res.data.experiments;
                 this.projectName = res.data.name;
+                this.report = res.data.report;
             }).catch(err =>{
                 this.isLoading = false;
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});

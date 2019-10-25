@@ -7,30 +7,30 @@
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text first_child">
-                    <span>设备名称：</span>
+                    <span>设备编号：</span>
                     <el-select
                         v-model="upkeep_section.equipment"
                         filterable
                         remote
                         reserve-keyword
                         v-el-select-loadmore="loadMore"
-                        placeholder="请输入设备名称"
+                        placeholder="请输入设备编号"
                         :remote-method="search_materialList"
                         @change='change_materialList'
                         :loading="isListloading">
                             <el-option
                             v-for="item in material_list"
                             :key="item.id"
-                            :label="item.name"
+                            :label="item.num"
                             :value="item.id">
                             </el-option>
                     </el-select>
-                    <span>设备编号：</span>
-                    <p>{{equipmentNum}}</p>
+                    <span>设备名称：</span>
+                    <p>{{equipmentName}}</p>
                 </div>
                 <div class="mian_text first_child">
                     <span>实验室：</span>
-                    <p>{{equipmentName}}</p>
+                    <p>{{equipmentRoom}}</p>
                     <span>设备负责人：</span>
                     <p>{{equipmentUser}}</p>
                 </div>
@@ -72,7 +72,6 @@ export default {
                 "equipment":'',
                 "cause":''
             },
-            equipmentNum:'',
             equipmentName:'',
             equipmentRoom:'',
             equipmentUser: '',
@@ -107,10 +106,9 @@ export default {
         change_materialList(data){
             this.material_list.forEach(Element =>{
                 if(Element.id == data){
-                    this.equipmentName = Element.name;
                     this.equipmentRoom = Element.room;
                     this.equipmentUser = Element.device_keeper;
-                    this.equipmentNum = Element.num;
+                    this.equipmentName = Element.name;
                 }
             })
         },

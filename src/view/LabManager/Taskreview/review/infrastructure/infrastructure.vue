@@ -1,6 +1,6 @@
 <template>
-    <div class="Taskreview_infrastructure">
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
+    <div class="Taskreview_infrastructure scrollTable">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 2.3rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
             <el-table-column prop="name"  label="设施名称"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="room"  label="实验室" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="create_time"  label="保修时间" header-align='center' align='center'> </el-table-column>
@@ -32,7 +32,6 @@ export default {
         isLoading:true,//加载动画
         totalSum:0,//数据总数
         CurrentChange:1,
-        currentPage: 1,//当前页
         page_size : 9,//一页数据条数
       }
     },
@@ -51,17 +50,11 @@ export default {
                 return "color:#444444";
             }
         },
-
-        /**@name 页面跳转 */
-        lookDetail(data){
-
-        },
         allocation(data){
             this.$router.push({path: '/applicationInfrastructure',query:{'infrastructureID': data.row.id} })
         },
          /**@name 分页 */
         handleCurrentChange(pageNumber) {
-            this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
             this.isLoading = true;
             !this.isSearch ?  this.getinfrastructureList(pageNumber):this.infrastructureSearch(this.searchText,pageNumber);
@@ -70,7 +63,7 @@ export default {
             this.isLoading = true;
             this.searchText = data;
             this.isSearch = true;
-            this.currentPage = 1;
+            this.CurrentChange =  pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getinfrastructureList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.getinfrastructureList + '?search=' + data  + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -99,7 +92,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?  this.infrastructureSearch(this.CurrentChange):this.infrastructureSearch(this.searchText,this.CurrentChange);
             }
         },

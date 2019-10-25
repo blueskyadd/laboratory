@@ -75,6 +75,7 @@ export default {
         /**@name数据请求 */
         getannouncementList(pageNumber){
             this.isSearch = false;
+            pageNumber = pageNumber ? pageNumber : 1;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getannouncementList + '?page_size=' +this.page_size : this.$conf.env.getannouncementList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -112,7 +113,11 @@ export default {
                 this.$http.delete(this.$conf.env.deleteAnnouncement + ID + '/').then(res =>{
                     if(res.status == '204'){
                         this.$message({ message: '删除成功', type: 'success'});
-                        this.reload();
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            this.getannouncementList(this.currentPage - 1);
+                        }else{
+                            this.getannouncementList(this.currentPage);
+                        }
                     }else{
                         this.$message({ message: '删除失败', type: 'warning'});              
                     }
@@ -139,7 +144,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 this.getannouncementList(this.CurrentChange);
             }
         },

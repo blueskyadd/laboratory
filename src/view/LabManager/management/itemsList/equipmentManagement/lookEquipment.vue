@@ -64,7 +64,7 @@ export default {
             this.$router.push({path:'/purchaseEquipment',query:{EquipmentpurchaseID: this.EquipmentpurchaseID}})
         },
         godocumentEquipment(){
-            this.$router.push({name:'documentEquipment'})
+            this.$router.push({path:'/documentEquipment',query:{equipmentID: this.$route.query.equipmentID}})
         },
         gomaintenanceRecord(){
              this.$router.push({path:'/maintenanceRecord',query:{EquipmentpurchaseID: this.EquipmentpurchaseID,equipmentNum:this.equipmentNum,equipmentName: this.equipmentName}})

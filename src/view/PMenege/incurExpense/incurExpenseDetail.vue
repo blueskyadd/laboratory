@@ -3,64 +3,24 @@
         <header class="testMethods_index_header">
             <h3>项目费用</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date" label="产品编号"  header-align='center'  align='center'> </el-table-column>
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table-column prop="number" label="产品编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name" label="产品名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name" label="费用" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="expense" label="费用" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name" label="明细" header-align='center' align='center'>
-                <template><span class="underline" @click="goEquipmentDetail()">详情</span></template>
+                <template slot-scope="scoped"><span class="underline" @click="goEquipmentDetail(scoped)">详情</span></template>
             </el-table-column>
         </el-table>
     </div>
 </template>
 <script>
-import Search from "../../../components/common/search";
 export default {
-    components:{Search},
     name:'incurExpenseDetail',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        popUptitle: '',
-        placeholderTexe:'上传试验编号、名称',
-        isUpslot:false,
-        pageNumber: 1,
-        perPage: 10
+        tableData: [],
+        isLoading:true,//加载动画
       }
     },
     methods:{
@@ -84,15 +44,31 @@ export default {
         getIndex(index){
             return (this.pageNumber - 1) * this.perPage + index + 1
         },
-        goEquipmentDetail(){
-            this.$router.push({name:'incurTest'})
+        getIndex(index){
+            return (this.pageNumber - 1) * this.perPage + index + 1
+        },
+        goEquipmentDetail(data){
+            this.$router.push({path:'/LaboratoryManager/incurTest',query:{"equipmentID": data.row.id}})
+        },
+        getPm_expendProject_list(){
+            this.$http.get(this.$conf.env.getPm_expendProject_list + this.$route.query.equipmentID  +'/').then( res =>{
+                this.isLoading = false;
+                this.tableData = res.data.experiment_projects;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
-    }
+    },
+    mounted(){
+        this.getPm_expendProject_list(1);
+    },
 }
 </script>
 <style lang="scss">
-@import '../../../style/LabManager/management/index.scss';
 .management_incurExpenseDetail{
+@import '../../../style/LabManager/management/index.scss';
+
      padding-top: .42rem;
     .testMethods_index_header{
         padding-left: .41rem;

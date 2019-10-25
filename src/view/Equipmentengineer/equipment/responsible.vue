@@ -61,7 +61,7 @@ export default {
             isSearch: false,//是否为搜索
             searchText:'',//搜索文字
             isqrCodeImg: false,
-            qrCodeImg:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3160924040,3588865717&fm=26&gp=0.jpg',
+            qrCodeImg:'',
         }
     },
     methods:{
@@ -91,7 +91,7 @@ export default {
             this.$router.push({path:'/Equipmentengineer/equipmentFlow',query:{equipmentID:data.row.id} })
         },
         open(row) {
-            // this.qrCodeImg = row.qrcode;
+            this.qrCodeImg = row.qrcode;
             this.isqrCodeImg = true;
         },
         change(data) {
@@ -139,7 +139,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getPrincipal_EquipmentList(this.CurrentChange):this.searchPrincipal_EquipmentList(this.searchText,this.CurrentChange);
             }
         },

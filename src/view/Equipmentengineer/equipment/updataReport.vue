@@ -1,5 +1,5 @@
 <template>
-    <div class="updataReport_detail body_main">
+    <div class="updataReport_detail body_main" v-loading.fullscreen.lock="isLoading">
         <header class="updataReport_index_header">
             <h3>上传调试报告</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -31,6 +31,7 @@ export default {
             fileName: '点击上传调试报告',
             equipment_debug: '',
             isupload: false,
+            isLoading:false
         }
     },
     methods:{
@@ -51,16 +52,19 @@ export default {
             if(!this.equipment_debug){
                 this.$message({ message: '请先上传文件', type: 'warning'});  
             }else{
+                this.isLoading = true;
                 this.$http.put(this.$conf.env.updataEquipment_applyReport + this.$route.query.equipmentID + '/' ,{'equipment_debug': this.equipment_debug}).then(res =>{
-                   if(res.status == '201'){
+                   if(res.status == '200'){
                         this.$message({ message: '提交成功', type: 'success'});
                         setTimeout(()=>{
-                            this.reload();
+                            this.$router.back();
                         },100)
                     }else{
                         this.$message({ message: '提交失败', type: 'warning'});              
                     } 
+                    this.isLoading = false;
                 }).catch(err =>{
+                    this.isLoading = false;
                     this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
                 })
             }

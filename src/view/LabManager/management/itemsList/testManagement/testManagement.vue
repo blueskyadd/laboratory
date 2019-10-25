@@ -40,7 +40,7 @@
             <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address"   label="操作" header-align='center' align='center'>
                  <template slot-scope="scoped">
-                     <a class="underline lookmanagement deletemanagement" :href="scoped.row.file" download="w3logo">下载</a>
+                     <a class="underline lookmanagement" :href="scoped.row.file" download="试验标准">下载</a>
                      <span class="underline deletemanagement"  @click="deletegettestManagement(scoped.row.id)">删除</span> </template>
             </el-table-column>
         </el-table>
@@ -100,7 +100,6 @@ export default {
         isLoading:true,//加载动画
         totalSum:0,//数据总数
         CurrentChange:1,
-        currentPage: 1,//当前页
         page_size : 9,//一页数据条数
         standard:{
             "name":'',//名称
@@ -167,17 +166,17 @@ export default {
         },
         /**@name 分页 */
         handleCurrentChange(pageNumber) {
-            this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
             this.isLoading = true;
             !this.isSearch ?  this.gettestManagementList(pageNumber):this.testManageSearch(this.searchText,pageNumber);
         },
         /**@name搜索 */
         testManageSearch(data,pageNumber){
+            pageNumber = pageNumber ? pageNumber : 1;
             this.isLoading = true;
             this.searchText = data;
             this.isSearch = true;
-            this.currentPage = 1;
+            this.CurrentChange = pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?search=' + data + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -191,6 +190,7 @@ export default {
         /**@name获取数据 */
         gettestManagementList(pageNumber){
             this.isSearch = false;
+             pageNumber = pageNumber ?  pageNumber : 1;
             this.$http.get(pageNumber == 1 ? this.$conf.env.gettestManagementList + '?page_size=' +this.page_size : this.$conf.env.gettestManagementList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -211,16 +211,17 @@ export default {
                 this.$http.delete(this.$conf.env.deletegettestManagement + ID + '/').then(res =>{
                     if(res.status == '204'){
                         this.$message({ message: '删除成功', type: 'success'});
-                        this.reload();
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            !this.isSearch ?  this.gettestManagementList(this.CurrentChange -1):this.testManageSearch(this.searchText,this.CurrentChange - 1);
+                        }else{
+                            !this.isSearch ?  this.gettestManagementList(this.CurrentChange):this.testManageSearch(this.searchText,this.CurrentChange);
+                        }
                     }else{
                         this.$message({ message: '删除失败', type: 'warning'});              
                     }
                 }).catch(err =>{
-                    if(err.response.status == '400'){
-                        this.$message({ message:err.response.data, type: 'warning'});   
-                    }else{
-                        this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
-                    }
+                    this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                    
                 })
             }).catch(() => {
                 this.$message({
@@ -265,7 +266,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) : newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?  this.gettestManagementList(this.CurrentChange):this.testManageSearch(this.searchText,this.CurrentChange);
             }
         },

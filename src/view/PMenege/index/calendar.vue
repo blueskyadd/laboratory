@@ -1,5 +1,5 @@
 <template>
-    <div class="calendar body_main">
+    <div class="calendar body_main" v-loading.fullscreen.lock="isLoading">
         <div class="calendar_box">
             <header>
                 <el-dropdown trigger="click" @command="handleCommand">
@@ -15,6 +15,7 @@
                 <header>配置项目</header>
                 <full-calendar  
                     :config="config" 
+                    v-model="selectDate"
                     :events="events"
                     ref="calendar" 
                     @event-selected='eventClick' 
@@ -26,14 +27,17 @@
         </div>
         <div class="from_submit">
             <header>
-                <span>设计方法</span><span @click="setCalendar"></span>
+                <span>设计方法</span><span @click="setCalendar"><img src="../../../assets/img/PMenege/index/plus.png" alt=""></span>
             </header>
             <ul class="submit_list">
                 <li v-for="(item ,index) in events" :key="index">
-                    <h3>阶段{{index+1}}</h3>
-                    <div><span>阶段名称：</span><input v-model="item.title" placeholder="输入阶段名称" type="text"></div>
+                    <h3>
+                        <span>阶段{{index+1}}</span>
+                        <img src="../../../assets/img/PMenege/index/deleteIcon.png" @click="deletePm_project_setting_flow(item,index)" alt="">
+                    </h3>
+                    <div><span><i class="importantData">*</i>阶段名称：</span><input v-model="item.title" placeholder="输入阶段名称" type="text"></div>
                     <div>
-                        <span>阶段一开始时间：</span>
+                        <span><i class="importantData">*</i>阶段{{index+1}}开始时间：</span>
                         <el-date-picker v-model="item.start"
                             type="date"
                             value-format = 'yyyy-MM-dd'
@@ -41,7 +45,7 @@
                         </el-date-picker>
                     </div>
                     <div>
-                        <span>阶段一结束时间：</span>
+                        <span><i class="importantData">*</i>阶段{{index+1}}结束时间：</span>
                         <el-date-picker v-model="item.end"
                             type="date"
                             value-format = 'yyyy-MM-dd'
@@ -49,14 +53,14 @@
                         </el-date-picker>
                     </div>
                     <div class="color_box">
-                        <span>使用的底色：</span>
+                        <span><i class="importantData">*</i>使用的底色：</span>
                         <i :style="{'background':color}" @click="setColorBlock(color,index)" v-for="(color, colorIndex) in colorBlock" :key="colorIndex">
                             <img v-if="item.color == color" src="../../../assets/img/PMenege/index/ckeck.png" alt="">
                         </i>
                     </div>
                     <footer>
-                        <el-button type="primary" @click="setCalendar(item)">确定</el-button>
-                    </footer>
+                        <el-button type="primary" @click="item.id?editPm_project_setting_flow(item):createdPm_project_setting_flow(item)">确定</el-button>
+                    </footer> 
                 </li>
             </ul>
         </div>
@@ -65,12 +69,14 @@
 </template>
 <script>
 import { FullCalendar } from 'vue-full-calendar'
-import 'fullcalendar/dist/fullcalendar.css'
+import 'fullcalendar/dist/fullcalendar.css';
+import VerificationData from '../../../components/VerificationData'
 export default {
     name:'calendar',
     components : { FullCalendar },
     data(){
         return{
+            isLoading: true,
              selectDate:'',//日期选择器选中的月份
              config: {
                 firstDay:'0',//以周日为每周的第一天
@@ -81,53 +87,48 @@ export default {
                 fixedWeekCount: true,//是否固定显示六周
                 // weekMode:"liquid",//周数不定，每周的高度可变，整个日历高度不变
                 allDaySlot:true,
+                eventClick: this.eventClick, //点击事件
+                lunarCalendar: true,
                 allDay:true,
                 header: {//表头信息
-                left: 'prev, next',
-                center: 'title',
-                right: 'hide, custom',
+                    left: 'prev, next',
+                    center: 'title',
+                    right: 'hide, custom',
                 },
+                
             },
-            events: [{
-                id:1,
-                title:'出差',
-                start:'2019-08-27',
-                end:'2019-08-29',
-                color:'#21a7b0'
-            }, {
-                id:2,
-                title:'春游',
-                start:'2019-08-12',
-                color:'#5621af'
-            },
-            {
-                id:1,
-                title:'出差',
-                start:'2019-08-01',
-                end:'2019-08-03',
-                color:'#21a7b0'
-            }],
+            events: [],
             newItem:{},
             editItem:{},
-            statusData:'',
+            statusData:'', 
             endData:'',
             calendarText:'',
             stageList:[],
             colorBlock:[ '#21a7b0','#ae21a3','#e18518','#5621af','#1620ab'],
             setColorIndex: 0,
             Colorblock:'#21a7b0',
-            fileItem:[{name:'项目一',id:1},{name:'项目二',id:2},{name:'项目三',id:3}],
-            fileItemIndex: {name:'项目一',id:1},
+            fileItem:[],
+            fileItemIndex: {},
+            newData: ''
         }
     },
     methods:{
         eventClick(event){ //events的点击事件
-            this.editItem = event
-            this.isAdd = true
+            this.editItem = event;
+            this.isAdd = true;
         },
         dayClick(date, jsEvent, view){ //日期的点击事件
-            this.editItem = {}
-            this.isAdd = true
+            this.editItem = {};
+            this.isAdd = true;
+        },
+        changeMonth() {
+            if(document.getElementsByClassName('fc-center')[0].getElementsByTagName('h2')[0].innerHTML.split(' ')[0].replace('月','').length ==2 ||  document.getElementsByClassName('fc-center')[0].getElementsByTagName('h2')[0].innerHTML.split(' ')[0].replace('月','') == '十' ){
+                this.newData = document.getElementsByClassName('fc-center')[0].getElementsByTagName('h2')[0].innerHTML.split(' ')[1]+'-'+ document.getElementsByClassName('fc-center')[0].getElementsByTagName('h2')[0].innerHTML.split(' ')[0].replace('月','').replace('十一','11').replace('十二','12').replace('十','10')
+            }else{
+                this.newData = document.getElementsByClassName('fc-center')[0].getElementsByTagName('h2')[0].innerHTML.split(' ')[1]+'-'+ document.getElementsByClassName('fc-center')[0].getElementsByTagName('h2')[0].innerHTML.split(' ')[0].replace('月','').replace('一','01').replace('二','02').replace('三','03')
+                .replace('四','04').replace('五','05').replace('六','06').replace('七','07').replace('八','08').replace('九','09')
+            }
+            this.getPm_project_setting_flow(this.fileItemIndex.id);
         },
         addstageList(){
             this.events.push({
@@ -141,7 +142,9 @@ export default {
         //选择颜色
         setColorBlock(item, index){
             this.events[index].color = item;
+            this.$set(this.events, index, this.events[index]);
             // this.Colorblock = item;
+            console.log(item)
         },
         //添加
         setCalendar(item){
@@ -153,12 +156,15 @@ export default {
                 }
                 this.addItem(JSON.stringify(obj))
             }else{
-
+                // if(item.id){
+                //     this.editPm_project_setting_flow(item)
+                // }else{
+                //     this.createdPm_project_setting_flow(item)
+                // }
             }
             
         },
         addItem(detail){
-            
             this.newItem = JSON.parse(detail)
             if(this.editItem.id){//如果是编辑，就删掉该条
                 this.events.forEach( (el,ind)=>{
@@ -168,28 +174,142 @@ export default {
                 })
             }
             this.events.push({
-                id : this.editItem.id?this.editItem.id:this.setUuid(),
+                id : this.editItem.id?this.editItem.id:'',
                 title : this.newItem.title,
                 start : this.newItem.period[0],
                 end : this.newItem.period[1],
                 color : this.newItem.color,
             })
+            this.$nextTick(() => {
+                var container = document.getElementsByClassName('submit_list')[0];
+                container.scrollTop = container.scrollHeight;
+            })
             
-        },
-        setUuid(){
-            var s = [];
-            var hexDigits = "0123456789abcdef";
-            for(var i = 0; i < 36; i++){ s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1); }
-            s[14] = "4";  
-            s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); 
-            s[8] = s[13] = s[18] = s[23];
-            var uuid = s.join("");
-            return uuid;
         },
         handleCommand(command) {
             console.log(command)
             this.fileItemIndex = command;
+            this.getPm_project_setting_flow(command.id)
         },
+        //产品列表
+        getPm_projectList(){
+            this.$http.get(this.$conf.env.getPm_projectList).then(res =>{
+                this.fileItem = res.data;
+                if(res.data.length){
+                    this.fileItemIndex = res.data[0];
+                    this.changeMonth();
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        getPm_project_setting_flow(ID){
+            this.isLoading = false;
+            this.$http.get(this.$conf.env.getPm_project_setting_flow + ID + '&month=' + this.newData ).then(res =>{
+                if(res.data.length>0){
+                    res.data.forEach(Element =>{
+                        Element.title = Element.name;
+                        delete Element.name;
+                        Element.start = Element.start_time;
+                        delete Element.start_time;
+                        Element.end = Element.end_time;
+                        delete Element.end_time;
+                        Element.color = Element.colour;
+                        delete Element.colour;
+                    })
+                }
+               this.events = res.data;
+               this.$nextTick(() => {
+                    var container = document.getElementsByClassName('submit_list')[0];
+                    container.scrollTop = container.scrollHeight;
+                })
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        //修改产品配置
+        editPm_project_setting_flow(item){
+            if(!VerificationData.VerificationData(item)) return;
+            var params = {
+                "name": item.title,
+                "colour": item.color,
+                "start_time": item.start,
+                "end_time": item.end
+            }
+            this.$http.put(this.$conf.env.editPm_project_setting_flow + item.id +'/', params).then(res =>{
+                if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                     this.getPm_project_setting_flow(this.fileItemIndex.id);
+                }else{
+                    this.$message({ message: '修改失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        createdPm_project_setting_flow(item){
+            var params = {
+                "name": item.title,
+                "colour": item.color,
+                "start_time": item.start,
+                "end_time": item.end,
+                "product": this.fileItemIndex.id
+            }
+            if(!VerificationData.VerificationData(params)) return;
+            this.$http.post(this.$conf.env.editPm_project_setting_flow , params).then(res =>{
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                     this.getPm_project_setting_flow(this.fileItemIndex.id);
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        deletePm_project_setting_flow(item,index){
+            this.$confirm('此操作将删除该设计方法, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                if(!item.id){
+                    this.events.splice(index,1)
+                    this.$message({ message: '删除成功', type: 'success'});
+                }else{
+                    this.$http.delete(this.$conf.env.deletePm_project_setting_flow + item.id +'/').then( res =>{
+                        if(res.status == '204'){
+                            this.$message({ message: '删除成功', type: 'success'});
+                            this.events.splice(index,1)
+                        }else{
+                            this.$message({ message: '删除失败', type: 'warning'});              
+                        }
+                    }).catch(err =>{
+                        if(err.response.status == '400'){
+                            this.$message({ message:err.response.data, type: 'warning'});   
+                        }else{
+                            this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+                        }
+                    })
+                }
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除',
+                });          
+            });
+            
+        }
+    },
+    mounted(){
+        this.getPm_projectList();
+        document.getElementsByClassName('fc-next-button')[0].addEventListener('click',this.changeMonth);
+        document.getElementsByClassName('fc-prev-button')[0].addEventListener('click',this.changeMonth);
+    },
+    watch:{
+        newData(newData, oldData){
+           
+        }
     }
 }
 </script>
@@ -281,9 +401,13 @@ export default {
             span:last-child{
                 width: .26rem;
                 height: .26rem;
-                background: #08a695;
+                // background: #08a695;
                 border-radius: 50%;
-                display: block;
+                display: flex;
+                cursor: pointer;
+                img{
+                    width: 100%;
+                }
             }
         }
         .submit_list {
@@ -296,9 +420,26 @@ export default {
             margin-bottom: .28rem;
             h3{
                 margin-bottom: .36rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                img{
+                    width: .35rem;
+                }
             }
             div{
                 margin-bottom: .08rem;
+                display: flex;
+                align-items: center;
+                span{
+                    display: flex;
+                    i{
+                        margin: 0;
+                    }
+                }
+                .el-date-editor{
+                    flex: 1;
+                }
                 input{
                     height: .32rem!important;
                     width: 3.9rem!important;
@@ -330,6 +471,9 @@ export default {
                     margin-right: .32rem;
                 }
             }
+        }
+        .submit_list::-webkit-scrollbar{
+            width: .04rem!important;
         }
         footer{
             justify-content: flex-end;

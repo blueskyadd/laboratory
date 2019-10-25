@@ -8,14 +8,14 @@
         <div class="main">
             <div class="main_list">
                 <ul class="flow">
-                    <li @click="isapplyFrock&&goProposeFeock()"  :style="{background:!isapplyFrock? '#fff':'#07A695'}">
+                    <li @click="goProposeFeock()"  :style="{background:!isapplyFrock? '#fff':'#07A695'}">
                         <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment.png" alt="" v-if="!isapplyFrock">
                         <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/applyEquipment_actively.png" alt="" v-else>
                         <span :style="{color:!isapplyFrock?'#07A695': '#fff'}">申请详情</span>
                     </li>
                     <li><img src="../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li  :style="{background:!iscontract? '#fff':'#07A695'}">
-                        <a :href="contractUrl" download="w3logo">
+                        <a :href="contractUrl" download="合同">
                             <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="!iscontract">
                             <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
                             <span :style="{color:!iscontract?'#07A695': '#fff'}">合同</span>
@@ -49,7 +49,11 @@ export default {
             this.$router.push({name:'EquipmentengineerIndex'})
         },
         goProposeFeock(){
-            this.$router.push({path:'/Equipmentengineer/proposeFeock', query:{"equipmentID": this.$route.query.equipmentID}})
+            if(!this.isapplyFrock){
+                this.$message({ message:'暂时不可以申请设备哦' , type: 'warning'}); 
+            }else{
+                this.$router.push({path:'/Equipmentengineer/proposeFeock', query:{"equipmentID": this.$route.query.equipmentID}})
+            }
         },
         goUpdatafrockReport(){
             this.$router.push({path:'/Equipmentengineer/updatafrockReport', query:{"equipmentID": this.$route.query.equipmentID}})

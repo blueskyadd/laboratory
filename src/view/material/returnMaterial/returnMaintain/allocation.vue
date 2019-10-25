@@ -92,10 +92,10 @@ export default {
                 this.$http.put(this.$conf.env.setEquipmentMaintainMaterialList + this.$route.query.equipmentID + '/',params).then(res =>{
                     this.isLoading = false;
                     if(res.status == '200'){
-                        this.$message({ message: '分配成功', type: 'success'});
+                        this.$message({ message: '归还成功', type: 'success'});
                         this.reload();
                     }else{
-                        this.$message({ message: '分配失败', type: 'warning'});              
+                        this.$message({ message: '归还失败', type: 'warning'});              
                     }
                 }).catch(err =>{
                     this.isLoading = false;

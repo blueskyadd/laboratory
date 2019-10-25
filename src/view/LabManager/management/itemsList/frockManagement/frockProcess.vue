@@ -8,22 +8,22 @@
         <div class="main">
             <div class="main_list">
                 <ul>
-                    <li @mouseover="islookReport = true" @mouseout="islookReport = false" :style="{background:islookReport? '#07A695':'#fff'}">
+                    <li   :style="{background:islookReport? '#07A695':'#fff'}">
                         <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport.png" alt="" v-if="!islookReport">
                         <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport_actively.png" alt="" v-else>
                         <span :style="{color:islookReport? '#fff':'#07A695'}">申请工装</span>
                     </li>
                     <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt="" ></li>
-                    <li @mouseover="iscontract= true" @mouseout="iscontract = false" :style="{background:iscontract? '#07A695':'#fff'}">
-                        <a :href="contractUrl" download="w3logo">
+                    <li  :style="{background:iscontract? '#07A695':'#fff'}">
+                        <a :href="contractUrl" download="合同">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="!iscontract">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
                             <span :style="{color:iscontract?'#fff':'#07A695'}">合同</span>
                         </a>
                     </li>
                     <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt="" ></li>
-                    <li @mouseover="isUplaod= true" @mouseout="isUplaod = false" :style="{background:isUplaod? '#07A695':'#fff'}">
-                        <a :href="reportUrl" download="w3logo">
+                    <li  :style="{background:isUplaod? '#07A695':'#fff'}">
+                        <a :href="reportUrl" download="调试报告">
                             <img src="../../../../../assets/img/LabManager/management/equipment/frockProcess/updataFile.png" alt="" v-if="!isUplaod">
                             <img src="../../../../../assets/img/LabManager/management/equipment/frockProcess/updataFile_actively.png" alt="" v-else>
                             <span :style="{color:isUplaod?'#fff':'#07A695'}">上传调试报告</span>
@@ -41,7 +41,7 @@ export default {
     data(){
         return{
             isLoading: true,
-            islookReport:false,
+            islookReport:true,
             iscontract: false,
             isUplaod:false,
             contractUrl: '',
@@ -55,12 +55,14 @@ export default {
         getFrockApplyDetailInfo(){
             this.$http.get(this.$conf.env.getFrockApplyDetailInfo + this.$route.query.frockID ).then( res =>{
                 this.contractUrl = res.data.contract?res.data.contract:'';
+                this.iscontract = res.data.contract? true: false;
                 this.reportUrl = res.data.report?res.data.report:'';
+                this.isUplaod = res.data.report?true: false;
                 this.isLoading = false;
             }).catch(err =>{
                 this.isLoading = false;
             })
-        }
+        },
     },
     mounted(){
         this.getFrockApplyDetailInfo()

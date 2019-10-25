@@ -1,79 +1,65 @@
 <template>
     <div class="management_projectHistory body_main">
         <header class="proposer_index_header">
-            <h3>历史项目</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <div>
+                <h3>历史项目</h3>
+                <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            </div>
+            <Search @searchDetail='getProject_history_finishproject' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe' ref="search"/>
 
         </header>
         <div class="Search">
             <ul>
                 <li>
                     <span class="equipmentName">项目类型</span>
-                    <el-select v-model="value" placeholder="请选择项目类型">
+                    <el-select v-model="project_type" placeholder="请选择项目类型">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in project_typeList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
                 </li>
                 <li>
                     <span class="equipmentName">项目结果</span>
-                    <el-select v-model="value" placeholder="请选择项目结果">
+                    <el-select v-model="report_result" placeholder="请选择项目结果">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in report_resultList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
                 </li>
-                <li>
-                    <span class="equipmentName">项目创建时间</span>
-                    <el-date-picker
-                        v-model="statusTime"
-                        type="date"
-                        placeholder="计量截止时间">
-                    </el-date-picker>
-                </li>
-                <li>
-                    <span class="equipmentName">项目预计完成时间</span>
-                    <el-date-picker
-                        v-model="statusTime"
-                        type="date"
-                        placeholder="计量截止时间">
-                    </el-date-picker>
-                </li>
-                
             </ul>
             <div class="editTableButton">
                 <el-button type="primary" @click="searchPersonnel">搜索</el-button>
-                <el-button type="primary">重置</el-button>
+                <el-button @click="reset()">重置</el-button>
             </div>
         </div>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 3.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table-column prop="number"  label="项目编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="项目名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目类型" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目创建时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目预计完成时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目结果" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="项目介绍" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                 <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
+            <el-table-column prop="project_type"  label="项目类型" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="create_time"  label="项目创建时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="report_time"  label="项目预计完成时间" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="status"  label="项目结果" header-align='center' align='center'> </el-table-column>
+            <el-table-column label="项目介绍" header-align='center' align='center'>
+                 <template slot-scope="scoped"><span class="underline"  @click="goprojectDetail(scoped)">详情</span> </template>
+            </el-table-column>
+            <el-table-column label="操作" header-align='center' align='center'>
+                 <template slot-scope="scoped"><span class="underline"  @click="goProdectDetail(scoped)">查看</span> </template>
             </el-table-column>
         </el-table>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange" 
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -86,45 +72,20 @@ export default {
     components:{Search},
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
+        tableData: [],
+        options: [],
         value: '',
-        popUptitle: '',
-        isUpslot: false,
-        statusTime: '',
         placeholderTexe: '搜索项目编号、名称',
-        CurrentChange:7,
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        CurrentChange:1,
+        searchText:'',//搜索文字
+        project_type:'',
+        report_result:'',
+        project_typeList:[{'name':'DV试验','id':1},{'name':'PV试验','id':2}],
+        report_resultList:[{'name':'不合格','id':1},{'name':'合格','id':2}],
       }
     },
     methods:{
@@ -136,48 +97,67 @@ export default {
         },
          /**@name 修改表格字体颜色 */
         changecolor(data){
-            if (data.columnIndex == 0 ||data.columnIndex == 3) {
+            if (data.columnIndex == 0) {
                 return "color:#07a695";
+            }else if(data.columnIndex === 5){
+                if(data.row.status == '关闭'){
+                    return "color:#f10000";
+                }else{
+                    return "color:#28d897";
+                }
             }else{
                 return "color:#444444";
             }
         },
-
-        /**@name 页面跳转 */
-        lookDetail(data){
-
+        reset(){
+            this.searchText = '';
+            this.project_type = '';
+            this.report_result = '';
+            this.$refs.search.result();
+            this.getProject_history_finishproject(this.searchText,this.currentPage, this.project_type,this.report_result);
         },
-        allocation(data){
-            this.$router.push({name: 'projectHistoryDetail' })
+        goProdectDetail(data){
+            this.$router.push({path: '/ProjectManager/projectHistoryDetail', query:{"equipmentID": data.row.id} })
         },
-
-        /**@name功能按键 */
-        //弹框
-        editquipment(title, flag, data){
-            this.popUptitle = title;
-            this.isUpslot = flag;
-            this.$refs.popUp.dialogVisible = true;
-        },
-        //上传按钮
-        updataFileChange(){
-            this.$refs.file.click()
+        goprojectDetail(data){
+            this.$router.push({path:'/ProjectManager/addProjectAppoinment',query:{equipmentID:data.row.id,equipmentName:data.row.name}})
         },
         //搜索按钮
         searchPersonnel(){
-
-        },
-        searchDetail(){
-
+            this.getProject_history_finishproject(this.searchText,this.currentPage, this.project_type,this.report_result);
         },
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getProject_history_finishproject(this.searchText,pageNumber, this.project_type,this.report_result);
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        getProject_history_finishproject(search,pageNumber,project_type,report_result){
+            this.searchText = search;
+             this.CurrentChange = pageNumber ?this.CurrentChange: 1; 
+            pageNumber= pageNumber?pageNumber:1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getProject_history_finishproject + this.project_type  + '&search='+search + '&report_result=' + this.report_result + '&page_size=' +this.page_size : this.$conf.env.getProject_history_finishproject + this.project_type + '&search='+search +  '&report_result=' + this.report_result +'&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            }) 
         }
-        
+    },
+    mounted(){
+        this.getProject_history_finishproject('',1,'','')
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                this.getProject_history_finishproject(this.searchText,this.CurrentChange, this.project_type,this.report_result);
+            }
+        },
     }
 }
 </script>

@@ -131,7 +131,7 @@ export default {
                         this.reload();
                     },200)
                 }else{
-                    this.$message({ message: '修改成失败', type: 'warning'});              
+                    this.$message({ message: '修改失败', type: 'warning'});              
                 }
             }).catch(err =>{
                 this.isLoading = false;

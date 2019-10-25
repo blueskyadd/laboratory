@@ -86,7 +86,7 @@ export default {
             this.$http.get(this.$conf.env.getEquipment_userinfoDetail).then(res =>{
                 this.labManagrInfo = res.data;
             }).catch(err =>{
-                console.log(err)
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
         createdExperimental_result(){

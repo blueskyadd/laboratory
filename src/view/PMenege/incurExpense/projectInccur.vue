@@ -1,23 +1,23 @@
 <template>
-    <div class="projectInccur body_main">
+    <div class="projectInccur body_main" v-loading.fullscreen.lock="isLoading">
         <header class="projectInccur_index_header">
-            <h3>烟雾试验</h3>
+            <h3>{{projectDetail.name}}</h3>
             <span class="goBack underline"  @click="$router.back(-1)">返回</span>
-            <span class="goBack underline" @click="goHome">首页</span>
+            <span class="goBack underline" @click="goHome()">首页</span>
         </header>
         <div class="main">
             <div class="measure_main">
                 <div class="mian_text two_child">
                     <span>申请人：</span>
-                    <p class="projectInccur_name">烟雾试验箱</p>
-                    <span>审批人：</span>
-                    <p>2012.02.12</p>
+                    <p class="projectInccur_name">{{projectDetail.apply}}</p>
+                    <!-- <span>审批人：</span>
+                    <p>2012.02.12</p> -->
                 </div>
                 <div class="mian_text textarea">
                     <span>备注</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="填写申请原因" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="projectDetail.intro" placeholder="填写申请原因" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{projectDetail.intro.length}}/800</p>
                     </div>
                 </div>
             </div>
@@ -29,13 +29,26 @@ export default {
     name:'projectInccur',
     data(){
         return{
-            cause: '',//申请原因
+            isLoading: false,
+            projectDetail: {}
         }
     },
     methods:{
         goHome(){
-            this.$router.push({name:'PMenegeIndex'})
+            this.$router.push({path:'/LaboratoryManager/PMenegeIndex'})
+        },
+        getPm_project_exexpendDetail(){
+            this.$http.get(this.$conf.env.getPm_project_exexpendDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.projectDetail = res.data;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         }
+    },
+    mounted(){
+        this.getPm_project_exexpendDetail();
     }
 }
 </script>

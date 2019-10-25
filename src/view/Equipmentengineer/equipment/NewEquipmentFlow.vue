@@ -20,7 +20,7 @@
                         <span>上传合同</span>
                     </li> -->
                     <li @mouseover="iscontract= false" @mouseout="iscontract = true" :style="{background:iscontract? '#fff':'#07A695'}">
-                        <a :href="contract" download="w3logo">
+                        <a :href="contract" download="合同">
                             <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract.png" alt="" v-if="iscontract">
                             <img src="../../../assets/img/LabManager/management/equipment/purchaseEquipment/contract_actively.png" alt="" v-else>
                             <span :style="{color:iscontract?'#07A695': '#fff'}">合同</span>
@@ -120,7 +120,7 @@ export default {
                     "next_upkeep_time": this.equipmentSection.next_upkeep_time,
                     "next_metering_time": this.equipmentSection.next_metering_time
                 }).then(res =>{
-                    if(res.status == '201'){
+                    if(res.status == '200'){
                         this.$message({ message: '保存成功', type: 'success'});
                         this.reload()
                     }else{

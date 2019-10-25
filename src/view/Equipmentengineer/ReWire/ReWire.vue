@@ -15,7 +15,7 @@
                 <el-table-column prop="address"   label="操作" header-align='center' align='center'>
                     <template slot-scope="scoped">
                         <span class="underline span_upload" :style="{'color':scoped.row.status == 1?'':'#999!important','cursor':scoped.row.status == 1 ?'':'not-allowed'}"  @click="scoped.row.status == 1 && goeditEquipment(scoped)">编辑</span>
-                        <a class="underline" download="w3logo" :href="scoped.row.operation_file">下载</a>
+                        <a class="underline" download="设备操作指导书" :href="scoped.row.operation_file">下载</a>
                     </template>
                 </el-table-column>
             </el-table>
@@ -114,7 +114,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getEquipmentOperation_applyList(this.CurrentChange):this.searchEquipmentOperation_applyList(this.searchText,this.CurrentChange);
             }
         },

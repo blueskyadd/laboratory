@@ -1,26 +1,24 @@
 <template>
-    <div class="historyEditDeteil body_main">
+    <div class="historyEditDeteil body_main" v-loading.fullscreen.lock="isLoading">
         <header class="historyEditDeteil_index_header">
-            <h3>项目名称</h3>
+            <h3>{{equipmentDetail.name}}</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
         <div class="main">
             <div class="historyEditDeteil_mian">
                 <div class="main_list">
-                    <div><span>公司名称：</span><p>二分额外为</p></div>
-                    <div><span>部门：</span><p>二分额外为</p></div>
-                    <div><span>创建人：</span><p>二分额外为</p></div>
-
+                    <div><span>公司名称：</span><p>{{equipmentDetail.company}}</p></div>
+                    <div><span>部门：</span><p>{{equipmentDetail.department}}</p></div>
+                    <div><span>创建人：</span><p>{{equipmentDetail.manager}}</p></div>
                 </div>
                 <div class="main_list">
-                    <div><span>项目名称</span><input placeholder="填写委托公司" type="text"></div>
-                    <div><span>项目类型</span><input placeholder="填写负责人" type="text"></div>
+                    <div><span>项目类型</span><input v-model="equipmentDetail.project_type" placeholder="项目类型" type="text"></div>
                 </div>
                  <div class="main_list projectTime">
                     <div>
                         <span>项目开始时间</span>
                         <el-date-picker
-                            v-model="statusTime"
+                            v-model="equipmentDetail.create_time"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -29,7 +27,7 @@
                     <div>
                         <span>项目截止时间</span>
                         <el-date-picker
-                            v-model="statusTime"
+                            v-model="equipmentDetail.report_time"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="选择日期">
@@ -40,15 +38,15 @@
                 <div>
                     <span>项目简介</span>
                     <div>
-                        <textarea name="" v-model="cause" maxlength="800" placeholder="输入项目简介" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" v-model="equipmentDetail.intro" maxlength="800" placeholder="输入项目简介" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{equipmentDetail.intro.length}}/800</p>
                     </div>
                 </div>
             </div>
             </div>
-            <footer>
+            <!-- <footer>
                 <el-button type="primary" >保存</el-button>
-            </footer>
+            </footer> -->
         </div>
     </div>
 </template>
@@ -57,26 +55,23 @@ export default {
     name:'historyEditDeteil' ,
     data(){
         return{
-            fileName: '',//文件名称
-            file:{},
-            cause: '',
-            statusTime:'',
-
+            isLoading: true,
+            equipmentDetail:{}
         }
     },
     methods:{
-        updataFileChange(){
-            this.$refs.file.click()
-
-        },
-        updataFile(e){
-            this.file =  e.target.files[0];
-            this.fileName =  e.target.files[0].name;
-        },
-        deleteFile(){
-            this.file = {};
-            this.fileName = '';
+        getmeasure_finishproject(){
+            this.$http.get(this.$conf.env.getmeasure_finishproject + this.$route.query.equipmentID + '/').then(res =>{
+                this.equipmentDetail = res.data;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
         }
+    },
+    mounted(){
+        this.getmeasure_finishproject()
     }
 }
 </script>
@@ -125,7 +120,7 @@ export default {
                 div{
                     display: flex;
                     margin-right: 1.45rem;
-                    
+                    align-items: center;
                     p{
                         font-size: .23rem;
                         color: #666;
@@ -167,6 +162,7 @@ export default {
                 margin-top: .45rem;
                 height: auto;
                 div{
+                    align-items: flex-start;
                     div{
                         margin-left: .19rem;
                         position: relative;

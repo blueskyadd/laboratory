@@ -33,8 +33,6 @@ export default {
     destroyed(){
         this.$emit('headerTitle','实验室信息化管理系统')
     },
-    computed:{
-    },
     methods:{
         /**@name 页面跳转 */
         //项目分配页

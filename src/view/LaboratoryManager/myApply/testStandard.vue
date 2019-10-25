@@ -1,12 +1,13 @@
 <template>
     <div class="management_LabTestStandard body_main">
         <header class="proposer_index_header">
-            <h3>试验标准</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
-
+            <div>
+                <h3>试验标准</h3>
+                <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            </div>
+            <Search @searchDetail='getLaboratory_standard' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-        <div class="Search">
+        <!-- <div class="Search">
             <ul>
                 <li>
                     <span class="equipmentName">标准来源</span>
@@ -24,23 +25,24 @@
                 <el-button type="primary" @click="searchPersonnel">搜索</el-button>
                 <el-button type="primary">重置</el-button>
             </div>
-        </div>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
-            <el-table-column prop="date"  label="标准编号"  header-align='center'  align='center'> </el-table-column>
+        </div> -->
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 2.3rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table-column prop="num"  label="标准编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="标准名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="上传单位" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="上传时间" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="标准来源" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="company"  label="上传单位" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
+            <!-- <el-table-column  label="标准来源" header-align='center' align='center'>
+                <template slot-scope="scoped"><a download="w3logo" :href="scoped.row.file"></a> </template>
+            </el-table-column> -->
         </el-table>
         <div class="pagination">
-            <span class="pagesize">共10页</span>
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
             <el-pagination
-            @size-change="handleSizeChange" 
             @current-change="handleCurrentChange"
             :current-page.sync="CurrentChange"
-            :page-size="10"
+            :page-size="page_size"
             layout="prev, pager, next"
-            :total="1000">
+            :total="totalSum">
             </el-pagination>
             <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
         </div>
@@ -53,45 +55,14 @@ export default {
     components:{Search},
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        popUptitle: '',
-        isUpslot: false,
-        statusTime: '',
+        tableData: [],
         placeholderTexe: '搜索项目编号、名称',
-        CurrentChange:7,
+        isLoading:true,//加载动画
+        totalSum:0,//数据总数
+        currentPage: 1,//当前页
+        page_size : 11,//一页数据条数
+        CurrentChange:1,
+        searchText:'',//搜索文字
       }
     },
     methods:{
@@ -103,48 +74,51 @@ export default {
         },
          /**@name 修改表格字体颜色 */
         changecolor(data){
-            if (data.columnIndex == 0 ||data.columnIndex == 3) {
+            if (data.columnIndex == 0) {
                 return "color:#07a695";
             }else{
                 return "color:#444444";
             }
         },
-
-        /**@name 页面跳转 */
-        lookDetail(data){
-
-        },
         allocation(data){
             this.$router.push({name: 'LabTestStandardDetail' })
         },
-
-        /**@name功能按键 */
-        //弹框
-        editquipment(title, flag, data){
-            this.popUptitle = title;
-            this.isUpslot = flag;
-            this.$refs.popUp.dialogVisible = true;
-        },
-        //上传按钮
-        updataFileChange(){
-            this.$refs.file.click()
-        },
-        //搜索按钮
-        searchPersonnel(){
-
-        },
-        searchDetail(){
-
-        },
         /**@name 分页 */
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getLaboratory_standard(this.searchText,this.CurrentChange);
         },
-        handleCurrentChange(val) {
-            this.CurrentChange =  val;
-            console.log(`当前页: ${val}`);
+        goEquipmentDetail(data){
+            this.$router.push({path:'/LaboratoryManager/equipmentDetail', query:{equipmentID: data.row.id}})
+        },
+        getLaboratory_standard(search, pageNumber){
+            this.searchText = search;
+            this.CurrentChange = pageNumber ?this.CurrentChange: 1; 
+            pageNumber= pageNumber?pageNumber:1;
+            this.$http.get(pageNumber == 1 ? this.$conf.env.getLaboratory_standard + '?page_size=' +this.page_size + '&search='+search : this.$conf.env.getLaboratory_standard + '?search='+search  +'&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
+                this.isLoading = false;
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            }) 
         }
         
+    },
+    mounted(){
+        this.getLaboratory_standard('',1);
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                this.getLaboratory_standard(this.searchText,this.CurrentChange);
+            }
+        },
     }
 }
 </script>

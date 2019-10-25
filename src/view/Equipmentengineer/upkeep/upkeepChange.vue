@@ -10,9 +10,7 @@
     </header>
     <div class="taskName">
       <span>委托公司部门：</span>
-      <p class="itemName">控福智能-硬件部</p>
-      <span>设备编号：</span>
-      <p>控福智能-硬件部</p>
+      <p class="itemName">{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
     </div>
     <div class="taskAllocation_distributed">
       <el-table :data="tableData" :cell-style="changecolor" style="width: 100%" height="calc(100%  - .5rem)" :row-class-name="tabRowClassName" v-loading='isLoading' >
@@ -117,6 +115,7 @@ export default {
       materialListPage_number: 1,
       materialListPage_Text: '',
       materialList_loadmore: false,
+      labManagrInfo:{}
     };
   },
   methods: {
@@ -180,7 +179,7 @@ export default {
             this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
         })
     },
-    getEquipment_upkeepserviceList(pageNumber){
+    getEquipment_upkeepserviceList(){
       this.$http.get(this.$conf.env.getEquipment_upkeepserviceList+ this.$route.query.equipmentID).then( res =>{
           this.isLoading = false;
           this.tableData = res.data;
@@ -291,10 +290,19 @@ export default {
             }else{
                 this.$message({ message:'暂时没有可提交的数据，快去添加吧' , type: 'warning'}); 
             }
-        }
+        },
+        getEquipment_userinfoDetail(){
+            this.$http.get(this.$conf.env.getEquipment_userinfoDetail).then(res =>{
+                this.labManagrInfo = res.data;
+                
+            }).catch(err =>{
+                console.log(err)
+            })
+        },
   },
   mounted(){
-    this.getEquipment_upkeepserviceList()
+    this.getEquipment_upkeepserviceList();
+    this.getEquipment_userinfoDetail();
   }
 };
 </script>

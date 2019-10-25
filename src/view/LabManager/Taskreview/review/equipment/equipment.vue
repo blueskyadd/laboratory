@@ -1,6 +1,6 @@
 <template>
-    <div class="Taskreview_equipment">
-        <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - 1.5rem)" style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
+    <div class="Taskreview_equipment scrollTable">
+        <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - 2.3rem)" style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
             <el-table-column prop="num"  label="设备编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="设备名称" header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="user"  label="申请人" header-align='center' align='center'> </el-table-column>
@@ -35,7 +35,6 @@ export default {
         isLoading:true,//加载动画
         totalSum:0,//数据总数
         CurrentChange:1,
-        currentPage: 1,//当前页
         page_size : 9,//一页数据条数
         equipmentID: 0,
         isSearch: false,//是否为搜索
@@ -63,7 +62,6 @@ export default {
         },
          /**@name 分页 */
         handleCurrentChange(pageNumber) {
-            this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
             this.isLoading = true;
             !this.isSearch ?  this.getApplyEquipmentList(pageNumber):this.EquipmentSearch(this.searchText,pageNumber);
@@ -72,7 +70,7 @@ export default {
             this.isLoading = true;
             this.searchText = data;
             this.isSearch = true;
-            this.currentPage = 1;
+            this.CurrentChange = pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getApplyEquipmentList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.getApplyEquipmentList + '?search=' + data  + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -84,6 +82,7 @@ export default {
         },
         getApplyEquipmentList(pageNumber){
             this.isSearch = false;
+            pageNumber = pageNumber ? pageNumber: 1
              this.$http.get(pageNumber == 1 ? this.$conf.env.getApplyEquipmentList + '?page_size=' +this.page_size : this.$conf.env.getApplyEquipmentList + '?p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -105,7 +104,11 @@ export default {
                      this.isLoading = false;
                      if(res.status == '200'){
                         this.$message({ message: '上传成功', type: 'success'});
-                        this.reload();
+                        if(this.tableData.length == 1 && this.CurrentChange != 1){
+                            !this.isSearch ?  this.getApplyEquipmentList(this.CurrentChange -1):this.EquipmentSearch(this.searchText,this.CurrentChange - 1);
+                        }else{
+                            !this.isSearch ?  this.getApplyEquipmentList(this.CurrentChange):this.EquipmentSearch(this.searchText,this.CurrentChange);
+                        }
                     }else{
                         this.$message({ message: '上传失败', type: 'warning'});              
                     }
@@ -123,7 +126,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?  this.getApplyEquipmentList(this.CurrentChange):this.EquipmentSearch(this.searchText,this.CurrentChange);
             }
         },

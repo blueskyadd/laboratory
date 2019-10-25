@@ -13,7 +13,7 @@
                  <template slot-scope="scoped"><span class="underline lookmanagement " style="margin-right:0!important"  @click="goDetail(scoped)">详情</span></template>
             </el-table-column>
             <el-table-column prop="address"   label="操作" header-align='center' align='center'>
-                 <template slot-scope="scoped"><a class="underline lookmanagement " style="margin-right:0!important" download="w3logo" :href="scoped.row.resume">查看</a></template>
+                 <template slot-scope="scoped"><a class="underline lookmanagement " style="margin-right:0!important" download="index" :href="scoped.row.resume">查看</a></template>
             </el-table-column>
         </el-table>
         <div class="pagination">
@@ -114,7 +114,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getCultivateList(this.CurrentChange):this.searchCultivateList(this.searchText,this.CurrentChange);
             }
         },

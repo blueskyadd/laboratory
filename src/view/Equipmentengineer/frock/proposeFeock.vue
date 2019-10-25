@@ -1,7 +1,7 @@
 <template>
     <div class="proposeFeock body_main" v-loading.fullscreen.lock="isLoading">
         <header class="proposeFeock_index_header">
-            <h3>申请工装</h3>
+            <h3>{{!isupload ? '工装详情':'申请工装'}}</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
         </header>
         <div class="main">
@@ -10,10 +10,10 @@
                     <span><i class="importantData">*</i>工装名称：</span>
                     <input type="text" v-model="equipmentSection.name" placeholder="填写设备名称">
                 </div>
-                <div class="mian_text first_child">
+                <!-- <div class="mian_text first_child">
                     <span><i class="importantData">*</i>工装数量：</span>
                     <input type="number" v-model="equipmentSection.num" placeholder="填写设备数量">
-                </div>
+                </div> -->
                 <div class="mian_text textarea">
                     <span><i class="importantData">*</i>申请原因：</span>
                     <div>
@@ -83,6 +83,17 @@ export default {
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
         },
+        getmeauserFlowFrockDetail(){
+            this.isLoading = true;
+            this.$http.get(this.$conf.env.getmeauserFlowFrockDetail + this.$route.query.equipmentID + '/').then(res =>{
+                this.isLoading =  false;
+                this.equipmentSection = res.data;
+                this.fileName = res.data.databook;
+            }).catch( err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
         createdApply_frock(){
             if(!VerificationData.VerificationData(this.equipmentSection)) return;
             this.$http.post(this.$conf.env.createdApply_frock,this.equipmentSection).then(res =>{
@@ -106,7 +117,12 @@ export default {
     mounted(){
         if(this.$route.query.equipmentID){
             this.isupload = false;
-            this.getApplyequipment_frockDetail()
+            if(this.$route.query.flage){
+                this.getmeauserFlowFrockDetail()
+            }else{
+                this.getApplyequipment_frockDetail()
+            }
+            
         }
     }
 }

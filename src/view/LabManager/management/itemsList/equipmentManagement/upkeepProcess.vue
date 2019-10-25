@@ -8,12 +8,12 @@
         <div class="main">
             <div class="main_list">
                 <ul>
-                    <li  @mouseover="ismalfunction = true" @mouseout="ismalfunction = false" :style="{background:ismalfunction? '#07A695':'#fff'}">
+                    <li  @click="goupkeepProposer()"  @mouseover="ismalfunction = true" @mouseout="ismalfunction = false" :style="{background:ismalfunction? '#07A695':'#fff'}">
                         <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/malfunction.png"  v-if="!ismalfunction">
                         <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/malfunction_actively.png" alt="" v-else>
                         <span :style="{color:ismalfunction? '#fff':'#07A695'}">故障现象</span>
                     </li>
-                    <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
+                    <li @click="goupkeepChange()"><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @mouseover="ismaintain = true" @mouseout="ismaintain = false" :style="{background:ismaintain? '#07A695':'#fff'}">
                         <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/maintain.png" alt="" v-if="!ismaintain">
                         <img src="../../../../../assets/img/LabManager/management/equipment/maintenanceProcess/maintain_actively.png" alt="" v-else>
@@ -21,7 +21,7 @@
                     </li>
                     <li><img src="../../.../../../../../assets/img/LabManager/management/equipment/arrows.png" alt=""></li>
                     <li @mouseover="islookReport = true" @mouseout="islookReport = false" :style="{background:islookReport? '#07A695':'#fff'}">
-                        <a :href="reportDownUrl" download="w3logo">
+                        <a :href="reportDownUrl" download="维修报告">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport.png" alt="" v-if="!islookReport">
                             <img src="../../../../../assets/img/LabManager/management/equipment/purchaseEquipment/lookReport_actively.png" alt="" v-else>
                             <span>查看维修报告</span>
@@ -57,6 +57,12 @@ export default {
                 this.isLoading = false;
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
             })
+        },
+        goupkeepProposer(){
+            this.$router.push({path:'/Equipmentengineer/upkeepProposer', query:{equipmentID: this.$route.query.maintenanceProcessID,flag:1}})
+        },
+        goupkeepChange(){
+            this.$router.push({path:'/Equipmentengineer/upkeepChange', query:{equipmentID: this.$route.query.maintenanceProcessID}})
         }
     },
     mounted(){

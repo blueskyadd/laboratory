@@ -6,8 +6,8 @@
             <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
         <div class="taskName">
-            <span>委托公司部门：</span>
-            <p>控福智能-硬件部</p>
+            <span>公司-部门：</span>
+            <p class="itemName">{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
         </div>
          <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor"  height="calc(100%  - .2rem)" style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
@@ -19,7 +19,7 @@
         </div>
         <footer>
              <span>{{projectName}}项目：<i :style="{color: report_result == '不合格'? '#f10956':''}">{{report_result}}</i></span>
-            <a class="underline" download="w3logo" :href="projecrReport">查看项目文件</a>
+            <a class="underline" download="项目文件" :href="projecrReport">查看项目文件</a>
         </footer>
     </div>
 </template>
@@ -37,7 +37,8 @@ export default {
             projectName: '',
             projecrReport: '',
             isLoading: true,
-            report_result:''
+            report_result:'',
+            labManagrInfo:{}
         }
     },
     methods:{
@@ -80,10 +81,19 @@ export default {
                 this.isLoading = false;
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })
-        }
+        },
+        getEquipment_userinfoDetail(){
+            this.$http.get(this.$conf.env.getEquipment_userinfoDetail).then(res =>{
+                this.labManagrInfo = res.data;
+                
+            }).catch(err =>{
+                console.log(err)
+            })
+        },
     },
     mounted(){
-        this.getProject_finishprojectDetailList()
+        this.getProject_finishprojectDetailList();
+        this.getEquipment_userinfoDetail()
     }
 }
 </script>

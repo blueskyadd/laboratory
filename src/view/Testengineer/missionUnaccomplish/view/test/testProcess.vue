@@ -1,12 +1,12 @@
 <template>
     <div class="testProcess body_main" v-loading.fullscreen.lock="isLoading">
         <header class="testProcess_index_header">
-            <h3>保养流程</h3>
+            <h3>试验流程</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <span class="goBack underline" @click="goHome">首页</span>
         </header>
         <div class="main">
-             <div class="titleEquipment"><span>设备名称：</span><p>{{equipmentSaction.name}}</p></div>
+             <div class="titleEquipment"><span>试验名称：</span><p>{{equipmentSaction.name}}</p></div>
             <div class="main_list">
                 <ul>
                     <li @click="environmentActive()" @mouseover="isEnvironment = true" @mouseout="isEnvironment = false" :style="{background:isEnvironment? '#07A695':'#fff'}">

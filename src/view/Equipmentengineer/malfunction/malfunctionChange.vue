@@ -9,10 +9,8 @@
             </div>
         </header>
          <div class="taskName">
-            <span>委托公司部门：</span>
-            <p class="itemName">控福智能-硬件部</p>
-            <span>设备编号：</span>
-            <p>控福智能-硬件部</p>
+            <span>公司-部门：</span>
+            <p class="itemName">{{labManagrInfo.lab}}-{{labManagrInfo.department}}</p>
         </div>
         <div class="taskAllocation_distributed ">
             <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - .5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
@@ -116,6 +114,7 @@ export default {
             materialListPage_Text: '',
             materialList_loadmore: false,
             isDisabled_select: true,
+            labManagrInfo:{}
         }
     },
     methods:{
@@ -287,10 +286,19 @@ export default {
                 this.$message({ message:'暂时没有可提交的数据，快去添加吧' , type: 'warning'}); 
             }
             
-        }
+        },
+        getEquipment_userinfoDetail(){
+            this.$http.get(this.$conf.env.getEquipment_userinfoDetail).then(res =>{
+                this.labManagrInfo = res.data;
+                
+            }).catch(err =>{
+                console.log(err)
+            })
+        },
     },
     mounted(){
-        this.getEquipment_Service()
+        this.getEquipment_Service();
+        this.getEquipment_userinfoDetail();
     }
 }
 </script>

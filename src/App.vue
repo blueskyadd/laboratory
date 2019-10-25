@@ -1,16 +1,22 @@
 <template>
   <div id="app" >
-     <AppHeader v-if="header_show" :setHeaderTitle='setHeaderTitle'/>
-    <router-view v-if="isRouterAlive" @headerShow="headerShow" @headerTitle='headerTitle'   />
+     <!-- <div id="box" :style="{
+	            'transformOrigin':'center top',
+	            'transform':`scale(${scalseNum},${scalseNum})`,'-webkit-transform':`scale(${scalseNum},${scalseNum})`,'-moz-transform':`scale(${scalseNum},${scalseNum})`,'-o-transform':`scale(${scalseNum},${scalseNum})`,'-ms-transform':`scale(${scalseNum},${scalseNum})`
+	        }"> -->
+        <WebHeader v-if="header_show" :setHeaderTitle='setHeaderTitle'/>
+        <router-view v-if="isRouterAlive" @headerShow="headerShow" @headerTitle='headerTitle'   />
+    <!-- </div> -->
+     
   </div>
 </template>
 
 <script>
-import AppHeader from './components/header';
+import WebHeader from './components/header';
 import { all } from 'q';
 export default {
   name: 'App',
-  components: { AppHeader},
+  components: { WebHeader},
   provide () {
     return {
       reload: this.reload,
@@ -21,7 +27,8 @@ export default {
       header_show:true,
       setHeaderTitle:'实验室信息化管理系统',
       isRouterAlive: true,
-      isLoading: true
+      isLoading: true,
+      scalseNum: 2, //缩放比例
     }
   },
   methods:{
@@ -32,17 +39,36 @@ export default {
       this.setHeaderTitle = title
     },
     reload() {
-      console.log('触发')
       this.isRouterAlive = false
       this.$nextTick(function () {
         this.isRouterAlive = true
       })
     },
+    // //计算缩放比例
+    // resize_window() {
+    //     let w_height = Number(document.documentElement.clientHeight / 1080);
+    //     this.scalseNum = w_height;
+    // }
+  },
+  mounted(){
+    // this.resize_window();
+    // window.addEventListener('resize', () => {
+    //     this.resize_window();
+    // });
   }
 }
 </script>
 
 <style lang="scss" scoped>
+#box {
+	// width:100%;
+	// height:100%;
+	// transform-origin:center top 0px;
+	// position:relative;
+	// left:50%;
+	// margin-left:-960px;
+}
+
 header{
         height: .8rem;
         background:rgba(255,255,255,1);
@@ -63,6 +89,7 @@ header{
             width: 2.91rem;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
             div{
                 display: flex;
                 img{

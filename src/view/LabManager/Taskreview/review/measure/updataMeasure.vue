@@ -95,7 +95,10 @@ export default {
                     this.isLoading = false;
                    if(res.status == '200'){
                     this.$message({ message: '提交成功', type: 'success'});
-                        this.reload();
+                        var _this = this;
+                        setTimeout(()=>{
+                            _this.$router.back();
+                        },1000)
                     }else{
                         this.$message({ message: '提交失败', type: 'warning'});              
                     }

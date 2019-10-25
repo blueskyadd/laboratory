@@ -1,5 +1,5 @@
 <template>
-    <div class="addProjectAppoinment body_main">
+    <div class="addProjectAppoinment body_main" v-loading.fullscreen.lock="isLoading">
         <header class="addProjectAppoinment_index_header">
             <h3>{{titleProject}}</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
@@ -8,64 +8,70 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>公司名称：</span>
-                    <p class="guaranteeName">而非附件人家鹅肉</p>
+                    <p class="guaranteeName">{{labManagrInfo.company}}</p>
                     <span>部门：</span>
-                    <p>而非附件人家鹅肉</p>
+                    <p>{{labManagrInfo.department}}</p>
                 </div>
                 <div class="mian_text first_child">
-                    <span>项目名称：</span>
-                    <el-select v-model="value" placeholder="请选择项目名称">
+                    <span><i class="importantData">*</i>项目名称：</span>
+                    <input type="text" v-model="projectDetail.name"  placeholder="请输入项目名称">
+                    <span style="margin-left:.24rem"><i class="importantData">*</i>项目类型：</span>
+                    <el-select v-model="projectDetail.project_type" placeholder="请选择项目类型">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in project_type"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
-                    <span style="margin-left:.24rem">项目类型：</span>
-                    <el-select v-model="value" placeholder="请选择项目类型">
+                    <span style="margin-left:.24rem" v-if="$route.query.flag">产品选择：</span>
+                    <el-select v-if="$route.query.flag" v-model="projectDetail.product" placeholder="请选择项目类型">
                         <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
+                        v-for="item in prodectList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
                         </el-option>
                     </el-select>
                 </div>
                 <div class="mian_text two_child ">
-                    <span>项目开始时间：</span>
+                    <span><i class="importantData">*</i>项目开始时间：</span>
                     <el-date-picker
-                        v-model="statusTime"
-                        type="date"
+                        v-model="projectDetail.start_time"
+                        type="datetime"
+                        value-format="yyyy-MM-ddTHH:mm:ss"
                         placeholder="项目开始时间">
                     </el-date-picker>
-                    <span style="margin-left:.24rem">项目结束时间：</span>
+                    <span style="margin-left:.24rem"><i class="importantData">*</i>项目结束时间：</span>
                     <el-date-picker
-                        v-model="statusTime"
-                        type="date"
+                        v-model="projectDetail.end_time"
+                        type="datetime"
+                        value-format="yyyy-MM-ddTHH:mm:ss"
                         placeholder="项目结束时间">
                     </el-date-picker>
+                    
                 </div>
                 <div class="mian_text textarea">
-                    <span>项目简介</span>
+                    <span><i class="importantData">*</i>项目简介</span>
                     <div>
-                        <textarea name="" maxlength="800" v-model="cause" placeholder="请输入项目简介" id="" cols="30" rows="10"></textarea>
-                        <p class="number">{{cause.length}}/800</p>
+                        <textarea name="" maxlength="800" v-model="projectDetail.intro" placeholder="请输入项目简介" id="" cols="30" rows="10"></textarea>
+                        <p class="number">{{projectDetail.intro.length}}/800</p>
                     </div>
                 </div>
-                <div class="main_list updata">
-                    <span class="file_title" style="margin-bottom:0.16rem">试验样件</span>
+                <div class="main_list updata" v-if="$route.query.flag">
+                    <span class="file_title" style="margin-bottom:0.16rem"><i class="importantData">*</i>试验样件</span>
                     <div class="file_box">
-                        <input type="file" ref="file"  @change='updataFile' style="display:none" >
+                        <input type="file" ref="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" @change='updataFile' style="display:none" >
                         <div class="fileBox">
                             <div><span @click="updataFileChange"><img src="../../../assets/img/commont/file/addfile.png" alt=""></span></div>
+                            <p>{{fileName}}</p>
                         </div>
                     </div>
                     <P class="warnning">提示：创建试验前请将样件送至物料仓库审核，否则不能进行正常预约！</P>
                 </div>
             </div>
-            <footer>
-                <el-button type="primary">保存</el-button>
+            <footer v-if="$route.query.flag">
+                <el-button type="primary" @click="$route.query.flag == 1?createdProject_prodect():editProject_prodect()">保存</el-button>
             </footer>
         </div>
     </div>
@@ -75,30 +81,24 @@ import Repairs from '../../../components/common/repairs';
 export default {
     name:'addProjectAppoinment',
     components:{Repairs},
+     inject:['reload'],
     data(){
         return{
-            cause: '',//申请原因
             fileName: '指导书',
-            options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        statusTime:'',
-        visible: false,
-        titleProject: this.$route.query.flag == 1 ? '创建项目' : '编辑项目'
+            titleProject:this.$route.query.equipmentName?this.$route.query.equipmentName: this.$route.query.flag == 1 ? '创建项目' : this.$route.query.flag == 2? '编辑项目':'项目详情',
+            isLoading: false,
+            projectDetail: {
+                "name":'',
+                "project_type":'',
+                "product":'',
+                "start_time":'',
+                "end_time":'',
+                "intro":'',
+                "sample":{}
+            },
+            labManagrInfo:{},
+            project_type:[{'name':'DV试验',id:1},{'name':'PV试验',id: 2}],
+            prodectList:[]
         }
     },
     methods:{
@@ -108,7 +108,7 @@ export default {
         },
         //上传按钮
         updataFile(e){
-            this.file =  e.target.files[0];
+            this.projectDetail.sample =  e.target.files[0];
             this.fileName =  e.target.files[0].name;
         },
         //文件删除
@@ -116,16 +116,134 @@ export default {
             this.file = {};
             this.fileName = '';
         },
-        changeHiden(){
-            console.log('aaa')
-            this.visible = false
+        getProject_projectDetail(){
+            this.isLoading = true;
+            this.$http.get(this.$conf.env.getProject_projectDetail + this.$route.query.equipmentID + '/').then( res =>{
+                res.data.project_type == 'DV试验' ? 1 : 2;
+                res.data.start_time =res.data.start_time? res.data.start_time.split(' ')[0]+'T'+res.data.start_time.split(' ')[1]+':00':'';
+                res.data.end_time = res.data.end_time?res.data.end_time.split(' ')[0]+'T'+res.data.end_time.split(' ')[1]+':00':'';
+                this.projectDetail =res.data;
+                this.fileName = res.data.sample;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getTest_projectDetail(){
+            this.isLoading = true;
+            this.$http.get(this.$conf.env.getTest_projectDetail + this.$route.query.equipmentID + '/').then( res =>{
+                res.data.project_type == 'DV试验' ? 1 : 2;
+                res.data.start_time =res.data.start_time? res.data.start_time.split(' ')[0]+'T'+res.data.start_time.split(' ')[1]+':00':'';
+                res.data.end_time = res.data.end_time?res.data.end_time.split(' ')[0]+'T'+res.data.end_time.split(' ')[1]+':00':'';
+                this.projectDetail =res.data;
+                this.fileName = res.data.sample;
+            
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getProject_users(){
+            this.$http.get(this.$conf.env.getProject_users).then(res =>{
+                this.labManagrInfo = res.data;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        getProject_produceList(){
+            this.$http.get(this.$conf.env.getProject_produceList).then(res =>{
+                this.prodectList = res.data;
+            
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        createdProject_prodect(){
+            if(!this.VerificationData()) return;
+            this.isLoading = true;
+             let params = new FormData();
+             params.append('name',this.projectDetail.name);
+             params.append('project_type',this.projectDetail.project_type);
+             params.append('product',this.projectDetail.product);
+             params.append('start_time',this.projectDetail.start_time);
+             params.append('end_time',this.projectDetail.end_time);
+             params.append('intro',this.projectDetail.intro);
+             params.append('sample',this.projectDetail.sample);
+            this.$http.post(this.$conf.env.createdProject_prodect, params, true).then(res =>{
+                this.isLoading = false;
+                if(res.status == '201'){
+                    this.$message({ message: '创建成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },100)
+                }else{
+                    this.$message({ message: '创建失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        editProject_prodect(){
+            // console.log(this.projectDetail.sample.name)
+            if(!this.VerificationData()) return;
+            this.isLoading = true;
+             let params = new FormData();
+             params.append('name',this.projectDetail.name);
+             params.append('project_type',this.projectDetail.project_type);
+             params.append('product',this.projectDetail.product);
+             params.append('start_time',this.projectDetail.start_time);
+             params.append('end_time',this.projectDetail.end_time);
+             params.append('intro',this.projectDetail.intro);
+             params.append('sample',this.projectDetail.sample.name?this.projectDetail.sample:'');
+            this.$http.put(this.$conf.env.editProject_prodect + this.$route.query.equipmentID + '/', params, true).then(res =>{
+                this.isLoading = false;
+                if(res.status == '200'){
+                    this.$message({ message: '修改成功', type: 'success'});
+                    setTimeout(()=>{
+                        this.reload();
+                    },100)
+                }else{
+                    this.$message({ message: '修改失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        VerificationData(){
+            if(!this.projectDetail.name||
+                !this.projectDetail.project_type||
+                !this.projectDetail.start_time||
+                !this.projectDetail.end_time||
+                !this.projectDetail.intro||
+                !this.projectDetail.sample
+            ){
+                this.$message({ message:'*为必填项哦' , type: 'warning'}); 
+                return false;
+            }else{
+                if(this.prodectList.length >0 && !this.projectDetail.product){
+                    this.$message({ message:'请选择产品哦' , type: 'warning'}); 
+                    return false;
+                }else{
+                    return true;
+                }
+                
+            }
         }
+    },
+    mounted(){
+        this.$route.query.flag == 1 ?  '':this.$route.query.flag == 2 ?this.getProject_projectDetail(): this.getTest_projectDetail();
+        this.getProject_users();
+        this.getProject_produceList();
     }
 }
 </script>
 <style lang="scss" scoped>
 .addProjectAppoinment{
-     padding-top: .42rem;
+     padding-top: .62rem;
      overflow-y: scroll;
     .addProjectAppoinment_index_header{
         padding-left: .41rem;
@@ -214,6 +332,17 @@ export default {
                     background-color: #ccc;
                 }
 
+            }
+            input {
+                width: 3rem;
+                height: 0.48rem;
+                font-size: 0.22rem;
+                border: 1px solid #cccccc;
+                padding: 0 0.15rem;
+                font-weight: 200;
+            }
+            input::placeholder {
+                color: #989898;
             }
             .updata{
                 display: flex;

@@ -1,15 +1,15 @@
 <template>
     <div class="management_LaboratoryPrincipalProject body_main" >
         <header class="testMethods_index_header">
-            <h3>负责项目</h3>
+            <h3>负责产品</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <Search @searchDetail='getPm_project_myproductList' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 2.3rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
             <el-table-column prop="id"  type="index"   width = '100%' :index="getIndex"  align='center' label="序号"></el-table-column>
-            <el-table-column prop="date" label="产品编号"  header-align='center'  align='center'> </el-table-column>
+            <el-table-column prop="number" min-width="20%" label="产品编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name" label="产品名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name" label="项目负责人" header-align='center' align='center'> </el-table-column>
+            <!-- <el-table-column prop="name" label="项目负责人" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name" label="产品状态" header-align='center' align='center'
                 :filters="[{ text: '王小虎', value: '王小虎' }, { text: '王小虎湖', value: '王小虎湖' }]"
                 :filter-method="filterOrder"
@@ -20,8 +20,19 @@
             <el-table-column prop="name" label="项目来源" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name" label="操作" header-align='center' align='center'>
                 <template><span class="underline lookmanagement" @click="goEquipmentDetail()">完成</span><span class="underline deletemanagement" @click="goEquipmentDetail()">删除</span></template>
-            </el-table-column>
+            </el-table-column> -->
         </el-table>
+        <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
     </div>
 </template>
 <script>
@@ -31,45 +42,14 @@ export default {
     name:'LaboratoryPrincipalProject',
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: ' 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上7 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎湖',
-          address: '上1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎湖',
-          address: '上海 1516 弄'
-        }],
-        options: [{
-            value: '选项1',
-            label: '黄金糕'
-            }, {
-            value: '选项2',
-            label: '双皮奶'
-            }, {
-            value: '选项3',
-            label: '蚵仔煎'
-            }, {
-            value: '选项4',
-            label: '龙须面'
-            }, {
-            value: '选项5',
-            label: '北京烤鸭'
-            }],
-        value: '',
-        popUptitle: '',
+        tableData: [],
         placeholderTexe:'上传试验编号、名称',
-        isUpslot:false,
-        pageNumber: 1,
-        perPage: 10
+        isLoading: true,
+        totalSum:0,//数据总数
+        currentPage: 1,//当前页
+        page_size : 9,//一页数据条数
+        CurrentChange:1,
+        search_text:''
       }
     },
     methods:{
@@ -87,18 +67,44 @@ export default {
                 return "color:#444444";
             }
         },
-        searchDetail(){
-
-        },
         getIndex(index){
-            return (this.pageNumber - 1) * this.perPage + index + 1
+            return (this.CurrentChange - 1) * this.page_size + index + 1
         },
         goEquipmentDetail(){
-             alert('a')
            this.$router.push({name:'projectInccur'})
         },
         filterOrder(value, row) {
             return row.name === value;
+        },
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+             this.currentPage = pageNumber;
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getPm_project_myproductList(this.search_text,pageNumber);
+        },
+        getPm_project_myproductList(search,pageNumber){
+            pageNumber=pageNumber?pageNumber:1;
+            this.$http.get(pageNumber == 1  ?this.$conf.env.getPm_project_myproductList  +  '?page_size=' +this.page_size +'&search=' + search:this.$conf.env.getPm_project_myproductList+'&p=' +pageNumber +  '&page_size=' +this.page_size +'&search=' + search).then(res =>{
+                this.tableData = res.data.results;
+                this.totalSum = res.data.count;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        }
+    },
+    mounted(){
+        this.getPm_project_myproductList('',1);
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                this.getPm_project_myproductList(this.search_text,this.CurrentChange);
+            }
         },
     }
 }

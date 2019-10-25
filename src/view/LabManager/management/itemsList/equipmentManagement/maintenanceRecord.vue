@@ -17,7 +17,7 @@
                     </div>
                 </div>
             </div>
-            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%" height="calc(100%  - 1.5rem)" :row-class-name="tabRowClassName" v-loading="isLoading">
+            <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%" height="100%" :row-class-name="tabRowClassName" v-loading="isLoading">
                 <el-table-column prop="start_time"  label="维修时间"  header-align='center'  align='center'> </el-table-column>
                 <el-table-column prop="report_time"  label="维修完成时间" header-align='center' align='center'> </el-table-column>
                 <el-table-column prop="applicant"  label="负责人" header-align='center' align='center'> </el-table-column>
@@ -67,10 +67,6 @@ export default {
                 return "color:#444444";
             }
         },
-        /**@name 页面跳转 */
-        lookDetail(data){
-
-        },
         allocation(data){
             this.$router.push({path: '/maintenanceProcess',query:{maintenanceProcessID:data.row.id} })
         },
@@ -83,19 +79,6 @@ export default {
         },
         getmaintenanceRecordList(pageNumber){
             this.$http.get(pageNumber == 1 ? this.$conf.env.getmaintenanceRecordList + this.$route.query.EquipmentpurchaseID + '&page_size=' +this.page_size : this.$conf.env.getmaintenanceRecordList +this.$route.query.EquipmentpurchaseID + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
-                res.data = {
-                    "count": 1,
-                    "next": null,
-                    "previous": null,
-                    "results": [
-                        {
-                            "id": 25,
-                            "start_time": "2019-08-22",
-                            "report_time": "2019-08-28",
-                            "applicant": "试验工程师6"
-                        }
-                    ]
-                }
                this.isLoading = false;
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
@@ -113,7 +96,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 this.getmaintenanceRecordList(this.CurrentChange);
             }
         },
@@ -151,7 +134,7 @@ export default {
     }
     .main{
         display: flex;
-        height: calc(100% - 2.05rem);
+        height: calc(100% - 2.2rem);
         flex-direction: column;
         align-items: flex-end;
         justify-content: space-between;

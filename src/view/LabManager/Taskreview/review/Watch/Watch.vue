@@ -1,6 +1,6 @@
 <template>
-    <div class="Taskreview_Watch">
-        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
+    <div class="Taskreview_Watch scrollTable">
+        <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 2.3rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading='isLoading'>
             <el-table-column prop="job_num"  label="工号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="姓名" header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="department"  label="职位" header-align='center' align='center'> </el-table-column>
@@ -32,7 +32,6 @@ export default {
         isLoading:true,//加载动画
         totalSum:0,//数据总数
         CurrentChange:1,
-        currentPage: 1,//当前页
         page_size : 9,//一页数据条数
         equipmentID: 0,
         isSearch: false,//是否为搜索
@@ -61,7 +60,6 @@ export default {
         },
          /**@name 分页 */
         handleCurrentChange(pageNumber) {
-            this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
             this.isLoading = true;
             !this.isSearch ?  this.getApplyWatchList(pageNumber):this.watchSearch(this.searchText,pageNumber);
@@ -70,7 +68,7 @@ export default {
             this.isLoading = true;
             this.searchText = data;
             this.isSearch = true;
-            this.currentPage = 1;
+            this.CurrentChange = pageNumber;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getApplyWatchList + '?search=' + data  + '&page_size=' +this.page_size : this.$conf.env.getApplyWatchList + '?search=' + data  + '&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
                 this.isLoading = false;
                 this.totalSum = res.data.count;
@@ -99,7 +97,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                 this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch ?  this.getApplyWatchList(this.CurrentChange):this.watchSearch(this.searchText,this.CurrentChange);
             }
         },

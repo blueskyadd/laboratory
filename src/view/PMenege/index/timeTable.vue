@@ -1,13 +1,13 @@
 <template>
-     <div class="imgInfo listInfo show_background" @click="listInfo()">
-            <ul>
+     <div class="imgInfo listInfo show_background">
+            <ul  @click="listInfo()">
                 <li>
                     <div>
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_one_header.png" alt=""></span>
                         <span>06试生产</span>
                     </div>
                     <div class="boxImg_bg"></div>
-                    <span>2018/05-2108/12</span>
+                    <span>{{projectFlow.start1}}-{{projectFlow.end1}}</span>
                 </li>
                 <li>
                     <div>
@@ -15,7 +15,7 @@
                         <span>05生准条件确认</span>
                     </div>
                     <div class="boxImg_bg"></div>
-                    <span>2018/05-2108/12</span>
+                    <span>{{projectFlow.start2}}-{{projectFlow.end2}}</span>
                 </li>
                 <li>
                     <div>
@@ -23,7 +23,7 @@
                         <span>04生准启动</span>
                     </div>
                     <div class="boxImg_bg"></div>
-                    <span>2018/05-2108/12</span>
+                    <span>{{projectFlow.start3}}-{{projectFlow.end3}}</span>
                 </li>
                 <li>
                     <div>
@@ -31,15 +31,15 @@
                         <span>03造型决定</span>
                     </div>
                     <div class="boxImg_bg"></div>
-                    <span>2018/05-2108/12</span>
+                    <span>{{projectFlow.start4}}-{{projectFlow.end4}}</span>
                 </li>
                 <li>
                     <div>
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_five_header.png" alt=""></span>
-                        <span>01项目提前</span>
+                        <span>01项目前提</span>
                     </div>
                     <div class="boxImg_bg"></div>
-                    <span>2018/05-2108/12</span>
+                    <span>{{projectFlow.start5}}-{{projectFlow.end5}}</span>
                 </li>
                 <li>
                     <div>
@@ -47,10 +47,10 @@
                         <span>02方案确认</span>
                     </div>
                     <div class="boxImg_bg"></div>
-                    <span>2018/05-2108/12</span>
+                    <span>{{projectFlow.start6}}-{{projectFlow.end6}}</span>
                 </li>
             </ul>
-            <el-dropdown trigger="click" @command="handleCommand" v-if="isElement" >
+            <el-dropdown trigger="click" @command="handleCommand" >
                 <span class="el-dropdown-link">
                     {{fileItemIndex.name}}<i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
@@ -63,14 +63,11 @@
 </template>
 <script>
 export default {
-    props:{
-        isElement:String
-    },
     data(){
         return{
-            fileItem:[{name:'高',id:1},{name:'中',id:2},{name:'低',id:3}],
-            fileItemIndex: {name:'高',id:1},
-            isElement:false
+            fileItem:[],
+            fileItemIndex: {},
+            projectFlow:{}
         }
     },
     methods:{
@@ -78,9 +75,33 @@ export default {
             this.$emit('listInfoDetail')
         },
         handleCommand(command) {
-            console.log(command)
             this.fileItemIndex = command;
+            this.$parent.fileItemIndex = command;
+            this.getPm_project_productFlow(command.id);
         },
+         //产品列表
+        getPm_projectList(){
+            this.$http.get(this.$conf.env.getPm_projectList).then(res =>{
+                this.fileItem = res.data;
+                if(res.data.length){
+                    this.fileItemIndex = res.data[0];
+                    this.$parent.fileItemIndex = res.data[0];
+                    this.getPm_project_productFlow(res.data[0].id);
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            })
+        },
+        getPm_project_productFlow(ID){
+           this.$http.get(this.$conf.env.getPm_project_productFlow + ID ).then(res =>{
+                this.projectFlow = res.data;
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'}); 
+            }) 
+        }
+    },
+    mounted(){
+        this.getPm_projectList();//产品列表
     }
 }
 </script>
@@ -89,7 +110,22 @@ export default {
         width: 35%;
         background: #fff url('../../../assets/img/PMenege/index/PMenegeIndex_bg.png') no-repeat 0 0 / 101% 101%!important;
         border-radius: .06rem;
-        
+        // height: 97%;
+        position: relative;
+        .el-dropdown{
+            position: absolute;
+            top: 0;
+            right: 0;
+            .el-dropdown-link{
+                // line-height: .52rem;
+                margin-top: .24rem;
+                margin-right: .34rem;
+                font-size: .2rem;
+                display: block;
+                color: #08a695; 
+                cursor: pointer;
+            }
+        }
         ul{
             display: flex;
             flex-wrap: wrap;
@@ -137,7 +173,7 @@ export default {
                 }
             }
             li:nth-child(2n+1){
-                margin-right: 1.46rem;
+                margin-right: 30%;
                 
             }
             li:nth-child(2){
@@ -170,7 +206,7 @@ export default {
             li:nth-child(5){
                 margin-top: .9rem;
                 margin-left: -.24rem;
-                margin-right: 1.7rem;
+                margin-right: 30%;
                 .boxImg_bg{
                     background: url('../../../assets/img/PMenege/index/PMenegeIndex_five.png') 0 0 / 100% 100%;
                 }

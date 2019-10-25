@@ -11,7 +11,7 @@
                         </div>
                         <div class="password">
                             <span><img src="../../assets/img/commont/loging/password.png" alt=""> </span>
-                            <input v-model="passWord" type="password">
+                            <input placeholder="密码" v-model="passWord" type="password">
                         </div>
                         <div class="loging" @click="logingSystem()">登录</div>
                         <p>忘记密码请联系管理员</p>
@@ -27,8 +27,8 @@ export default {
     name:'loging',
     data(){
         return{
-            userName: '17630718222',
-            passWord: 'asd123456'
+            userName: '',
+            passWord: ''
         }
     },
     methods:{
@@ -72,7 +72,7 @@ export default {
                 }
             }).catch(err =>{
                 if(err.response.status == '401'){
-                    this.$message({message: err.response.data.message,type: 'error'});
+                    this.$message({message: err.response.data,type: 'error'});
                 }else if(err.response.state == '500'){
                     this.$message({message: '服务器错误',type: 'error'});
                 }else{

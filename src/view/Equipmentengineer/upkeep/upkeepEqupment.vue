@@ -2,7 +2,7 @@
     <div class="upkeepEqupment">
         <header class="upkeepEqupment_header">
             <h3>设备保养数</h3>
-            <span class="goBack underline" @click="goBack">返回</span>
+            <span class="goBack underline" @click="$router.back()">返回</span>
             <Search @searchDetail='searchEquipment_upkeepList' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
          <div class="taskAllocation_distributed ">
@@ -130,7 +130,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getEquipment_upkeepList(this.CurrentChange):this.searchEquipment_upkeepList(this.searchText,this.CurrentChange);
             }
         },

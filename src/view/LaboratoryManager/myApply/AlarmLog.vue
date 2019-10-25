@@ -5,24 +5,31 @@
             <h3>报警日志</h3>
             <span class="goBack underline" @click="$router.back(-1)">返回</span>
             <div class="AlarmLog_index_header_link">
-                <router-link class="underline" replace :style="{color: $route.query.flag == 1 ? '#07a695' : '#999'}" to="/LaboratoryManager/AlarmLog?flag=1" tag="span">本日</router-link>
-                <router-link class="underline" replace :style="{color: $route.query.flag == 2 ? '#07a695' : '#999'}" to="/LaboratoryManager/AlarmLog?flag=2" tag="span">本周</router-link>
-                <router-link class="underline" replace :style="{color: $route.query.flag == 3 ? '#07a695' : '#999'}" to="/LaboratoryManager/AlarmLog?flag=3" tag="span">本月</router-link>
-                <router-link class="underline" replace :style="{color: $route.query.flag == 4 ? '#07a695' : '#999'}" to="/LaboratoryManager/AlarmLog?flag=4" tag="span">本季</router-link>
-                <router-link class="underline" replace :style="{color: $route.query.flag == 5 ? '#07a695' : '#999'}" to="/LaboratoryManager/AlarmLog?flag=5" tag="span">本年</router-link>
+                <span v-for="item in dataTime" class="underline" :key="item.value" @click="setRouter(item.value)" :style="{color: $route.query.eqeryData == item.value ? '#07a695' : '#999'}">{{item.name}}</span>
             </div>
-            <Search @searchDetail='searchDetail' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
+            <Search @searchDetail="getLaboratory_AlarmLog" class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>
         </header>
 
         <div class="taskAllocation_distributed ">
-            <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName">
+            <el-table :data="tableData" :cell-style="changecolor" height="100%"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
                 <el-table-column prop="id"  type="index"   width = '100%' :index="getIndex"  align='center' label="序号"></el-table-column>
-                <el-table-column prop="date" min-width="30%" label="设备编号"  header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date" min-width="30%" label="设备名称" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date" min-width="30%" label="设备负责人" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date" min-width="30%" label="报警原因" header-align='center'  align='center'> </el-table-column>
-                <el-table-column prop="date"  label="报警时间" header-align='left'  align='left'> </el-table-column>
+                <el-table-column prop="num" min-width="30%" label="设备编号"  header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="equipment" min-width="30%" label="设备名称" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="device_keeper" min-width="30%" label="设备负责人" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="cause"  label="报警原因" header-align='center'  align='center'> </el-table-column>
+                <el-table-column prop="create_time" min-width="30%" label="报警时间" header-align='center'  align='center'> </el-table-column>
             </el-table>
+            <div class="pagination">
+            <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
+            <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="CurrentChange"
+            :page-size="page_size"
+            layout="prev, pager, next"
+            :total="totalSum">
+            </el-pagination>
+            <div class="changePage"><span>跳转至：</span><input v-model="CurrentChange" type="number"></div>
+        </div>
         </div>
     </div>
 </template>
@@ -34,26 +41,20 @@ export default {
     data(){
         return{
             placeholderTexe:'搜索报告编号、名称',
-             tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: ' 弄'
-                }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上7 弄'
-                }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上1519 弄'
-                }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海 1516 弄'
-                }
+            tableData: [],
+            isLoading: true,
+            totalSum:0,//数据总数
+            currentPage: 1,//当前页
+            page_size : 11,//一页数据条数
+            CurrentChange:1,
+            dataTime:[
+                {name:'本日',value:'day'},
+                {name:'本周',value:'week'},
+                {name:'本月',value:'month'},
+                {name:'本季',value:'quarter'},
+                {name:'本年',value:'year'},
             ],
-            pageNumber: 1,
-            perPage: 10
+            eqeryData: ''
         }
     },
     methods:{
@@ -77,16 +78,53 @@ export default {
             }
         },
         getIndex(index){
-            return (this.pageNumber - 1) * this.perPage + index + 1
+            return (this.CurrentChange - 1) * this.page_size + index + 1
         },
-        searchDetail(){
-
+        /**@name 分页 */
+        handleCurrentChange(pageNumber) {
+            this.currentPage = pageNumber; 
+            this.CurrentChange =  pageNumber;
+            this.isLoading = true;
+            this.getLaboratory_AlarmLog(this.searchText,pageNumber,this.eqeryData);
+        },
+        setRouter(data){
+            this.eqeryData = data;
+            this.$router.replace({path:'/LaboratoryManager/AlarmLog', query:{eqeryData: data}})
+            this.getLaboratory_AlarmLog(this.searchText,this.CurrentChange,data)
+        },
+        getLaboratory_AlarmLog(search,pageNumber,data){
+            this.searchText = search;
+            this.CurrentChange = pageNumber ? this.CurrentChange: 1; 
+            pageNumber= pageNumber?pageNumber:1;
+            data = data ? data : this.$route.query.eqeryData;
+            this.eqeryData = data;
+            this.$http.get(pageNumber==1?this.$conf.env.getLaboratory_AlarmLog + data + '&search=' + search + '&page_size=' +this.page_size:this.$conf.env.getLaboratory_AlarmLog + data + '&search=' + search + '&page_size=' + '&p=' +pageNumber).then(res =>{
+                this.totalSum = res.data.count;
+                this.tableData = res.data.results;
+                this.isLoading = false;
+            }).catch(err =>{
+                this.isLoading = false;
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        }
+    },
+    mounted(){
+        this.getLaboratory_AlarmLog('',1)
+    },
+    watch:{
+        //根据当前输入页数跳转
+        CurrentChange(newData, oldData){
+            if(newData){
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
+                this.getLaboratory_AlarmLog(this.searchText,this.currentPage);
+            }
         },
     }
 }
 </script>
 <style lang="scss">
 .AlarmLog_index{
+@import '../../../style/LabManager/management/index.scss';
     padding-top: .42rem;
     
     .AlarmLog_index_header{
@@ -138,7 +176,7 @@ export default {
     }
     .taskAllocation_distributed{
         margin-top: .4rem;
-        height: calc(100% - 4.5rem);
+        height: calc(100% - 2.2rem);
         th{
             font-size: .2rem;
             line-height: .48rem;

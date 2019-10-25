@@ -3,7 +3,7 @@
         <!-- 公共头部 -->
         <header class="management_index_header">
             <h3>管理事项</h3>
-            <span class="goBack underline" @click="$router.back(-1)">返回</span>
+            <span class="goBack underline"  @click="$router.back(-1)">返回</span>
             <div class="management_index_header_link">
                 <router-link replace  to="/management/personnelManagement" tag="span">人员管理</router-link>
                 <router-link replace  to="/management/equipmentManagement" tag="span">设备管理</router-link>
@@ -13,9 +13,10 @@
                 <router-link replace  to="/management/historyManagement" tag="span">历史项目</router-link>
                 <router-link replace  to="/management/frockManagement" tag="span">工装管理</router-link>
             </div>
-            <Search class="management_header_Search" @searchDetail='searchDetail' :placeholderTexe = 'placeholderTexe'/>
+            
+            <Search class="management_header_Search"  ref="search"  @searchDetail='searchDetail' :placeholderTexe = 'placeholderTexe'/>
         </header>
-       <router-view ref='childer' ></router-view> 
+       <router-view ref='childer' @searchresolt = 'searchresolt'></router-view> 
     </div>
 </template>
 <script>
@@ -55,6 +56,9 @@ export default {
                     break;
                 
             }
+        },
+        searchresolt(){
+            this.$refs.search.result();
         }
     },
     mounted(){

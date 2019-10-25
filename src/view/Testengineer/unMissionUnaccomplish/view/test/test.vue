@@ -3,7 +3,7 @@
         <el-table :data="tableData" :cell-style="changecolor"   style="width: 100%" height="calc(100%  - 1rem)" :row-class-name="tabRowClassName" v-loading="isLoading">
             <el-table-column prop="experiment_num"  label="试验编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name"  label="试验名称" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name"  label="试验类型" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="type_"  label="试验类型" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="start_time"  label="试验开始时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="end_time"  label="试验结束时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="cycle"  label="周期" header-align='center' align='center'> </el-table-column>
@@ -12,15 +12,14 @@
                 <template slot-scope="scoped">
                   <div>
                     <el-popover placement="top-start"  width="340" height='280' title='选择试验设备' popper-class='popover_unMissionUnaccomplishTest' trigger="click">
-                        <Repairs v-if="isEquipmentList" @changeHiden='changeHiden' :equipmentList='equipmentList'></Repairs>
+                        <Repairs v-if="isEquipmentList" @changeHiden='changeHiden' :ischexkbox='true' :equipmentList='equipmentList'></Repairs>
                         <span class="underline lookmanagement"  style="color: #f23536"  slot="reference" @click="getrepairs(scoped)">报修</span>
                     </el-popover>
                   </div>
                 </template>
-
             </el-table-column>
             <el-table-column prop="name" min-width="50%" label="试验方法" header-align='center' align='center'> 
-                <template slot-scope="scoped"><a class="underline lookmanagement" download="w3logo" :href="scoped.row.method">下载</a></template>
+                <template slot-scope="scoped"><a class="underline lookmanagement" download="试验方法" :href="scoped.row.method">下载</a></template>
             </el-table-column>
             <el-table-column prop="address" min-width="30%"  label="操作" header-align='center' align='center'>
                  <template slot-scope="scoped"><span class="underline lookmanagement"  @click="goTestProcess(scoped)">开始</span></template>
@@ -141,7 +140,7 @@ export default {
         //根据当前输入页数跳转
         CurrentChange(newData, oldData){
             if(newData){
-                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 0 ? 1 :  newData*1;
+                this.CurrentChange =newData*1 > Math.ceil( this.totalSum/this.page_size) ? Math.ceil( this.totalSum/this.page_size) :  newData*1 < 1 ? 1 :  newData*1;
                 !this.isSearch?this.getExperimental_myexperimentList(this.CurrentChange):this.searchExperimental_myexperimentList(this.searchText,this.CurrentChange);
             }
         },
