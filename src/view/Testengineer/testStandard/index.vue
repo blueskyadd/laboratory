@@ -1,3 +1,11 @@
+<!--
+ * @Author: your name
+ * @Date: 2019-08-15 15:31:47
+ * @LastEditTime: 2019-10-31 09:11:59
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \laboratory\src\view\Testengineer\testStandard\index.vue
+ -->
 <template>
     <div class="management_testStandard body_main">
         <header class="testMethods_index_header">
@@ -34,8 +42,8 @@
             </div>
         </div> -->
         <el-table :data="tableData" :cell-style="changecolor" height="calc(100%  - 1.5rem)"  style="width: 100%"  :row-class-name="tabRowClassName" v-loading="isLoading">
-            <el-table-column prop="num"  label="试验方法编号"  header-align='center'  align='center'> </el-table-column>
-            <el-table-column prop="name"  label="试验方法名称" header-align='center' align='center'> </el-table-column>
+            <el-table-column prop="num"  label="试验标准编号"  header-align='center'  align='center'> </el-table-column>
+            <el-table-column prop="name"  label="试验标准名称" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="company"  label="上传单位" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="address"   label="下载" header-align='center' align='center'>

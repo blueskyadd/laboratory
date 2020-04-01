@@ -2,7 +2,7 @@
     <div class="management_InternalAppointment body_main">
         <header class="proposer_index_header">
             <div>
-                <h3>历史项目</h3>
+                <h3>试验预约</h3>
                 <span class="goBack underline" @click="$router.back(-1)">返回</span>
             </div>
             <Search @searchDetail='searchProject_appointList' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe'/>

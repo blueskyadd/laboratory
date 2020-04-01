@@ -45,7 +45,7 @@
                 <el-button type="primary" @click="$route.query.equipmentID?editEquipment_safetyInfo():createdEquipment_safetyInfo()">提交</el-button>
             </footer>
         </div>
-    </div>
+    </div> 
 </template>
 <script>
 import VerificationData from '../../../components/VerificationData'

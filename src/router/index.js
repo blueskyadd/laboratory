@@ -106,7 +106,7 @@ export default new Router({
     },
     //上传计量合同
     {
-      path: '/updataMeasure',
+      path: '/updataMeasure', 
       name: 'updataMeasure',
         component:() => import('@/view/LabManager/Taskreview/review/measure/updataMeasure'),
     },

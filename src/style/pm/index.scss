@@ -31,6 +31,7 @@
     }
     .user_content{
         padding-top: .71rem;
+        
         h3{
             font-size: .2rem;
             font-weight: normal;
@@ -300,6 +301,7 @@
                                 margin-right: .09rem;
                                 margin-top: 0;
                                 display: block;
+                                
                             }
                             span{
                                 line-height: initial;
@@ -328,7 +330,12 @@
                 display: flex;
                 span:first-child{
                     display: block;
-                    margin-right: .08rem;
+                    margin-right: .1rem;
+                    display: -webkit-box;
+                    text-overflow: ellipsis;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 3;
+                    overflow: hidden;
                 }
                 span:last-child{
                     height: 1px;

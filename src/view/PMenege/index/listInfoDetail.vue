@@ -4,7 +4,7 @@
         <div class="right_table">
             <ul>
                 <li>
-                    <h3>01项目提前</h3>
+                    <h3>01项目前提</h3>
                     <div>
                         <span><i class="importantData">*</i>时间:</span>
                         <el-date-picker
@@ -114,6 +114,7 @@
             </ul>
             <footer>
                 <el-button type="primary" @click="editPm_project_orderDetail()">提交</el-button>
+                <el-button type="primary" @click="$router.back(-1)">返回</el-button>
             </footer>
         </div>
     </div>

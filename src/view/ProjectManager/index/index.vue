@@ -53,7 +53,7 @@ export default {
       }
     },  
     mounted(){
-        this.$emit('headerTitle','实验室信息化管理系统-客户经理');
+        this.$emit('headerTitle','实验室信息化管理系统-项目经理');
         this.getProject_topNumber();
     },
     destroyed(){

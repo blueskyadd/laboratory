@@ -38,30 +38,37 @@
 	 width: .15rem;
 	 height: .15rem;
  }
- #app{
-	min-width:1600px;
-	min-height:900px;
-	
- }
- @media screen and (max-width: 1600px){ 
-    body { 
-		overflow-x: scroll!important;
-		// width: 16rem!important;
-		// height: 9rem!important;
-    }
-}
-@media screen and (max-height:900px){ 
-    body { 
-		overflow-y: scroll!important;
-		// width: 1600px!important;
-		// height: 9rem!important;
-    } 
-}
+ 
+//  @media screen and (max-width: 1600px){ 
+//     body { 
+// 		overflow-x: scroll!important;
+// 		// width: 16rem!important;
+// 		// height: 9rem!important;
+//     }
+// }
+// @media screen and (max-height:900px){ 
+//     body { 
+// 		overflow-y: scroll!important;
+// 		// width: 1600px!important;
+// 		// height: 9rem!important;
+//     } 
+// }
  body, #app{
    width : 100% ;
    height : 100% ;
    overflow : hidden;
    
+ }
+ body{
+	background: #f0f3f6;
+ }
+ #app{
+	width: 19.2rem;
+    height: 10.8rem;
+    overflow: hidden;
+	margin: 0 auto;
+	background: #fff;
+	position: relative;
  }
  fieldset,img {border:0}
  address,caption,cite,code,dfn,em,strong,th,var {font-style:normal;font-weight:normal}

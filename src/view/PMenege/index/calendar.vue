@@ -1,15 +1,9 @@
 <template>
     <div class="calendar body_main" v-loading.fullscreen.lock="isLoading">
         <div class="calendar_box">
-            <header>
-                <el-dropdown trigger="click" @command="handleCommand">
-                    <span class="el-dropdown-link">
-                        {{fileItemIndex.name}}<i class="el-icon-arrow-down el-icon--right"></i>
-                    </span>
-                    <el-dropdown-menu slot="dropdown"   class ='imgInfo_listInfo_element' >
-                        <el-dropdown-item v-for="item in fileItem" :key="item.id" :command="item">{{item.name}}</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
+            <header class="taskkAllocation_index_header">
+                <h3>项目配置</h3>
+                <span class="goBack underline" @click="$router.back(-1)">返回</span>
             </header>
             <div class="element_calendar">
                 <header>配置项目</header>
@@ -27,7 +21,18 @@
         </div>
         <div class="from_submit">
             <header>
-                <span>设计方法</span><span @click="setCalendar"><img src="../../../assets/img/PMenege/index/plus.png" alt=""></span>
+                <div>
+                    <el-dropdown trigger="click" @command="handleCommand">
+                        <span class="el-dropdown-link">
+                            {{fileItemIndex.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown"   class ='imgInfo_listInfo_element' >
+                            <el-dropdown-item v-for="item in fileItem" :key="item.id" :command="item">{{item.name}}</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                     <span>设计方法</span>
+                </div>
+               <span class="addButton" @click="setCalendar"><img src="../../../assets/img/PMenege/index/plus.png" alt=""></span>
             </header>
             <ul class="submit_list">
                 <li v-for="(item ,index) in events" :key="index">
@@ -316,13 +321,33 @@ export default {
 <style lang="scss">
 .calendar{
     display: flex;
+    padding-top: .42rem;
     .calendar_box{
         width: 46%;
         font-size: .2rem;
         height: 100%;
         // border: 1px solid #ebebeb;
-        padding-left: .34rem;
+        padding-left: .2rem;
         padding-top: .14rem;
+        .taskkAllocation_index_header{
+            height: .38rem;
+            display: flex;
+            margin-left: .19rem;
+            align-items: flex-end;
+            padding-bottom: .43rem;
+            h3{
+                font-size: .36rem;
+                color: #333333;
+                font-weight: 500;
+                margin-bottom: .04rem;
+                line-height: .36rem;
+            }
+            //返回按钮
+            .goBack{
+                margin-left: .28rem;
+                font-size: .23rem
+            }
+        }
         header{
             height: .8rem;
             .el-dropdown{
@@ -398,7 +423,12 @@ export default {
             align-items: center;
             font-size: .2rem;
             color: #727272;
-            span:last-child{
+            .el-dropdown{
+                .el-dropdown-link{
+                   font-size: .2rem; 
+                }
+            }
+            .addButton{
                 width: .26rem;
                 height: .26rem;
                 // background: #08a695;

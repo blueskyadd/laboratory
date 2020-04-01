@@ -87,7 +87,11 @@ export default {
             this.$router.push({name:'EquipmentengineerIndex'})
         },
         goProposerEquipment(){
-            this.$router.push({name:'proposerEquipment'})
+            if(this.equipmentSection.status == 3){
+                this.$router.push({name:'proposerEquipment'})
+            }else{
+                this.$message({ message:'已不可申请设备' , type: 'warning'});
+            }
         },
         godocumentEquipment(){
             this.$router.push({name:'documentEquipment'})

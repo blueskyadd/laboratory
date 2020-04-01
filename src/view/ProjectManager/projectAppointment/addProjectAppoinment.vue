@@ -84,7 +84,7 @@ export default {
      inject:['reload'],
     data(){
         return{
-            fileName: '指导书',
+            fileName: '点击上传试验样件',
             titleProject:this.$route.query.equipmentName?this.$route.query.equipmentName: this.$route.query.flag == 1 ? '创建项目' : this.$route.query.flag == 2? '编辑项目':'项目详情',
             isLoading: false,
             projectDetail: {

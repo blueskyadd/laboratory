@@ -54,7 +54,7 @@
               name
               maxlength="800"
               v-model="projectDetail.intro"
-              placeholder="需求设备量大"
+              placeholder="请输入试验简介"
               id
               cols="30"
               rows="10"

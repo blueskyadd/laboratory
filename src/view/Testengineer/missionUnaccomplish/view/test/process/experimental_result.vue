@@ -94,7 +94,7 @@ export default {
             this.isLoading = true;
                 this.$http.put(this.$conf.env.createdExperimental_result + this.$route.query.equipmentID + '/', this.exresult).then( res =>{
                     this.isLoading = false;
-                    if(res.status == '201'){
+                    if(res.status == '200'){
                         this.$message({ message: '提交成功', type: 'success'});
                         setTimeout(()=>{
                             this.reload();

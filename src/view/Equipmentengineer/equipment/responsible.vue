@@ -20,7 +20,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column  label="状态"      header-align='center' align='center'>
-                    <template slot-scope="scoped"><span  @click="lookDetail(scoped)">{{scoped.row.status}}</span></template>
+                    <template slot-scope="scoped"><span  @click="lookDetail(scoped)">{{scoped.row.status === '申请' ? '申请中':scoped.row.status}}</span></template>
                 </el-table-column>
                 <el-table-column prop="address"   label="操作" header-align='center' align='center'>
                     <template slot-scope="scoped"><span class="underline"  @click="goEquipment_lookreport(scoped)">查看</span> </template>

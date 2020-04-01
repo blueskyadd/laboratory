@@ -8,7 +8,7 @@
             <div class="measure_main">
                 <div class="mian_text first_child">
                     <span>设备名称：</span>
-                    <p>{{equipmentSection.cause}}</p>
+                    <p>{{equipmentSection.name}}</p>
                 </div>
                 <div class="mian_text two_child ">
                     <span>申请时间：</span>
@@ -32,8 +32,8 @@
                 </div>
             </div>
             <footer>
-                <el-button type="primary" class="primary_err" @click="editApplyEquipment(0)">不同意</el-button>
-                <el-button type="primary" @click="editApplyEquipment(2)">审批</el-button> 
+                <el-button type="primary" class="primary_err" @click="editApplyEquipment(0)">退回</el-button>
+                <el-button type="primary" @click="editApplyEquipment(2)">同意</el-button> 
             </footer>
         </div>
     </div>

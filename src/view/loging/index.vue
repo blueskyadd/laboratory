@@ -18,19 +18,23 @@
                     </div>
                 </div>
             </div>
-            <footer>控福(上海)智能科技有限公司 2017-2018</footer>
+            <footer>
+               <p>控福(上海)智能科技有限公司 2017-2018</p>
+               <p><img src="../../assets/icp.png" alt=""><a @click="openIcp" >沪ICP备18031142号-13</a></p>
+            </footer>
         </div>
     </div>
 </template>
+
 <script>
 export default {
-    name:'loging',
+    name:'loging',  
     data(){
         return{
             userName: '',
             passWord: ''
         }
-    },
+    },     
     methods:{
         logingSystem(){
             if(!this.VerificationData()) return;
@@ -93,6 +97,9 @@ export default {
                 return true;
             }
         },
+        openIcp(){
+            window.open('http://www.beian.miit.gov.cn/')
+        }
     },
     mounted(){
         this.$message.closeAll()
@@ -184,13 +191,16 @@ export default {
             } 
         }
         footer{
-            font-size: .18rem;
-            font-family:MicrosoftYaHei;
-            font-weight:400;
-            color:rgba(153,153,153,1);
-            padding-top: .66rem;
+            padding-top: .4rem;
             text-align: center;
             width: 100%;
+            p,a{
+                font-size: .16rem;
+                font-family:MicrosoftYaHei;
+                line-height: .3rem;
+                font-weight:400;
+                color:rgba(153,153,153,1);
+            }
         }
     }
 }

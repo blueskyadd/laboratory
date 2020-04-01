@@ -49,7 +49,11 @@
                 <h3>实验室公告栏</h3>
                  <swiper :options="swiperOption_Bulletin_board" v-if="swiperOption_Bulletin_board" >
                     <swiper-slide v-for="(item, index) in Bulletin_board" :key="index">
-                        <img src="../assets/img/LabManager/index/ellipse.png" alt=""><p>{{item.content}}</p>
+                        <img src="../assets/img/LabManager/index/ellipse.png" alt="">
+                        <p>
+                            <span>{{item.create_time}}</span>
+                            {{item.content}}
+                        </p>
                     </swiper-slide>
                 </swiper>
             </div>
@@ -271,7 +275,6 @@ $setColor:#7f0dde;
                     span{
                         font-size: .3rem;
                         color: #333;
-                        
                     }
                 }
                 .number{
@@ -288,7 +291,6 @@ $setColor:#7f0dde;
                         font-size: .38rem;
                     }
                 }
-                
             }
             .img_text{
                 display: flex;
@@ -460,8 +462,9 @@ $setColor:#7f0dde;
                             li{
                                 display: flex; 
                                 line-height: .24rem;
+                                justify-content: center;
                                 span, p {
-                                    font-size: .12rem;
+                                    font-size: .14rem;
                                     color: #fff;
                                 }
                                 span{
@@ -534,7 +537,13 @@ $setColor:#7f0dde;
                         margin-top: .05rem;
                     }
                     p{
+                        span{
+                            display: block;
+                            font-size: .16rem;
+                        }
                         flex: 1;
+                        font-size: .18rem;
+                        padding-right: .05rem;
                     }
                 }
             }

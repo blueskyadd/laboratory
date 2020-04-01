@@ -53,7 +53,7 @@
                         <h3>设备档案</h3>
                         <div class="efficient_data">
                             <div class="text_number">
-                                <yd-countup :endnum="Laboratory_topNumber.num2" :duration="1" >{{Laboratory_topNumber.num2}}</yd-countup>
+                                <yd-countup :endnum="Laboratory_topNumber.num2" :duration="1" >{{Laboratory_topNumber.num2 || 0}}</yd-countup>
                                 <span>份</span>
                             </div>
                         </div>

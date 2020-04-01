@@ -48,7 +48,7 @@
         </div>  
             
     </index-home>
-</template>
+</template> 
 <script>
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
 import indexHome from '../../../components/index'

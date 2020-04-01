@@ -1,3 +1,11 @@
+<!--
+ * @Author: your name
+ * @Date: 2019-08-21 11:56:49
+ * @LastEditTime: 2019-10-31 09:15:04
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \laboratory\src\view\LaboratoryManager\myApply\testStandard.vue
+ -->
 <template>
     <div class="management_LabTestStandard body_main">
         <header class="proposer_index_header">
@@ -31,9 +39,9 @@
             <el-table-column prop="name"  label="标准名称" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="company"  label="上传单位" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="create_time"  label="上传时间" header-align='center' align='center'> </el-table-column>
-            <!-- <el-table-column  label="标准来源" header-align='center' align='center'>
-                <template slot-scope="scoped"><a download="w3logo" :href="scoped.row.file"></a> </template>
-            </el-table-column> -->
+            <el-table-column  label="操作" header-align='center' align='center'>
+                <template slot-scope="scoped"><a class="underline" download="w3logo" :href="scoped.row.file">下载</a> </template>
+            </el-table-column>
         </el-table>
         <div class="pagination">
             <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>

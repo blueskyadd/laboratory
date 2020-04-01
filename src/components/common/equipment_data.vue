@@ -9,7 +9,7 @@
             alt
           />
         </div>
-        <span>{{operatingNum}}</span>
+        <span>{{operatingNum || 0}}</span>
       </div>
     </div>
 </template>

@@ -2,7 +2,7 @@
     <div class="management_projectSum body_main">
         <header class="proposer_index_header">
             <div>
-                <h3>试验项目</h3>
+                <h3>项目列表</h3>
                 <span class="goBack underline" @click="$router.back(-1)">返回</span>
             </div>
             <Search @searchDetail='getLaboratory_finishproject3' class="Taskreview_header_Search" :placeholderTexe = 'placeholderTexe' ref="search"/>
@@ -44,7 +44,7 @@
                 </li>
             </ul>
             <div class="editTableButton">
-                <el-button type="primary" @click="searchPersonnel">搜索</el-button>
+                <el-button type="primary" @click="searchPersonnel">筛选</el-button>
                 <el-button  @click="result">重置</el-button>
             </div>
         </div>

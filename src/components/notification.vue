@@ -92,6 +92,15 @@ export default {
             this.$http.put(this.$conf.env.setSystem_msg + data.id + '/').then( res =>{
                 data.is_read = '已读';
                 this.$refs.popUp.dialogVisible = true;
+                this.getSystem_number();
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
+        },
+        getSystem_number(){
+            this.$http.get(this.$conf.env.getSystem_number).then(res =>{
+                console.log(res)
+                this.systemNumber = res.data.num;
             }).catch(err =>{
                 this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
             })

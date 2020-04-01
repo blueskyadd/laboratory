@@ -163,7 +163,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="address"  label="操作" header-align='center' align='center'>
-                        <template slot-scope="scoped"><span class="underline lookmanagement"  @click="editquipment('新增设备', true,scoped)">新增</span><span class="underline lookmanagement"  @click="SendbackEquipment(scoped.row.id)">退回</span></template>
+                        <template slot-scope="scoped"><span class="underline lookmanagement"  @click="editquipment('新增设备', true,scoped)">分配</span><span class="underline lookmanagement"  @click="SendbackEquipment(scoped.row.id)">退回</span></template>
                     </el-table-column>
                 </el-table>
             </template>
@@ -247,7 +247,7 @@ export default {
         showListTab(){
             this.getunEquipmentList();//获取数据
             this.isEquipmentList = false;
-            this.popUptitle = '新增设备';
+            this.popUptitle = '分配设备';
             this.setWidth = '70%';
             this.$refs.popUp.dialogVisible = true;
         },

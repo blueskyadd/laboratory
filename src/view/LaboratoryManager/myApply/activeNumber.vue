@@ -71,7 +71,7 @@ export default {
             this.CurrentChange = pageNumber ?this.CurrentChange: 1; 
             pageNumber= pageNumber?pageNumber:1;
             this.$http.get(pageNumber == 1 ? this.$conf.env.getLaboratory_user + '?page_size=' +this.page_size + '&search='+search : this.$conf.env.getLaboratory_user + '?search='+search  +'&p=' +pageNumber +'&page_size=' +this.page_size ).then( res =>{
-                this.isLoading = false;
+                this.isLoading = false;  
                 this.totalSum = res.data.count;
                 this.tableData = res.data.results;
             }).catch(err =>{

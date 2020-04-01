@@ -71,12 +71,14 @@
                         <input type="text" maxlength="50" v-model="standard.company" placeholder="填写上传单位">
                     </li>
                     <li class="upload">
-                        <span><i class="importantData">*</i>上传图片：</span>
-                        <input type="file" accept="image/*" ref="file"  @change='updataFile' style="display:none" >
+                        <span><i class="importantData">*</i>上传文件：</span>
+                        <input type="file" ref="file"  @change='updataFile' style="display:none" >
                         <div v-if="isCreated">
                             <span @click="updataFileChange"><img src="../../../../../assets/img/commont/file/addfile.png" alt=""></span>
                         </div>
-                        <img v-else  @click="updataFileChange" :src="standard.file" class="upload_img" alt="">
+                        <span style="width: .65rem!important;" v-else class="accessory"><img src="../../../../../assets/img/commont/file/accessory.png" alt=""><span class="underline deleteFile" @click="deleteFile()">删除</span></span>
+                        <p >{{fileName}}</p>
+                        <!-- <img v-else  @click="updataFileChange" :src="standard.file" class="upload_img" alt=""> -->
                     </li>
                     <li><el-button type="primary" @click="$refs.popUp.dialogVisible = false">取消</el-button><el-button type="primary" @click="createdtestStandard">完成</el-button></li>
                 </ul>
@@ -93,6 +95,7 @@ export default {
     inject:['reload'],
     data() {
       return {
+        fileName:'',
         tableData: [],
         value: '',
         popUptitle: '',
@@ -132,7 +135,7 @@ export default {
         //弹框
         editquipment(title, flag, data){
             this.popUptitle = title;
-            this.isUpslot = flag;
+            this.isCreated = flag;
             flag?this.DeleteSection():'';
             this.$refs.popUp.dialogVisible = true;
         },
@@ -163,6 +166,7 @@ export default {
                 "file":'',//文件url
                 "company":'',//上传单位
             };
+            this.fileName = '';
         },
         /**@name 分页 */
         handleCurrentChange(pageNumber) {

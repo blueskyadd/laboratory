@@ -1,4 +1,6 @@
-const winchaingroupApi = "http://47.104.95.206:8010/";
+// const winchaingroupApi = "http://47.104.95.206:8010/";
+const winchaingroupApi = "https://kungfutimes.cn/";
+
 
 
 module.exports = {
@@ -294,6 +296,7 @@ module.exports = {
     created_produce: winchaingroupApi + 'ex/v1/produce/',//创建产品(产品经理201)
     getPm_noticeList: winchaingroupApi + 'ex/v1/notice/',//公告栏 (产品经理223)
     getPm_project_myproductList: winchaingroupApi + 'ex/v1/myproduct/',//负责产品(产品经理224)
+    updataPm_project_myproductList: winchaingroupApi + 'ex/v1/myproduct/',//产品是否显示(产品经理225)
     getPm_delayedList: winchaingroupApi + 'ex/v1/delayed/',//延时报警 (产品经理222)
     getPm_projectList: winchaingroupApi + 'ex/v1/produce/',//产品列表 (产品经理207)
     getPm_projectpctFlow: winchaingroupApi + 'ex/v1/projectpct/?product=',//产品项目进度 (产品经理219)

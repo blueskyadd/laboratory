@@ -9,18 +9,9 @@
             <el-table-column prop="id"  type="index"   width = '100%' :index="getIndex"  align='center' label="序号"></el-table-column>
             <el-table-column prop="number" min-width="20%" label="产品编号"  header-align='center'  align='center'> </el-table-column>
             <el-table-column prop="name" label="产品名称" header-align='center' align='center'> </el-table-column>
-            <!-- <el-table-column prop="name" label="项目负责人" header-align='center' align='center'> </el-table-column>
-            <el-table-column prop="name" label="产品状态" header-align='center' align='center'
-                :filters="[{ text: '王小虎', value: '王小虎' }, { text: '王小虎湖', value: '王小虎湖' }]"
-                :filter-method="filterOrder"
-                :filter-multiple="false"
-                filter-placement="bottom-end">
-                <template><span class="underline" @click="goEquipmentDetail()">进行</span></template>
-            </el-table-column>
-            <el-table-column prop="name" label="项目来源" header-align='center' align='center'> </el-table-column>
             <el-table-column prop="name" label="操作" header-align='center' align='center'>
-                <template><span class="underline lookmanagement" @click="goEquipmentDetail()">完成</span><span class="underline deletemanagement" @click="goEquipmentDetail()">删除</span></template>
-            </el-table-column> -->
+                <template slot-scope="scoped" ><span  style="margin-right:0!important;cursor:pointer;" :style="{color:scoped.row.is_show?'':'#f10000'}" @click="updataPm_project_myproductList(scoped.row.id)">{{scoped.row.is_show?'显示':'隐藏'}}</span></template>
+            </el-table-column>
         </el-table>
         <div class="pagination">
             <span class="pagesize">共{{Math.ceil(totalSum/page_size)}}页</span>
@@ -70,8 +61,20 @@ export default {
         getIndex(index){
             return (this.CurrentChange - 1) * this.page_size + index + 1
         },
-        goEquipmentDetail(){
-           this.$router.push({name:'projectInccur'})
+        updataPm_project_myproductList(ID){
+           this.$http.put(this.$conf.env.updataPm_project_myproductList+ID +'/').then(res =>{
+                if(res.status == '200'){
+                    this.$message({ message: '设置成功', type: 'success'});
+                        var _this = this;
+                        setTimeout(()=>{
+                            this.getPm_project_myproductList(this.search_text,this.currentPage);
+                        },1000)
+                }else{
+                    this.$message({ message: '设置失败', type: 'warning'});              
+                }
+            }).catch(err =>{
+                this.$message({ message:err.response?err.response.data:'服务器错误' , type: 'warning'});
+            })
         },
         filterOrder(value, row) {
             return row.name === value;
@@ -80,10 +83,10 @@ export default {
         handleCurrentChange(pageNumber) {
              this.currentPage = pageNumber;
             this.CurrentChange =  pageNumber;
-            this.isLoading = true;
             this.getPm_project_myproductList(this.search_text,pageNumber);
         },
         getPm_project_myproductList(search,pageNumber){
+            this.isLoading = true;
             pageNumber=pageNumber?pageNumber:1;
             this.$http.get(pageNumber == 1  ?this.$conf.env.getPm_project_myproductList  +  '?page_size=' +this.page_size +'&search=' + search:this.$conf.env.getPm_project_myproductList+'&p=' +pageNumber +  '&page_size=' +this.page_size +'&search=' + search).then(res =>{
                 this.tableData = res.data.results;

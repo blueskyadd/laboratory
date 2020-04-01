@@ -3,7 +3,7 @@
         <!-- 公共头部 -->
         <header class="proposer_index_header">
             <div>
-                 <h3>任务审核</h3>
+                 <h3>试验管理</h3>
                 <span class="goBack underline" @click="$router.back(-1)">返回</span>
                 <div class="projectManageTest_index_header_link">
                     <!-- <router-link class="underline"  to="/ProjectManager/addProjectTest?flag=1" tag="span">创建试验</router-link> -->

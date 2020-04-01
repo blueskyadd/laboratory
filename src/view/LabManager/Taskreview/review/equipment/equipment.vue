@@ -9,7 +9,7 @@
                 <template slot-scope="scoped"><span class="underline"  @click="allocation(scoped)">查看</span> </template>
             </el-table-column>
              <el-table-column prop="id"   label="合同上传" header-align='center' align='center'>
-                <template slot-scope="scoped"><span class="underline"  :style="{'color':scoped.row.status == 2?'':'#999!important','cursor':scoped.row.status == 2?'':'not-allowed'}" @click="updataApplyEquipmentFile(scoped)">上传</span> <input type="file" ref="file"   @change='updataFile' style="display:none" ></template>
+                <template slot-scope="scoped"><span class="underline"  :style="{'color':scoped.row.status == 2?'':'#999!important','cursor':scoped.row.status == 2?'':'not-allowed'}" @click="scoped.row.status == 2 && updataApplyEquipmentFile(scoped)">上传</span> <input type="file" ref="file"   @change='updataFile' style="display:none" ></template>
             </el-table-column>
         </el-table>
         <div class="pagination">

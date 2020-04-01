@@ -5,9 +5,10 @@
             </div>
             <div class="right_trake">
                 <div @click="goNotification()">
-                    <el-badge :value="systemNumber" :max="99" class="item">
+                    <el-badge :value="systemNumber" :max="99" class="item" v-if="systemNumber != 0">
                         <img src="../assets/img/commont/header/inform.png" alt="">
                     </el-badge>
+                    <img src="../assets/img/commont/header/inform.png" alt="" v-else>
                     <span>通知</span>
                 </div>
                 <div><img src="../assets/img/commont/header/user.png" alt=""><span>{{userName}}</span></div>
@@ -19,7 +20,7 @@
 export default {
     name:'header',
     props:{
-        setHeaderTitle:String
+        setHeaderTitle:String,
     },
     data(){
         return{

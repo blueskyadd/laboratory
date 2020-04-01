@@ -6,48 +6,48 @@
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_one_header.png" alt=""></span>
                         <span>06试生产</span>
                     </div>
-                    <div class="boxImg_bg"></div>
-                    <span>{{projectFlow.start1}}-{{projectFlow.end1}}</span>
+                    <div class="boxImg_bg"><p>{{projectFlow.info6}}</p></div>
+                    <span>{{projectFlow.start6}}-{{projectFlow.end6}}</span>
                 </li>
                 <li>
                     <div>
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_two_header.png" alt=""></span>
                         <span>05生准条件确认</span>
                     </div>
-                    <div class="boxImg_bg"></div>
-                    <span>{{projectFlow.start2}}-{{projectFlow.end2}}</span>
+                    <div class="boxImg_bg"><p>{{projectFlow.info5}}</p></div>
+                    <span>{{projectFlow.start5}}-{{projectFlow.end5}}</span>
                 </li>
                 <li>
                     <div>
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_there_header.png" alt=""></span>
                         <span>04生准启动</span>
                     </div>
-                    <div class="boxImg_bg"></div>
-                    <span>{{projectFlow.start3}}-{{projectFlow.end3}}</span>
+                    <div class="boxImg_bg"><p>{{projectFlow.info4}}</p></div>
+                    <span>{{projectFlow.start4}}-{{projectFlow.end4}}</span>
                 </li>
                 <li>
                     <div>
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_fore_header.png" alt=""></span>
                         <span>03造型决定</span>
                     </div>
-                    <div class="boxImg_bg"></div>
-                    <span>{{projectFlow.start4}}-{{projectFlow.end4}}</span>
+                    <div class="boxImg_bg"><p>{{projectFlow.info3}}</p></div>
+                    <span>{{projectFlow.start3}}-{{projectFlow.end3}}</span>
                 </li>
                 <li>
                     <div>
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_five_header.png" alt=""></span>
                         <span>01项目前提</span>
                     </div>
-                    <div class="boxImg_bg"></div>
-                    <span>{{projectFlow.start5}}-{{projectFlow.end5}}</span>
+                    <div class="boxImg_bg"><p>{{projectFlow.info1}}</p></div>
+                    <span>{{projectFlow.start1}}-{{projectFlow.end1}}</span>
                 </li>
                 <li>
                     <div>
                         <span class="header_img"><img src="../../../assets/img/PMenege/index/PMenegeIndex_six_header.png" alt=""></span>
                         <span>02方案确认</span>
                     </div>
-                    <div class="boxImg_bg"></div>
-                    <span>{{projectFlow.start6}}-{{projectFlow.end6}}</span>
+                    <div class="boxImg_bg"><p>{{projectFlow.info2}}</p></div>
+                    <span>{{projectFlow.start2}}-{{projectFlow.end2}}</span>
                 </li>
             </ul>
             <el-dropdown trigger="click" @command="handleCommand" >
@@ -142,6 +142,18 @@ export default {
                 .boxImg_bg{
                     height: .94rem;
                     width: 100%;
+                    // padding: 0 .2rem;
+                    p{
+                        padding: 0.05rem .3rem;
+                        line-height: .23rem;
+                        height: 100%;
+                        overflow: scroll;
+                        color: #fff;
+                        font-size: .12rem;
+                    }
+                    p::-webkit-scrollbar{
+                        display: none;
+                    }
                 }
                 div{
                     display: flex;
